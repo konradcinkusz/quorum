@@ -12,3 +12,6 @@ global using MR.Service.Exceptions;
 global using Newtonsoft.Json;
 global using System.Net;
 global using MediatR;
+global using MR.Domain.Entities;
+global using MR.Domain.Enums;
+global using System.Reflection;

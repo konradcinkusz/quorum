@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.33516.290
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MR.Server", "Server\MR.Server.csproj", "{AA1B7983-F8C7-4657-8B7A-69F93A452729}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MR.Server", "Server\MR.Server.csproj", "{AA1B7983-F8C7-4657-8B7A-69F93A452729}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MR.Client", "Client\MR.Client.csproj", "{C7088BD9-7D64-4A09-BCFD-2DA4A07C71BA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MR.Client", "Client\MR.Client.csproj", "{C7088BD9-7D64-4A09-BCFD-2DA4A07C71BA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MR.Shared", "Shared\MR.Shared.csproj", "{26D414CB-7A1A-455C-B29B-F9F68E716C98}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MR.Shared", "Shared\MR.Shared.csproj", "{26D414CB-7A1A-455C-B29B-F9F68E716C98}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MR.Domain", "MR.Domain\MR.Domain.csproj", "{9292377F-F8DB-4EB7-B486-B1BE47D659BF}"
 EndProject
@@ -16,6 +16,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MR.Persistence", "MR.Persistence\MR.Persistence.csproj", "{A331A7C0-D543-4972-B902-B538AE95DFFD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MR.Service", "MR.Service\MR.Service.csproj", "{5E4039E3-4E69-4341-B8AC-1D06248B9798}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentation", "{54110292-8BB0-4F85-9B3B-F870E8CE1126}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -54,6 +56,11 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{AA1B7983-F8C7-4657-8B7A-69F93A452729} = {54110292-8BB0-4F85-9B3B-F870E8CE1126}
+		{C7088BD9-7D64-4A09-BCFD-2DA4A07C71BA} = {54110292-8BB0-4F85-9B3B-F870E8CE1126}
+		{26D414CB-7A1A-455C-B29B-F9F68E716C98} = {54110292-8BB0-4F85-9B3B-F870E8CE1126}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BED68434-2FA3-42C1-AA4D-2570C4E4BC4A}

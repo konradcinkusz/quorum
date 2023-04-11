@@ -1,19 +1,48 @@
 ﻿namespace MR.Service.Features.PaymentFeatures;
 
-public class CreatePaymentCommand : IRequest<int>
+public class CreatePaymentCommand : IRequest<Guid>
 {
-    public class CreatePaymentCommandHanlder : IRequestHandler<CreatePaymentCommand, int>
+    public string UserEmail { get; set; }
+    public string PaymentLink { get; set; }
+    public string ClientReferenceId { get; set; }
+    public string PaymentIntentId { get; set; }
+    public string SessionId { get; set; }
+    public PaymentStatus PaymentStatus { get; set; }
+    public string ApplicationUserId { get; set; }
+    public decimal PaymentValuePLN { get; set; }
+
+    public class CreatePaymentCommandHandler : IRequestHandler<CreatePaymentCommand, Guid>
     {
         private readonly IApplicationDbContext _context;
 
-        public CreatePaymentCommandHanlder(IApplicationDbContext context)
+        public CreatePaymentCommandHandler(IApplicationDbContext context)
         {
             _context = context;
         }
 
-        public Task<int> Handle(CreatePaymentCommand request, CancellationToken cancellationToken)
+        public async Task<Guid> Handle(CreatePaymentCommand request, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var payment = new Payment
+            {
+                UserEmail = request.UserEmail,
+                PaymentLink = request.PaymentLink,
+                ClientReferenceId = request.ClientReferenceId,
+                PaymentIntentId = request.PaymentIntentId,
+                SessionId = request.SessionId,
+                PaymentStatus = request.PaymentStatus.ToString(),
+                ApplicationUserId = request.ApplicationUserId,
+                PaymentValuePLN = request.PaymentValuePLN,
+                PaymentStatusHistories = new List<PaymentStatusHistory> {
+                    new PaymentStatusHistory {
+                        PaymentStatus = request.PaymentStatus
+                    }
+                }
+            };
+
+            await _context.Payments.AddAsync(payment, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
+
+            return payment.Id;
         }
     }
 }

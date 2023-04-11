@@ -1,4 +1,6 @@
-﻿public static class Constants
+﻿namespace MR.Domain.Constants;
+
+public static partial class Constants
 {
     public static readonly string SuperAdmin = "49FDD1CA-B802-4F9F-AC09-C8619FE90DF5";
     public static readonly string Admin = "649B8428-A497-47CA-A5C4-953EE395F16E";

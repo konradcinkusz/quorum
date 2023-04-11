@@ -7,3 +7,4 @@ global using MR.Domain.Entities;
 global using Microsoft.AspNetCore.Identity;
 global using MR.Domain.Enum;
 global using MR.Persistence.Seeds;
+global using MR.Domain.Constants;

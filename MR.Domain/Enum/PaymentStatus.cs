@@ -15,5 +15,6 @@ public enum PaymentStatus
     DeactivatedByAdmin,
     AddedByCode,
     //zwykły przelew
-    Completed
+    Completed,
+    Unknown
 }

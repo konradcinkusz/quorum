@@ -37,4 +37,5 @@ public class PaymentModel
     //Kwota płatności w PLN
     public double PaymentValuePLN { get; set; }
 
+    public List<Tuple<string, DateTime>> PaymentStatuses { get; set; }
 }

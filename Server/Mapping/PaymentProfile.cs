@@ -1,4 +1,8 @@
-﻿namespace MR.Infrastructure.Mapping;
+﻿using MR.Domain.Entities;
+using MR.Domain.Enums;
+using MR.Shared.ViewModel;
+
+namespace MR.Server.Mapping;
 
 public class PaymentProfile : Profile
 {
@@ -6,7 +10,7 @@ public class PaymentProfile : Profile
     {
         CreateMap<Payment, PaymentModel>();
 
-        CreateMap<Payment, PaymentViewModel>()
+        CreateMap<Payment, Infrastructure.ViewModel.PaymentViewModel>()
             .ForMember(dest => dest.PaymentStatus,
                        opt => opt.MapFrom(src => Enum.Parse<PaymentStatus>(src.PaymentStatus)))
             .ReverseMap();

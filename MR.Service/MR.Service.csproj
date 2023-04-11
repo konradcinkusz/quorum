@@ -17,8 +17,4 @@
     <ProjectReference Include="..\MR.Persistence\MR.Persistence.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Features\Queries\" />
-  </ItemGroup>
-
 </Project>

@@ -1,4 +1,6 @@
-﻿namespace MR.Persistence.Seeds;
+﻿
+
+namespace MR.Persistence.Seeds;
 
 public static class DefaultUser
 {

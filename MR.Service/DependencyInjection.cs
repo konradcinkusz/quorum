@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-
-namespace MR.Service;
+﻿namespace MR.Service;
 
 public static class DependencyInjection
 {
