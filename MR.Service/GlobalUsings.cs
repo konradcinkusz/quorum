@@ -1,0 +1,14 @@
+﻿global using Microsoft.EntityFrameworkCore;
+global using Microsoft.Extensions.Configuration;
+global using Microsoft.Extensions.DependencyInjection;
+global using MR.Persistence;
+global using System.Globalization;
+global using System;
+global using System.Runtime.Serialization;
+global using FluentValidation.Results;
+global using Microsoft.AspNetCore.Http;
+global using Microsoft.Extensions.Logging;
+global using MR.Service.Exceptions;
+global using Newtonsoft.Json;
+global using System.Net;
+global using MediatR;

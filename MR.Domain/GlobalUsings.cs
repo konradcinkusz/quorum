@@ -1,0 +1,11 @@
+﻿global using Microsoft.AspNetCore.Identity;
+global using System.Text.Json.Serialization;
+global using System.ComponentModel.DataAnnotations;
+global using System.Net;
+global using System.Net.Sockets;
+global using System.ComponentModel.DataAnnotations.Schema;
+global using MR.Domain;
+global using MR.Domain.Base;
+global using MR.Domain.Constants;
+global using MR.Domain.Auth;
+global using MR.Domain.Enums;

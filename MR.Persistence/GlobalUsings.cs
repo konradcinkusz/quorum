@@ -1,0 +1,9 @@
+﻿global using Duende.IdentityServer.EntityFramework.Options;
+global using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.Extensions.Options;
+global using MR.Domain.Auth;
+global using MR.Domain.Entities;
+global using Microsoft.AspNetCore.Identity;
+global using MR.Domain.Enum;
+global using MR.Persistence.Seeds;
