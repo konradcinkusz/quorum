@@ -1,4 +1,5 @@
 ﻿namespace MR.Service.Features.Queries;
+
 public class GetAllPaymentsQuery : IRequest<IEnumerable<Payment>>
 {
     public class GetAllPaymentsQueryHandler : IRequestHandler<GetAllPaymentsQuery, IEnumerable<Payment>>

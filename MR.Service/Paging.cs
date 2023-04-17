@@ -35,10 +35,3 @@ public class Paging<T> where T : class
     }
     public List<T> Items { get; set; } = new List<T>();
 }
-public abstract class QueryBase
-{
-    public int CurrentPage { get; set; } = 1;
-    public int PageSize { get; set; } = 10;
-    public string Name { get; set; } = string.Empty;
-    public string Question { get; set; } = string.Empty;
-}

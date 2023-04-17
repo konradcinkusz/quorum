@@ -52,10 +52,10 @@ public class PaymentController : MRBaseController
         return paymentDto;
     }
 
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<PaymentReadDTO>>> GetPayments([FromQuery] PaymentQueryDTO query)
+    [HttpGet(nameof(GetPaymentsByQuery))]
+    public async Task<ActionResult<PaymentPagedListDto>> GetPaymentsByQuery([FromQuery] PaymentSearchParamsDTO query)
     {
-        var result = await Mediator.Send(new GetPaymentsByQuery
+        var result = await Mediator.Send(new GetPaymentsBySearchParamsQuery
         {
             UserEmail = query.UserEmail,
             ClientReferenceId = query.ClientReferenceId,
@@ -64,7 +64,7 @@ public class PaymentController : MRBaseController
             MaxPaymentValuePLN = query.MaxPaymentValuePLN
         });
 
-        var paymentDTOs = result.Select(payment => new PaymentReadDTO
+        var paymentDTOs = result.Items.Select(payment => new PaymentReadDTO
         {
             Id = payment.Id,
             UserEmail = payment.UserEmail,
@@ -79,6 +79,6 @@ public class PaymentController : MRBaseController
                 .ToList()
         }).ToList();
 
-        return Ok(paymentDTOs);
+        return Ok(new PaymentPagedListDto { Items = paymentDTOs, CurrentPage = result.CurrentPage, PageSize = result.PageSize, TotalItems = result.TotalItems, TotalPages = result.TotalPages });
     }
 }

@@ -5,7 +5,8 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 #region Init HTTP Client
 const string MRPaymentDataService = "MR.ServerAPI";
 builder.Services
-    .AddHttpClient<IPaymentService, PaymentService>(MRPaymentDataService, client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
+    .AddHttpClient<IPaymentService, PaymentService>(MRPaymentDataService, client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress))
+    .AddHttpMessageHandler<BaseAddressAuthorizationMessageHandler>();
 
 const string MRAuthorizedDataService = "MR.ServerAPI.Authorized";
 builder.Services

@@ -11,16 +11,14 @@ public class CreatePaymentCommand : IRequest<Guid>
     public string ApplicationUserId { get; set; }
     public decimal PaymentValuePLN { get; set; }
 
-    public class CreatePaymentCommandHandler : IRequestHandler<CreatePaymentCommand, Guid>
+    public class CreatePaymentCommandHandler : CommandHandlerBase<CreatePaymentCommand, Guid>
     {
-        private readonly IApplicationDbContext _context;
-
-        public CreatePaymentCommandHandler(IApplicationDbContext context)
+        public CreatePaymentCommandHandler(IApplicationDbContext context, ILogger<CreatePaymentCommand> logger)
+            : base(context, logger)
         {
-            _context = context;
         }
 
-        public async Task<Guid> Handle(CreatePaymentCommand request, CancellationToken cancellationToken)
+        public override async Task<Guid> Handle(CreatePaymentCommand request, CancellationToken cancellationToken)
         {
             var payment = new Payment
             {
@@ -44,5 +42,6 @@ public class CreatePaymentCommand : IRequest<Guid>
 
             return payment.Id;
         }
+
     }
 }

@@ -1,5 +1,6 @@
 ﻿namespace MR.Server;
 
+[Authorize]
 [Route(Constants.RouteValues.AdvanceAPIRoute)]
 [ApiController]
 [ApiVersion(Constants.RouteValues.APIV1)]

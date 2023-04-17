@@ -2,50 +2,64 @@
 @using MR.Client.Services
 @inject IPaymentService paymentService
 
-<h1>Payments</h1>
+<PageTitle>Payments list</PageTitle>
 
-@if (Payments == null)
-{
-    <p>Loading...</p>
-}
-else if (Payments.Count == 0)
-{
-    <p>No payments found.</p>
-}
-else
-{
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>User Email</th>
-                <th>Value (PLN)</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var payment in Payments)
+<AuthorizeView>
+    <Authorized>
+        @if (PaymentPagedListDto == null)
+        {
+            <_Loading />
+        }
+        else
+        {
+            @if (PaymentPagedListDto.Items.Count == 0)
             {
-                <tr>
-                    <td><a href="/payments/@payment.Id">@payment.Id</a></td>
-                    <td>@payment.UserEmail</td>
-                    <td>@payment.PaymentValuePLN</td>
-                    <td>@payment.PaymentStatusHistory[0].PaymentStatus</td>
-                </tr>
+                <p><em>Brak kwestii spełniających kryteria wyszukiwania...</em></p>
             }
-        </tbody>
-    </table>
-}
+            else
+            {
+                <_Paging QueryBase="PaymentQuerySearchDTO"
+                 RefreshList="_refresh"
+                 TotalPages="PaymentPagedListDto.TotalPages"
+                 TotalItems="PaymentPagedListDto.TotalItems"></_Paging>
+
+                <div class="content">
+                    <div class="container">
+                        <div class="row align-content-center justify-content-center">
+                            @foreach (var p in PaymentPagedListDto.Items)
+                            {
+                                <PaymentReadForList Payment="p"></PaymentReadForList>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <_Paging QueryBase="PaymentQuerySearchDTO"
+                 RefreshList="_refresh"
+                 TotalPages="PaymentPagedListDto.TotalPages"
+                 TotalItems="PaymentPagedListDto.TotalItems"></_Paging>
+            }
+        }
+    </Authorized>
+    <NotAuthorized>
+        <div class="m-2 p-2 font-weight-bold" style="background-color:grey">
+            You must be logged as a super admin user at least to see these page
+        </div>
+    </NotAuthorized>
+</AuthorizeView>
 
 @code {
-    private List<PaymentReadDTO> Payments;
+    PaymentSearchParamsDTO PaymentQuerySearchDTO;
+    PaymentPagedListDto? PaymentPagedListDto;
 
     protected override async Task OnInitializedAsync()
     {
-        Payments = (await paymentService.GetPayments(new PaymentQueryDTO
-            {
-                UserEmail = "jane@example.com",
-                MaxPaymentValuePLN = 1000
-            })).ToList();
+        PaymentQuerySearchDTO = new PaymentSearchParamsDTO();
+        await _refresh();
+    }
+
+    async Task _refresh()
+    {
+        PaymentPagedListDto = await paymentService.GetPayments(PaymentQuerySearchDTO);
     }
 }

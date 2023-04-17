@@ -17,4 +17,8 @@
     <ProjectReference Include="..\Shared\MR.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\js\" />
+  </ItemGroup>
+
 </Project>

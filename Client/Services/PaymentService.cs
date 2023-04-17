@@ -1,17 +1,16 @@
 ﻿namespace MR.Client.Services;
 
-public class PaymentService : IPaymentService
+public class PaymentService : DataServiceBase, IPaymentService
 {
-    private readonly HttpClient _httpClient;
+    private const string _paymentControllerPath = @"/api/v1.0/Payment";
 
-    public PaymentService(HttpClient httpClient)
+    public PaymentService(HttpClient httpclient) : base(httpclient)
     {
-        _httpClient = httpClient;
     }
 
     public async Task<string> CreatePayment(PaymentCreateDTO paymentDto)
     {
-        var response = await _httpClient.PostAsJsonAsync("/api/v1.0/Payment", paymentDto);
+        var response = await _httpClient.PostAsJsonAsync(_paymentControllerPath, paymentDto);
 
         response.EnsureSuccessStatusCode();
 
@@ -19,7 +18,7 @@ public class PaymentService : IPaymentService
     }
     public async Task<PaymentReadDTO> GetPayment(Guid id)
     {
-        var response = await _httpClient.GetAsync($"/api/v1.0/Payment/{id}");
+        var response = await _httpClient.GetAsync($"{_paymentControllerPath}/{id}");
 
         if (!response.IsSuccessStatusCode)
         {
@@ -31,17 +30,21 @@ public class PaymentService : IPaymentService
         return paymentDto;
     }
 
-    public async Task<IEnumerable<PaymentReadDTO>> GetPayments(PaymentQueryDTO query)
+    public async Task<PaymentPagedListDto> GetPayments(PaymentSearchParamsDTO query)
     {
-        var response = await _httpClient.GetAsync($"/api/v1.0/Payment?userEmail={query.UserEmail}&clientReferenceId={query.ClientReferenceId}&paymentIntentId={query.PaymentIntentId}&minPaymentValuePLN={query.MinPaymentValuePLN}&maxPaymentValuePLN={query.MaxPaymentValuePLN}");
+        var q = BuildQuery(query);
 
-        if (!response.IsSuccessStatusCode)
+        var response = await _httpClient.GetAsync($"{_paymentControllerPath}/GetPaymentsByQuery?{q}");
+
+        response.EnsureSuccessStatusCode();
+
+        var content = await response.Content.ReadAsStringAsync();
+
+        var result = JsonSerializer.Deserialize<PaymentPagedListDto>(content, new JsonSerializerOptions
         {
-            return null;
-        }
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        });
 
-        var paymentDTOs = await response.Content.ReadFromJsonAsync<List<PaymentReadDTO>>();
-
-        return paymentDTOs;
+        return result ?? throw new Exception("Deserialized response is null.");
     }
 }

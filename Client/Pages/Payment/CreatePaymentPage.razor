@@ -2,44 +2,55 @@
 @using MR.Client.Services
 @inject IPaymentService paymentService
 
-<h1>Create a Payment</h1>
-
-<EditForm Model="@paymentDto" OnValidSubmit="@CreatePayment">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-
-    <div class="form-group">
-        <label for="user-email">User Email</label>
-        <InputText id="user-email" class="form-control" @bind-Value="@paymentDto.UserEmail" />
+<div class="card shadow rounded-3">
+    <div class="card-header bg-primary text-white py-3 rounded-3">
+        <h5 class="card-title mb-0">Create Payment</h5>
     </div>
 
-    <div class="form-group">
-        <label for="payment-link">Payment Link</label>
-        <InputText id="payment-link" class="form-control" @bind-Value="@paymentDto.PaymentLink" />
-    </div>
+    <div class="card-body">
+        <EditForm Model="@paymentDto" OnValidSubmit="@CreatePayment">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
 
-    <div class="form-group">
-        <label for="client-reference-id">Client Reference ID</label>
-        <InputText id="client-reference-id" class="form-control" @bind-Value="@paymentDto.ClientReferenceId" />
-    </div>
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <label for="user-email" class="form-label">User Email</label>
+                    <InputText id="user-email" class="form-control rounded-pill" @bind-Value="@paymentDto.UserEmail" />
+                </div>
 
-    <div class="form-group">
-        <label for="payment-intent-id">Payment Intent ID</label>
-        <InputText id="payment-intent-id" class="form-control" @bind-Value="@paymentDto.PaymentIntentId" />
-    </div>
+                <div class="col-md-6 mb-4">
+                    <label for="client-reference-id" class="form-label">Client Reference ID</label>
+                    <InputText id="client-reference-id" class="form-control rounded-pill" @bind-Value="@paymentDto.ClientReferenceId" />
+                </div>
 
-    <div class="form-group">
-        <label for="session-id">Session ID</label>
-        <InputText id="session-id" class="form-control" @bind-Value="@paymentDto.SessionId" />
-    </div>
+                <div class="col-md-6 mb-4">
+                    <label for="payment-link" class="form-label">Payment Link</label>
+                    <InputText id="payment-link" class="form-control rounded-pill" @bind-Value="@paymentDto.PaymentLink" />
+                </div>
 
-    <div class="form-group">
-        <label for="payment-value-pln">Payment Value (PLN)</label>
-        <InputNumber id="payment-value-pln" class="form-control" @bind-Value="@paymentDto.PaymentValuePLN" />
-    </div>
+                <div class="col-md-6 mb-4">
+                    <label for="payment-intent-id" class="form-label">Payment Intent ID</label>
+                    <InputText id="payment-intent-id" class="form-control rounded-pill" @bind-Value="@paymentDto.PaymentIntentId" />
+                </div>
 
-    <button type="submit" class="btn btn-primary">Create Payment</button>
-</EditForm>
+                <div class="col-md-12 mb-4">
+                    <label for="session-id" class="form-label">Session ID</label>
+                    <InputText id="session-id" class="form-control rounded-pill" @bind-Value="@paymentDto.SessionId" />
+                </div>
+
+                <div class="col-md-12 mb-4">
+                    <label for="payment-value-pln" class="form-label">Payment Value (PLN)</label>
+                    <InputNumber id="payment-value-pln" class="form-control rounded-pill" @bind-Value="@paymentDto.PaymentValuePLN" />
+                </div>
+
+                <div class="col-md-12 d-grid">
+                    <button type="submit" class="btn btn-primary rounded-pill">Create Payment</button>
+                </div>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
 
 @code {
     private PaymentCreateDTO paymentDto = new PaymentCreateDTO();

@@ -9,3 +9,8 @@ global using Microsoft.Extensions.DependencyInjection.Extensions;
 global using Microsoft.Extensions.Http;
 global using MR.Client;
 global using MR.Client.Services;
+global using MR.Shared;
+global using System.Collections.Specialized;
+global using System.Web;
+global using MR.Client.Services.Base;
+global using System.Text.Json;
