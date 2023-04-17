@@ -5,10 +5,5 @@ public class PaymentProfile : Profile
     public PaymentProfile()
     {
         CreateMap<Payment, PaymentModel>();
-
-        CreateMap<Payment, PaymentViewModel>()
-            .ForMember(dest => dest.PaymentStatus,
-                       opt => opt.MapFrom(src => Enum.Parse<PaymentStatus>(src.PaymentStatus)))
-            .ReverseMap();
     }
 }

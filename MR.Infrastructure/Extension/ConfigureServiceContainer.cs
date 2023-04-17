@@ -21,35 +21,6 @@ public static class ConfigureServiceContainer
     {
     }
 
-    public static void AddSwaggerOpenAPI(this IServiceCollection serviceCollection)
-    {
-        serviceCollection.AddSwaggerGen(setupAction =>
-        {
-
-            setupAction.SwaggerDoc(
-                "OpenAPISpecification",
-                new OpenApiInfo()
-                {
-                    Title = "Onion Architecture WebAPI",
-                    Version = "1",
-                    Description = "Through this API you can access customer details",
-                    Contact = new OpenApiContact()
-                    {
-                        Email = "amit.naik8103@gmail.com",
-                        Name = "Amit Naik",
-                        Url = new Uri("https://amitpnk.github.io/")
-                    },
-                    License = new OpenApiLicense()
-                    {
-                        Name = "MIT License",
-                        Url = new Uri("https://opensource.org/licenses/MIT")
-                    }
-                });
-
-        });
-
-    }
-
     public static IServiceCollection AddController(this IServiceCollection serviceCollection)
     {
         serviceCollection.AddControllersWithViews().AddNewtonsoftJson();

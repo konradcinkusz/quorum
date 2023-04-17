@@ -1,0 +1,51 @@
+﻿@page "/payments"
+@using MR.Client.Services
+@inject IPaymentService paymentService
+
+<h1>Payments</h1>
+
+@if (Payments == null)
+{
+    <p>Loading...</p>
+}
+else if (Payments.Count == 0)
+{
+    <p>No payments found.</p>
+}
+else
+{
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>User Email</th>
+                <th>Value (PLN)</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var payment in Payments)
+            {
+                <tr>
+                    <td><a href="/payments/@payment.Id">@payment.Id</a></td>
+                    <td>@payment.UserEmail</td>
+                    <td>@payment.PaymentValuePLN</td>
+                    <td>@payment.PaymentStatusHistory[0].PaymentStatus</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<PaymentReadDTO> Payments;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Payments = (await paymentService.GetPayments(new PaymentQueryDTO
+            {
+                UserEmail = "jane@example.com",
+                MaxPaymentValuePLN = 1000
+            })).ToList();
+    }
+}

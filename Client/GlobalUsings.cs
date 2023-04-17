@@ -1,0 +1,11 @@
+﻿global using MR.Shared.DTOs.Payment;
+global using System.Net.Http;
+global using System.Net.Http.Json;
+global using System.Threading.Tasks;
+global using Microsoft.AspNetCore.Components.Web;
+global using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+global using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+global using Microsoft.Extensions.DependencyInjection.Extensions;
+global using Microsoft.Extensions.Http;
+global using MR.Client;
+global using MR.Client.Services;

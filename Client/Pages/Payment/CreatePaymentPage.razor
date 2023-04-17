@@ -1,0 +1,51 @@
+﻿@page "/create-payment"
+@using MR.Client.Services
+@inject IPaymentService paymentService
+
+<h1>Create a Payment</h1>
+
+<EditForm Model="@paymentDto" OnValidSubmit="@CreatePayment">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="user-email">User Email</label>
+        <InputText id="user-email" class="form-control" @bind-Value="@paymentDto.UserEmail" />
+    </div>
+
+    <div class="form-group">
+        <label for="payment-link">Payment Link</label>
+        <InputText id="payment-link" class="form-control" @bind-Value="@paymentDto.PaymentLink" />
+    </div>
+
+    <div class="form-group">
+        <label for="client-reference-id">Client Reference ID</label>
+        <InputText id="client-reference-id" class="form-control" @bind-Value="@paymentDto.ClientReferenceId" />
+    </div>
+
+    <div class="form-group">
+        <label for="payment-intent-id">Payment Intent ID</label>
+        <InputText id="payment-intent-id" class="form-control" @bind-Value="@paymentDto.PaymentIntentId" />
+    </div>
+
+    <div class="form-group">
+        <label for="session-id">Session ID</label>
+        <InputText id="session-id" class="form-control" @bind-Value="@paymentDto.SessionId" />
+    </div>
+
+    <div class="form-group">
+        <label for="payment-value-pln">Payment Value (PLN)</label>
+        <InputNumber id="payment-value-pln" class="form-control" @bind-Value="@paymentDto.PaymentValuePLN" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create Payment</button>
+</EditForm>
+
+@code {
+    private PaymentCreateDTO paymentDto = new PaymentCreateDTO();
+
+    private async Task CreatePayment()
+    {
+        await paymentService.CreatePayment(paymentDto);
+    }
+}

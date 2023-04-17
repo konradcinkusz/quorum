@@ -1,10 +1,6 @@
-﻿using MR.Shared.ViewModel;
-using System.Net.Http.Json;
-using System.Text.Json.Serialization;
+﻿namespace MR.Client.Services;
 
-namespace MR.Client.Services;
-
-public class PaymentService
+public class PaymentService : IPaymentService
 {
     private readonly HttpClient _httpClient;
 
@@ -13,13 +9,39 @@ public class PaymentService
         _httpClient = httpClient;
     }
 
-    public async Task<PaymentViewModel> GetPayment(int id)
+    public async Task<string> CreatePayment(PaymentCreateDTO paymentDto)
     {
-        return await _httpClient.GetFromJsonAsync<PaymentViewModel>($"/api/payments/{id}");
+        var response = await _httpClient.PostAsJsonAsync("/api/v1.0/Payment", paymentDto);
+
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadAsStringAsync();
+    }
+    public async Task<PaymentReadDTO> GetPayment(Guid id)
+    {
+        var response = await _httpClient.GetAsync($"/api/v1.0/Payment/{id}");
+
+        if (!response.IsSuccessStatusCode)
+        {
+            return null;
+        }
+
+        var paymentDto = await response.Content.ReadFromJsonAsync<PaymentReadDTO>();
+
+        return paymentDto;
     }
 
-    public async Task<IEnumerable<PaymentViewModel>> GetPayments()
+    public async Task<IEnumerable<PaymentReadDTO>> GetPayments(PaymentQueryDTO query)
     {
-        return await _httpClient.GetFromJsonAsync<IEnumerable<PaymentViewModel>>("/api/payments");
+        var response = await _httpClient.GetAsync($"/api/v1.0/Payment?userEmail={query.UserEmail}&clientReferenceId={query.ClientReferenceId}&paymentIntentId={query.PaymentIntentId}&minPaymentValuePLN={query.MinPaymentValuePLN}&maxPaymentValuePLN={query.MaxPaymentValuePLN}");
+
+        if (!response.IsSuccessStatusCode)
+        {
+            return null;
+        }
+
+        var paymentDTOs = await response.Content.ReadFromJsonAsync<List<PaymentReadDTO>>();
+
+        return paymentDTOs;
     }
 }
