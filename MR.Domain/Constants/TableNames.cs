@@ -21,13 +21,10 @@ public class TableNames
     public const string Subscriptions = "Subscriptions";
     public const string Payments = "Payments";
     public const string PaymentStatusHistories = "PaymentStatusHistories";
+    public const string Payment_Logs = "Payment_Logs";
     #endregion
 
     #region MRDicts
     public const string Dictionaries = "Dictionaries";
-    #endregion
-
-    #region MRLogs
-    public const string Payment_Logs = "Payment_Logs";
     #endregion
 }
