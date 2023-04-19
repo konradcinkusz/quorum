@@ -1,6 +1,6 @@
 ﻿namespace MR.Service.Features.Queries;
 
-public class GetPaymentsBySearchParamsQuery : QueryBase, IRequest<Paging<Payment>>
+public class GetPaymentsBySearchParamsQuery : QueryBase, IRequest<PagedList<Payment>>
 {
     public string UserEmail { get; set; } = string.Empty;
     public string ClientReferenceId { get; set; } = string.Empty;
@@ -9,13 +9,13 @@ public class GetPaymentsBySearchParamsQuery : QueryBase, IRequest<Paging<Payment
     public decimal? MinPaymentValuePLN { get; set; }
     public decimal? MaxPaymentValuePLN { get; set; }
 
-    public class GetPaymentsByQueryHandler : CommandHandlerBase<GetPaymentsBySearchParamsQuery, Paging<Payment>>
+    public class GetPaymentsByQueryHandler : CommandHandlerBase<GetPaymentsBySearchParamsQuery, PagedList<Payment>>
     {
         public GetPaymentsByQueryHandler(IApplicationDbContext context, ILogger<GetPaymentsBySearchParamsQuery> logger) : base(context, logger)
         {
         }
 
-        public override async Task<Paging<Payment>> Handle(GetPaymentsBySearchParamsQuery request, CancellationToken cancellationToken)
+        public override async Task<PagedList<Payment>> Handle(GetPaymentsBySearchParamsQuery request, CancellationToken cancellationToken)
         {
             var query = _context.Payments.Include(x=>x.PaymentStatusHistories).AsQueryable();
 
@@ -49,20 +49,7 @@ public class GetPaymentsBySearchParamsQuery : QueryBase, IRequest<Paging<Payment
                 query = query.Where(p => p.PaymentValuePLN <= request.MaxPaymentValuePLN.Value);
             }
 
-            // Count total number of items
-            int totalCount = await query.CountAsync(cancellationToken);
-
-            // Apply pagination
-            int skip = (request.CurrentPage - 1) * request.PageSize;
-            query = query.Skip(skip).Take(request.PageSize);
-
-            var payments = await query.ToListAsync(cancellationToken);
-
-            return new Paging<Payment>(request)
-            {
-                Items = payments
-            };
-
+            return new PagedList<Payment>(query, request);
         }
     }
 }

@@ -1,4 +1,7 @@
-﻿namespace MR.Server.Controllers;
+﻿using MR.Service;
+using MR.Shared;
+
+namespace MR.Server.Controllers;
 
 public class PaymentController : MRBaseController
 {
@@ -63,10 +66,14 @@ public class PaymentController : MRBaseController
             ClientReferenceId = query.ClientReferenceId,
             PaymentIntentId = query.PaymentIntentId,
             MinPaymentValuePLN = query.MinPaymentValuePLN,
-            MaxPaymentValuePLN = query.MaxPaymentValuePLN
+            MaxPaymentValuePLN = query.MaxPaymentValuePLN,
+            CurrentPage = query.CurrentPage,
+            PageSize = query.PageSize,
+            Name = query.Name,
+            Question = query.Question
         });
 
-        var paymentDTOs = result.Items.Select(payment => new PaymentReadDTO
+        var paymentDTOs = result.Select(payment => new PaymentReadDTO
         {
             Id = payment.Id,
             UserEmail = payment.UserEmail,

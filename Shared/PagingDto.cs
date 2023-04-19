@@ -1,6 +1,6 @@
 ﻿namespace MR.Shared;
 
-public abstract class PagingDto<T> where T : class
+public abstract class PagedListDto<T> where T : class
 {
     public int CurrentPage { get; set; } = 1;
     public int PageSize { get; set; } = 10;

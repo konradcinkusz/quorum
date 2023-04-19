@@ -1,6 +1,6 @@
 ﻿<div class="d-flex align-items-center justify-content-center">
     <div class="d-flex align-items-center">
-        <button class="btn btn-light me-3" type="button" @onclick="Previous">
+        <button class="btn btn-light me-3" type="button" @onclick="Previous" disabled="@IsPreviousButtonDisabled">
             <span class="oi oi-arrow-thick-left"></span>
         </button>
         <div class="d-flex align-items-center">
@@ -10,7 +10,7 @@
                 <option value="50">50</option>
             </select>
         </div>
-        <button class="btn btn-dark ms-3" type="button" @onclick="Next">
+        <button class="btn btn-dark ms-3" type="button" @onclick="Next" disabled="@IsNextButtonDisabled">
             <span class="oi oi-arrow-thick-right"></span>
         </button>
     </div>
@@ -26,6 +26,9 @@
     public SearchParams QueryBase { get; set; }
     [Parameter]
     public EventCallback RefreshList { get; set; }
+
+    private bool IsPreviousButtonDisabled => QueryBase.CurrentPage <= 1;
+    private bool IsNextButtonDisabled => QueryBase.CurrentPage >= TotalPages;
 
     async Task ChangePageSize(string selectedValue)
     {
