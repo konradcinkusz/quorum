@@ -1,0 +1,69 @@
+﻿@page "/payments/{id}"
+@using MR.Client.Services
+@inject IPaymentService paymentService
+@inject NavigationManager navigationManager
+
+<div class="card shadow rounded-3">
+    <div class="card-header bg-primary text-white py-3 rounded-3">
+        <h5 class="card-title mb-0">Payment Details</h5>
+    </div><div class="card-body">
+        @if (payment == null)
+        {
+            <p>Loading...</p>
+        }
+        else
+        {
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <label for="user-email" class="form-label">User Email</label>
+                    <p>@payment.UserEmail</p>
+                </div>
+
+                <div class="col-md-6 mb-4">
+                    <label for="client-reference-id" class="form-label">Client Reference ID</label>
+                    <p>@payment.ClientReferenceId</p>
+                </div>
+
+                <div class="col-md-6 mb-4">
+                    <label for="payment-link" class="form-label">Payment Link</label>
+                    <p>@payment.PaymentLink</p>
+                </div>
+
+                <div class="col-md-6 mb-4">
+                    <label for="payment-intent-id" class="form-label">Payment Intent ID</label>
+                    <p>@payment.PaymentIntentId</p>
+                </div>
+
+                <div class="col-md-12 mb-4">
+                    <label for="session-id" class="form-label">Session ID</label>
+                    <p>@payment.SessionId</p>
+                </div>
+
+                <div class="col-md-12 mb-4">
+                    <label for="payment-value-pln" class="form-label">Payment Value (PLN)</label>
+                    <p>@payment.PaymentValuePLN</p>
+                </div>
+
+                <div class="col-md-12 d-grid">
+                    <button class="btn btn-secondary rounded-pill" @onclick="GoBack">Back</button>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+@code {
+    [Parameter]
+    public string id { get; set; }
+    private PaymentReadDTO? payment;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Guid.TryParse(id, out Guid result);
+        payment = await paymentService.GetPayment(result);
+    }
+
+    private void GoBack()
+    {
+        navigationManager.NavigateTo("/payments");
+    }
+}

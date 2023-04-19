@@ -3,46 +3,50 @@
 
 @if (Payment != null)
 {
-    <div class="card">
+    <div class="card m-1 p-1">
         <div class="card-header">
             <h4 class="card-title">Payment Details</h4>
         </div>
         <div class="card-body">
-            <div class="row">
-                <div class="col-4">
-                    <strong>ID</strong>
-                    <p>@Payment.Id</p>
+            <div class="row mb-3">
+                <div class="col-sm-4">
+                    <label for="payment-id" class="form-label">Payment ID:</label>
+                    <p class="form-control-plaintext" id="payment-id">@Payment.Id</p>
                 </div>
-                <div class="col-4">
-                    <strong>User Email</strong>
-                    <p>@Payment.UserEmail</p>
+                <div class="col-sm-4">
+                    <label for="user-email" class="form-label">User Email:</label>
+                    <p class="form-control-plaintext" id="user-email">@Payment.UserEmail</p>
                 </div>
-                <div class="col-4">
-                    <strong>Payment Value PLN</strong>
-                    <p>@Payment.PaymentValuePLN.ToString("C", CultureInfo.GetCultureInfo("pl-PL"))</p>
+                <div class="col-sm-4">
+                    <label for="payment-value" class="form-label">Payment Value:</label>
+                    <p class="form-control-plaintext" id="payment-value">@Payment.PaymentValuePLN.ToString("C", CultureInfo.GetCultureInfo("pl-PL"))</p>
                 </div>
             </div>
             <hr />
-            <button class="btn btn-primary" type="button" @onclick="ToggleDetails">@ShowDetailsButtonText</button>
+            <button class="btn btn-primary mb-3" type="button" @onclick="ToggleDetails">@ShowDetailsButtonText</button>
             <div class="@DetailsCssClass">
                 <hr />
-                <dl class="row">
-                    <dt class="col-sm-3">Payment Link</dt>
+                <h5>Payment Details</h5>
+                <dl class="row mb-3">
+                    <dt class="col-sm-3">Payment Link:</dt>
                     <dd class="col-sm-9"><a href="@Payment.PaymentLink">@Payment.PaymentLink</a></dd>
 
-                    <dt class="col-sm-3">Client Reference ID</dt>
+                    <dt class="col-sm-3">Reference ID:</dt>
                     <dd class="col-sm-9">@Payment.ClientReferenceId</dd>
 
-                    <dt class="col-sm-3">Payment Intent ID</dt>
+                    <dt class="col-sm-3">Payment Intent ID:</dt>
                     <dd class="col-sm-9">@Payment.PaymentIntentId</dd>
 
-                    <dt class="col-sm-3">Session ID</dt>
+                    <dt class="col-sm-3">Session ID:</dt>
                     <dd class="col-sm-9">@Payment.SessionId</dd>
 
-                    <dt class="col-sm-3">Created At</dt>
+                    <dt class="col-sm-3">Created At:</dt>
                     <dd class="col-sm-9">@Payment.CreatedAt.ToString("g", CultureInfo.InvariantCulture)</dd>
 
-                    <dt class="col-sm-3">Payment Status History</dt>
+                    <dt class="col-sm-3">More:</dt>
+                    <dd class="col-sm-9"><a href="/payments/@Payment.Id">View Payment Details</a></dd>
+
+                    <dt class="col-sm-3">Payment Status History:</dt>
                     <dd class="col-sm-9">
                         @if (Payment.PaymentStatusHistory != null && Payment.PaymentStatusHistory.Any())
                         {
@@ -89,8 +93,7 @@ else
     [Parameter]
     public string GetDetailsButtonText { get; set; } = "Get Details";
 
-    [Parameter]
-    public string DetailsCssClass { get; set; } = "collapse";
+    private string DetailsCssClass => showDetails ? "d-block" : "d-none";
 
     private bool showDetails = false;
 

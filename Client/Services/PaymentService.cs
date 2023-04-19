@@ -47,4 +47,11 @@ public class PaymentService : DataServiceBase, IPaymentService
 
         return result ?? throw new Exception("Deserialized response is null.");
     }
+
+    public async Task<bool> SeedPayments()
+    {
+        var result = await _httpClient.PostAsync($"{_paymentControllerPath}/SeedPayments",
+                                                       null);
+        return result.IsSuccessStatusCode;
+    }
 }

@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
-using Microsoft.AspNetCore.Mvc;
-
-namespace MR.Server.Controllers;
+﻿namespace MR.Server.Controllers;
 public class OidcConfigurationController : Controller
 {
     private readonly ILogger<OidcConfigurationController> _logger;

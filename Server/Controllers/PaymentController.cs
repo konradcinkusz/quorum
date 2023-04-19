@@ -2,8 +2,10 @@
 
 public class PaymentController : MRBaseController
 {
-    public PaymentController(IMapper mapper) : base(mapper)
+    private readonly IConfiguration _configuration;
+    public PaymentController(IMapper mapper, IConfiguration configuration) : base(mapper)
     {
+        _configuration = configuration;
     }
 
     [HttpPost]
@@ -81,4 +83,19 @@ public class PaymentController : MRBaseController
 
         return Ok(new PaymentPagedListDto { Items = paymentDTOs, CurrentPage = result.CurrentPage, PageSize = result.PageSize, TotalItems = result.TotalItems, TotalPages = result.TotalPages });
     }
+
+    [HttpPost(nameof(SeedPayments))]
+    public async Task<IActionResult> SeedPayments()
+    {
+        if (!_configuration.GetValue<bool>("SeedData:IsSeeded"))
+        {
+            var command = new SeedPaymentCommand(GetUserId());
+            await Mediator.Send(command);
+            _configuration["SeedData:IsSeeded"] = "true";
+
+            return Ok();
+        }
+        return BadRequest("Data has already been seeded");
+    }
+
 }

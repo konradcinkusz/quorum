@@ -15,7 +15,9 @@ public class GetPaymentQuery : IRequest<Payment>
 
         public async Task<Payment> Handle(GetPaymentQuery request, CancellationToken cancellationToken)
         {
-            var payment = await _context.Payments.FindAsync(request.PaymentId);
+            var payment = await _context.Payments
+                .Include(p => p.PaymentStatusHistories) // Include the PaymentStatusHistories related data
+                .FirstOrDefaultAsync(p => p.Id == request.PaymentId, cancellationToken);
 
             if (payment == null)
             {
