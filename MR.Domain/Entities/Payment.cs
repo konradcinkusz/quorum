@@ -40,7 +40,12 @@ public class Payment : BaseEntity<Guid>
     //Kwota płatności w PLN
     [Column(TypeName = "money")]
     public decimal PaymentValuePLN { get; set; }
+}
 
-    [InverseProperty(EntityNames.Payment)]
-    public ICollection<PaymentStatusHistory> PaymentStatusHistories { get; set; }
+[Table(nameof(TableNames.Payment_Logs), Schema = SchemasNames.MRLogs)]
+public class Payment_Log : BaseEntityLog
+{
+    [ForeignKey(nameof(Payment))]
+    public Guid PaymentId { get; set; }
+    public Payment Payment { get; set; }
 }

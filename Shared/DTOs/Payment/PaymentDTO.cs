@@ -1,6 +1,6 @@
 ﻿namespace MR.Shared.DTOs.Payment;
 
-public class PaymentReadDTO
+public class PaymentDTO
 {
     public Guid Id { get; set; }
     public string UserEmail { get; set; }

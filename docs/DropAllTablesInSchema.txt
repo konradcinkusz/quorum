@@ -1,0 +1,26 @@
+﻿https://stackoverflow.com/a/8934038/4510954
+
+DECLARE @SqlStatement NVARCHAR(MAX)
+SELECT @SqlStatement = 
+    COALESCE(@SqlStatement, N'') + N'DROP TABLE [FseClub].' + QUOTENAME(TABLE_NAME) + N';' + CHAR(13)
+FROM INFORMATION_SCHEMA.TABLES
+WHERE TABLE_SCHEMA = 'FseClub' and TABLE_TYPE = 'BASE TABLE'
+
+PRINT @SqlStatement
+
+
+DROP TABLE [FseClub].[Mail];
+DROP TABLE [FseClub].[PaymentStatusHistory];
+DROP TABLE [FseClub].[Payment];
+DROP TABLE [FseClub].[Subscription];
+DROP TABLE [FseClub].[PlanPlanIncludeItem];
+DROP TABLE [FseClub].[PlanIncludeItem];
+DROP TABLE [FseClub].[Plan];
+DROP TABLE [FseClub].[MeetingPartMeetingPartArea];
+DROP TABLE [FseClub].[MeetingPartArea];
+DROP TABLE [FseClub].[MeetingPartPoint];
+DROP TABLE [FseClub].[MeetingMeetingPart];
+DROP TABLE [FseClub].[MeetingPart];
+DROP TABLE [FseClub].[BookedUser];
+DROP TABLE [FseClub].[Meeting];
+DROP TABLE [FseClub].[PromotionCode];

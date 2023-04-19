@@ -6,6 +6,8 @@
     <div class="card m-1 p-1">
         <div class="card-header">
             <h4 class="card-title">Payment Details</h4>
+            <a href="/edit-payment/@Payment.Id" class="btn btn-secondary btn-sm">Edit</a>
+
         </div>
         <div class="card-body">
             <div class="row mb-3">
@@ -85,7 +87,7 @@ else
 
 @code {
     [Parameter]
-    public PaymentReadDTO Payment { get; set; }
+    public PaymentDTO Payment { get; set; }
 
     [Parameter]
     public string ShowDetailsButtonText { get; set; } = "Show Details";

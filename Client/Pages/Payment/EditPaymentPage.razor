@@ -1,0 +1,84 @@
+﻿@page "/edit-payment/{id}"
+@using MR.Client.Services
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Forms
+@inject IPaymentService paymentService
+@inject NavigationManager navigationManager
+
+@if (paymentDto != null)
+{
+    <div class="card shadow rounded-3">
+        <div class="card-header bg-primary text-white py-3 rounded-3">
+            <h5 class="card-title mb-0">Edit Payment</h5>
+        </div>
+
+        <div class="card-body">
+            <EditForm Model="@paymentDto" OnValidSubmit="@UpdatePayment">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <label for="user-email" class="form-label">User Email</label>
+                        <InputText id="user-email" class="form-control rounded-pill" @bind-Value="@paymentDto.UserEmail" />
+                    </div>
+
+                    <div class="col-md-6 mb-4">
+                        <label for="client-reference-id" class="form-label">Client Reference ID</label>
+                        <InputText id="client-reference-id" class="form-control rounded-pill" @bind-Value="@paymentDto.ClientReferenceId" />
+                    </div>
+
+                    <div class="col-md-6 mb-4">
+                        <label for="payment-link" class="form-label">Payment Link</label>
+                        <InputText id="payment-link" class="form-control rounded-pill" @bind-Value="@paymentDto.PaymentLink" />
+                    </div>
+
+                    <div class="col-md-6 mb-4">
+                        <label for="payment-intent-id" class="form-label">Payment Intent ID</label>
+                        <InputText id="payment-intent-id" class="form-control rounded-pill" @bind-Value="@paymentDto.PaymentIntentId" />
+                    </div>
+
+                    <div class="col-md-12 mb-4">
+                        <label for="session-id" class="form-label">Session ID</label>
+                        <InputText id="session-id" class="form-control rounded-pill" @bind-Value="@paymentDto.SessionId" />
+                    </div>
+
+                    <div class="col-md-12 mb-4">
+                        <label for="payment-value-pln" class="form-label">Payment Value (PLN)</label>
+                        <InputNumber id="payment-value-pln" class="form-control rounded-pill" @bind-Value="@paymentDto.PaymentValuePLN" />
+                    </div>
+
+                    <div class="col-md-12 d-grid">
+                        <button type="submit" class="btn btn-primary rounded-pill">Update Payment</button>
+                    </div>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+}
+else
+{
+    <p>No payment to display.</p>
+}
+
+@code {
+    [Parameter]
+    public string id { get; set; }
+    private PaymentDTO? paymentDto;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Guid.TryParse(id, out Guid result);
+        paymentDto = await paymentService.GetPayment(result);
+    }
+
+    private void GoBack()
+    {
+        navigationManager.NavigateTo("/payments");
+    }
+
+    private async Task UpdatePayment()
+    {
+        await paymentService.UpdatePayment(new PaymentUpdateDTO(paymentDto));
+    }
+}

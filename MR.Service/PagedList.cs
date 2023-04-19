@@ -15,6 +15,6 @@ public class PagedList<T> : List<T>
         TotalItems = query.Count();
         TotalPages = (int)Math.Ceiling(TotalItems / (double)PageSize);
 
-        AddRange(query.Skip((CurrentPage - 1) * PageSize).Take(PageSize).ToList());
+        AddRange(query.Skip((CurrentPage - 1) * PageSize).Take(PageSize));
     }
 }

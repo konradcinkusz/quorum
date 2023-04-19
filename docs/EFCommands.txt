@@ -1,0 +1,19 @@
+dotnet tool update --global dotnet-ef
+
+dotnet ef migrations add "migrations_name" --startup-project ..\..\MR\Server\
+
+dotnet ef migrations remove --startup-project ..\..\MR\Server\
+
+dotnet ef database update --startup-project ..\..\MR\Server\
+
+dotnet ef database update -- --environment Production
+
+
+Do update'owania bazy produkcyjnej nalezy wykomentowaæ (FSE.Club.Infrastructure -> DependencyInjection -> AddInfrastructure):
+
+string connectionString = "PROD";
+//var env = configuration["ASPNETCORE_ENVIRONMENT"];
+//if (env == "Development")
+//{
+//    connectionString = "DEV";
+//}

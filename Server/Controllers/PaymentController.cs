@@ -30,7 +30,7 @@ public class PaymentController : MRBaseController
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<PaymentReadDTO>> GetPayment(Guid id)
+    public async Task<ActionResult<PaymentDTO>> GetPayment(Guid id)
     {
         var payment = await Mediator.Send(new GetPaymentQuery { PaymentId = id });
 
@@ -39,7 +39,7 @@ public class PaymentController : MRBaseController
             return NotFound();
         }
 
-        var paymentDto = new PaymentReadDTO
+        var paymentDto = new PaymentDTO
         {
             Id = payment.Id,
             UserEmail = payment.UserEmail,
@@ -73,7 +73,7 @@ public class PaymentController : MRBaseController
             Question = query.Question
         });
 
-        var paymentDTOs = result.Select(payment => new PaymentReadDTO
+        var paymentDTOs = result.Select(payment => new PaymentDTO
         {
             Id = payment.Id,
             UserEmail = payment.UserEmail,

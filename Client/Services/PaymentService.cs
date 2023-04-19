@@ -16,7 +16,7 @@ public class PaymentService : DataServiceBase, IPaymentService
 
         return await response.Content.ReadAsStringAsync();
     }
-    public async Task<PaymentReadDTO> GetPayment(Guid id)
+    public async Task<PaymentDTO> GetPayment(Guid id)
     {
         var response = await _httpClient.GetAsync($"{_paymentControllerPath}/{id}");
 
@@ -25,7 +25,7 @@ public class PaymentService : DataServiceBase, IPaymentService
             return null;
         }
 
-        var paymentDto = await response.Content.ReadFromJsonAsync<PaymentReadDTO>();
+        var paymentDto = await response.Content.ReadFromJsonAsync<PaymentDTO>();
 
         return paymentDto;
     }
@@ -53,5 +53,10 @@ public class PaymentService : DataServiceBase, IPaymentService
         var result = await _httpClient.PostAsync($"{_paymentControllerPath}/SeedPayments",
                                                        null);
         return result.IsSuccessStatusCode;
+    }
+
+    public Task UpdatePayment(PaymentUpdateDTO paymentUpdateDTO)
+    {
+        throw new NotImplementedException();
     }
 }

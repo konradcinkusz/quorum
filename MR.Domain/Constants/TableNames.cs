@@ -26,4 +26,8 @@ public class TableNames
     #region MRDicts
     public const string Dictionaries = "Dictionaries";
     #endregion
+
+    #region MRLogs
+    public const string Payment_Logs = "Payment_Logs";
+    #endregion
 }

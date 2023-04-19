@@ -3,7 +3,8 @@
 public interface IPaymentService
 {
     Task<string> CreatePayment(PaymentCreateDTO paymentDto);
-    Task<PaymentReadDTO> GetPayment(Guid id);
+    Task<PaymentDTO> GetPayment(Guid id);
+    Task UpdatePayment(PaymentUpdateDTO paymentUpdateDTO);
     Task<PaymentPagedListDto> GetPayments(PaymentSearchParamsDTO query);
     Task<bool> SeedPayments();
 }

@@ -21,4 +21,16 @@
     <Folder Include="wwwroot\js\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Pages\Payment\EditPaymentPage.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Pages\Payment\EditPaymentPage.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Pages\Payment\EditPaymentPage.razor" />
+  </ItemGroup>
+
 </Project>
