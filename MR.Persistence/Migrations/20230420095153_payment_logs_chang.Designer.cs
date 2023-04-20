@@ -4,6 +4,7 @@ using MR.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MR.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230420095153_payment_logs_chang")]
+    partial class payment_logs_chang
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -240,7 +243,7 @@ namespace MR.Persistence.Migrations
                         {
                             Id = "E97336F4-CF5A-4C72-8C61-997E5C621143",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "9e5c9f71-eee1-4c3c-a7aa-2e136166876a",
+                            ConcurrencyStamp = "9627d684-e206-45ca-91c0-a367bb3bf79d",
                             Email = "superadmin@gmail.com",
                             EmailConfirmed = true,
                             FirstName = "Amit",
@@ -250,7 +253,7 @@ namespace MR.Persistence.Migrations
                             NormalizedUserName = "SUPERADMIN",
                             PasswordHash = "AQAAAAEAACcQAAAAEBLjouNqaeiVWbN0TbXUS3+ChW3d7aQIk/BQEkWBxlrdRRngp14b0BIH0Rp65qD6mA==",
                             PhoneNumberConfirmed = true,
-                            SecurityStamp = "dd8edd05-5815-4444-88ab-c47a1e783607",
+                            SecurityStamp = "630ee530-d367-42c3-b89e-945f59b88185",
                             TwoFactorEnabled = false,
                             UserName = "superadmin"
                         },
@@ -258,7 +261,7 @@ namespace MR.Persistence.Migrations
                         {
                             Id = "B2BED4FF-47C0-47A1-9AE0-7AEF44CC14BB",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "98303485-02e6-4ca3-a910-ac910734f196",
+                            ConcurrencyStamp = "487c366b-4708-4850-8c69-2e2ffd76a516",
                             Email = "basicuser@gmail.com",
                             EmailConfirmed = true,
                             FirstName = "Basic",
@@ -268,7 +271,7 @@ namespace MR.Persistence.Migrations
                             NormalizedUserName = "BASICUSER",
                             PasswordHash = "AQAAAAEAACcQAAAAEBLjouNqaeiVWbN0TbXUS3+ChW3d7aQIk/BQEkWBxlrdRRngp14b0BIH0Rp65qD6mA==",
                             PhoneNumberConfirmed = true,
-                            SecurityStamp = "8e8a2135-f4bb-48e8-b26b-cc15376fb0f7",
+                            SecurityStamp = "2a654674-ab91-422a-8c00-0e87c23d97b9",
                             TwoFactorEnabled = false,
                             UserName = "basicuser"
                         });
@@ -389,15 +392,18 @@ namespace MR.Persistence.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Action")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("LogDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("NewValues")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("OldValues")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("PaymentId")

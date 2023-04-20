@@ -13,8 +13,8 @@ public abstract class BaseEntityLog
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
-    public string Action { get; set; }
-    public string OldValues { get; set; }
-    public string NewValues { get; set; }
+    public string? Action { get; set; }
+    public string? OldValues { get; set; }
+    public string? NewValues { get; set; }
     public DateTime LogDate { get; set; }
 }

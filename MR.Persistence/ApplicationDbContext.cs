@@ -14,7 +14,6 @@ public partial class ApplicationDbContext : ApiAuthorizationDbContext<Applicatio
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Seed();
-
         base.OnModelCreating(modelBuilder);
     }
 }
