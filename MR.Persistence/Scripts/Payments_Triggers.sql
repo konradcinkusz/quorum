@@ -1,9 +1,9 @@
 USE [aspnet-mreferenda.Server-44bd1c16-4782-4de1-8743-3aee3305f17d];
 GO
 
-CREATE TRIGGER trg_Payment_InsertUpdateDelete
+CREATE OR ALTER TRIGGER trg_Payment_InsertUpdateDelete
 ON [MRPayments].[Payments]
-AFTER INSERT, UPDATE, DELETE
+AFTER INSERT, UPDATE
 AS
 BEGIN
     DECLARE @action nvarchar(10)
@@ -13,8 +13,6 @@ BEGIN
             SET @action = 'UPDATE'
         ELSE
             SET @action = 'INSERT'
-    ELSE
-        SET @action = 'DELETE'
 
     DECLARE @oldValues NVARCHAR(MAX)
     DECLARE @newValues NVARCHAR(MAX)

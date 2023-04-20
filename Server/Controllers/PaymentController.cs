@@ -1,7 +1,4 @@
-﻿using MR.Service;
-using MR.Shared;
-
-namespace MR.Server.Controllers;
+﻿namespace MR.Server.Controllers;
 
 public class PaymentController : MRBaseController
 {
@@ -11,7 +8,7 @@ public class PaymentController : MRBaseController
         _configuration = configuration;
     }
 
-    [HttpPost]
+    [HttpPost(nameof(CreatePayment))]
     public async Task<IActionResult> CreatePayment(PaymentCreateDTO paymentDto)
     {
         string uId = GetUserId();
@@ -23,7 +20,7 @@ public class PaymentController : MRBaseController
             PaymentIntentId = paymentDto.PaymentIntentId,
             SessionId = paymentDto.SessionId,
             ApplicationUserId = uId,
-            PaymentValuePLN = paymentDto.PaymentValuePLN
+            PaymentValuePLN = paymentDto.PaymentValuePLN.HasValue ? paymentDto.PaymentValuePLN.Value : -1
         });
 
         return CreatedAtAction(nameof(GetPayment), new { id = paymentId }, null);

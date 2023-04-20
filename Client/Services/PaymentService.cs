@@ -10,7 +10,7 @@ public class PaymentService : DataServiceBase, IPaymentService
 
     public async Task<string> CreatePayment(PaymentCreateDTO paymentDto)
     {
-        var response = await _httpClient.PostAsJsonAsync(_paymentControllerPath, paymentDto);
+        var response = await _httpClient.PostAsJsonAsync($"{_paymentControllerPath}/CreatePayment", paymentDto);
 
         response.EnsureSuccessStatusCode();
 

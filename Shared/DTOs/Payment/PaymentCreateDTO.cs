@@ -7,5 +7,5 @@ public class PaymentCreateDTO
     public string ClientReferenceId { get; set; }
     public string PaymentIntentId { get; set; }
     public string SessionId { get; set; }
-    public decimal PaymentValuePLN { get; set; }
+    public decimal? PaymentValuePLN { get; set; }
 }
