@@ -14,7 +14,7 @@ public class PaymentService : DataServiceBase, IPaymentService
 
         response.EnsureSuccessStatusCode();
 
-        return await response.Content.ReadAsStringAsync();
+        return response.Headers.Location.Segments.Last();
     }
     public async Task<PaymentDTO> GetPayment(Guid id)
     {
@@ -55,8 +55,14 @@ public class PaymentService : DataServiceBase, IPaymentService
         return result.IsSuccessStatusCode;
     }
 
-    public Task UpdatePayment(PaymentUpdateDTO paymentUpdateDTO)
+    public async Task<string> UpdatePayment(PaymentUpdateDTO paymentUpdateDTO)
     {
-        throw new NotImplementedException();
+        var response = await _httpClient.PutAsJsonAsync($"{_paymentControllerPath}/EditPayment/{paymentUpdateDTO.Id}", paymentUpdateDTO);
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new ApplicationException(await response.Content.ReadAsStringAsync());
+        }
+
+        return response.Headers.Location.Segments.Last();
     }
 }

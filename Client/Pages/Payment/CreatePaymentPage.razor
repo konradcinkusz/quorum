@@ -56,13 +56,19 @@
         </EditForm>
     </div>
 </div>
-
+@if (paymentCreated)
+{
+    <div class="alert alert-success" role="alert">
+        Payment created successfully.
+    </div>
+}
 
 @code {
     private PaymentCreateDTO paymentDto = new PaymentCreateDTO();
-
+    private bool paymentCreated = false;
     private async Task CreatePayment()
     {
-        await paymentService.CreatePayment(paymentDto);
+        string result = await paymentService.CreatePayment(paymentDto);
+        paymentCreated = !string.IsNullOrWhiteSpace(result);
     }
 }

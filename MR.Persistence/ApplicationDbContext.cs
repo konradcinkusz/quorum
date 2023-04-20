@@ -14,6 +14,9 @@ public partial class ApplicationDbContext : ApiAuthorizationDbContext<Applicatio
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Seed();
+        modelBuilder
+            .Entity<Payment>()
+            .ToTable(t => t.HasTrigger("trg_Payment_InsertUpdateDelete"));
         base.OnModelCreating(modelBuilder);
     }
 }

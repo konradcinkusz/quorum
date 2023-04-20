@@ -21,7 +21,7 @@ public class EditPaymentCommand : IRequest<Guid>
 
         public override async Task<Guid> Handle(EditPaymentCommand request, CancellationToken cancellationToken)
         {
-            var payment = await _context.Payments.FindAsync(request.PaymentId);
+            var payment = await _context.Payments.Include(p => p.PaymentStatusHistories).FirstOrDefaultAsync(p => p.Id == request.PaymentId);
 
             if (payment == null)
             {
@@ -36,6 +36,11 @@ public class EditPaymentCommand : IRequest<Guid>
             payment.SessionId = request.SessionId;
             payment.PaymentStatus = request.PaymentStatus.ToString();
             payment.PaymentValuePLN = request.PaymentValuePLN;
+
+            if (payment.PaymentStatusHistories == null)
+            {
+                payment.PaymentStatusHistories = new List<PaymentStatusHistory>();
+            }
 
             payment.PaymentStatusHistories.Add(new PaymentStatusHistory
             {

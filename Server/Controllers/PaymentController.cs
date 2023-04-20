@@ -47,7 +47,7 @@ public class PaymentController : MRBaseController
             CreatedAt = payment.CreatedAt,
             PaymentValuePLN = payment.PaymentValuePLN,
             PaymentStatusHistory = payment.PaymentStatusHistories
-                .Select(h => new PaymentStatusHistoryDTO { PaymentStatus = EnumHelper.EnumToString(h.PaymentStatus) })
+                .Select(h => new PaymentStatusHistoryDTO { PaymentStatus = EnumHelper.EnumToString(h.PaymentStatus), StatusDate = h.CreatedAt })
                 .ToList()
         };
 
@@ -81,11 +81,52 @@ public class PaymentController : MRBaseController
             CreatedAt = payment.CreatedAt,
             PaymentValuePLN = payment.PaymentValuePLN,
             PaymentStatusHistory = payment.PaymentStatusHistories
-                .Select(h => new PaymentStatusHistoryDTO { PaymentStatus = EnumHelper.EnumToString(h.PaymentStatus) })
+                .Select(h => new PaymentStatusHistoryDTO { PaymentStatus = EnumHelper.EnumToString(h.PaymentStatus), StatusDate = h.CreatedAt })
                 .ToList()
         }).ToList();
 
         return Ok(new PaymentPagedListDto { Items = paymentDTOs, CurrentPage = result.CurrentPage, PageSize = result.PageSize, TotalItems = result.TotalItems, TotalPages = result.TotalPages });
+    }
+
+    [HttpPut("EditPayment/{id}")]
+    public async Task<IActionResult> EditPayment(Guid id, [FromBody] PaymentUpdateDTO paymentDto)
+    {
+        if (id != paymentDto.Id)
+        {
+            return BadRequest("Payment ID mismatch");
+        }
+
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var command = new EditPaymentCommand
+        {
+            PaymentId = id,
+            UserEmail = paymentDto.UserEmail,
+            PaymentLink = paymentDto.PaymentLink,
+            ClientReferenceId = paymentDto.ClientReferenceId,
+            PaymentIntentId = paymentDto.PaymentIntentId,
+            SessionId = paymentDto.SessionId,
+            PaymentStatus = PaymentStatus.Pending,
+            ApplicationUserId = GetUserId(),
+            PaymentValuePLN = paymentDto.PaymentValuePLN
+        };
+
+        try
+        {
+            var paymentId = await Mediator.Send(command);
+            return CreatedAtAction(nameof(GetPayment), new { id = paymentId }, null);
+        }
+        catch (NotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
     }
 
     [HttpPost(nameof(SeedPayments))]

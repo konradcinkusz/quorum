@@ -20,32 +20,38 @@
                 <div class="row">
                     <div class="col-md-6 mb-4">
                         <label for="user-email" class="form-label">User Email</label>
-                        <InputText id="user-email" class="form-control rounded-pill" @bind-Value="@paymentDto.UserEmail" />
+                        <InputText id="user-email" class="form-control rounded-pill" @bind-Value="@paymentDto.UserEmail" required />
+                        <ValidationMessage For="@(() => paymentDto.UserEmail)" />
                     </div>
 
                     <div class="col-md-6 mb-4">
                         <label for="client-reference-id" class="form-label">Client Reference ID</label>
-                        <InputText id="client-reference-id" class="form-control rounded-pill" @bind-Value="@paymentDto.ClientReferenceId" />
+                        <InputText id="client-reference-id" class="form-control rounded-pill" @bind-Value="@paymentDto.ClientReferenceId" required />
+                        <ValidationMessage For="@(() => paymentDto.ClientReferenceId)" />
                     </div>
 
                     <div class="col-md-6 mb-4">
                         <label for="payment-link" class="form-label">Payment Link</label>
-                        <InputText id="payment-link" class="form-control rounded-pill" @bind-Value="@paymentDto.PaymentLink" />
+                        <InputText id="payment-link" class="form-control rounded-pill" @bind-Value="@paymentDto.PaymentLink" required />
+                        <ValidationMessage For="@(() => paymentDto.PaymentLink)" />
                     </div>
 
                     <div class="col-md-6 mb-4">
                         <label for="payment-intent-id" class="form-label">Payment Intent ID</label>
-                        <InputText id="payment-intent-id" class="form-control rounded-pill" @bind-Value="@paymentDto.PaymentIntentId" />
+                        <InputText id="payment-intent-id" class="form-control rounded-pill" @bind-Value="@paymentDto.PaymentIntentId" required />
+                        <ValidationMessage For="@(() => paymentDto.PaymentIntentId)" />
                     </div>
 
                     <div class="col-md-12 mb-4">
                         <label for="session-id" class="form-label">Session ID</label>
-                        <InputText id="session-id" class="form-control rounded-pill" @bind-Value="@paymentDto.SessionId" />
+                        <InputText id="session-id" class="form-control rounded-pill" @bind-Value="@paymentDto.SessionId" required />
+                        <ValidationMessage For="@(() => paymentDto.SessionId)" />
                     </div>
 
                     <div class="col-md-12 mb-4">
                         <label for="payment-value-pln" class="form-label">Payment Value (PLN)</label>
-                        <InputNumber id="payment-value-pln" class="form-control rounded-pill" @bind-Value="@paymentDto.PaymentValuePLN" />
+                        <InputNumber id="payment-value-pln" class="form-control rounded-pill" @bind-Value="@paymentDto.PaymentValuePLN" required />
+                        <ValidationMessage For="@(() => paymentDto.PaymentValuePLN)" />
                     </div>
 
                     <div class="col-md-12 d-grid">
@@ -60,11 +66,18 @@ else
 {
     <p>No payment to display.</p>
 }
+@if (paymentEdited)
+{
+    <div class="alert alert-success" role="alert">
+        Payment edited successfully.
+    </div>
+}
 
 @code {
     [Parameter]
     public string id { get; set; }
     private PaymentDTO? paymentDto;
+    private bool paymentEdited = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -79,6 +92,7 @@ else
 
     private async Task UpdatePayment()
     {
-        await paymentService.UpdatePayment(new PaymentUpdateDTO(paymentDto));
+        var result = await paymentService.UpdatePayment(new PaymentUpdateDTO(paymentDto));
+        paymentEdited = !string.IsNullOrWhiteSpace(result);
     }
 }

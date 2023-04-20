@@ -62,5 +62,7 @@
     async Task _refresh()
     {
         PaymentPagedListDto = await paymentService.GetPayments(PaymentQuerySearchDTO);
+        PaymentQuerySearchDTO.CurrentPage = PaymentPagedListDto.CurrentPage;
+        PaymentQuerySearchDTO.PageSize = PaymentPagedListDto.PageSize;
     }
 }

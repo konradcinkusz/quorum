@@ -15,6 +15,12 @@ public class PagedList<T> : List<T>
         TotalItems = query.Count();
         TotalPages = (int)Math.Ceiling(TotalItems / (double)PageSize);
 
+        // Check if the new PageSize would result in a page number greater than the total number of pages
+        if (CurrentPage > TotalPages && TotalPages > 0)
+        {
+            CurrentPage = TotalPages;
+        }
+
         AddRange(query.Skip((CurrentPage - 1) * PageSize).Take(PageSize));
     }
 }

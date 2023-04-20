@@ -6,8 +6,6 @@
     <div class="card m-1 p-1">
         <div class="card-header">
             <h4 class="card-title">Payment Details</h4>
-            <a href="/edit-payment/@Payment.Id" class="btn btn-secondary btn-sm">Edit</a>
-
         </div>
         <div class="card-body">
             <div class="row mb-3">
@@ -25,7 +23,11 @@
                 </div>
             </div>
             <hr />
-            <button class="btn btn-primary mb-3" type="button" @onclick="ToggleDetails">@ShowDetailsButtonText</button>
+            <div class="btn-group my-2" role="group">
+                <a href="/edit-payment/@Payment.Id" class="btn btn-secondary btn-sm me-2">Edit</a>
+                <button class="btn btn-primary btn-sm" type="button" @onclick="ToggleDetails">@ShowDetailsButtonText</button>
+            </div>
+
             <div class="@DetailsCssClass">
                 <hr />
                 <h5>Payment Details</h5>

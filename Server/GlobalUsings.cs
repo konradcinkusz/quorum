@@ -27,3 +27,5 @@ global using MR.Persistence;
 global using MR.Service;
 global using MR.Infrastructure.Extension;
 global using MR.Domain.Auth;
+global using MR.Domain.Enums;
+global using MR.Service.Exceptions;
