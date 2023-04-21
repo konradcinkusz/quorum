@@ -15,6 +15,7 @@ public class TableNames
     public const string Mails = "Mails";
     public const string PaymentToIssues = "PaymentToIssues";
     public const string IssueRatingHistories = "IssueRatingHistories";
+    public const string Admin_Logs = "Admin_Logs";
     #endregion
 
     #region MRPayments

@@ -2,7 +2,7 @@
 
 public static class ConfigureServiceContainer
 {
-    public static void AddAutoMapper(this IServiceCollection serviceCollection)
+    public static void AddInfrastructureAutoMapper(this IServiceCollection serviceCollection)
     {
         var mappingConfig = new MapperConfiguration(mc =>
         {

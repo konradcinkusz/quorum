@@ -29,3 +29,6 @@ global using MR.Infrastructure.Extension;
 global using MR.Domain.Auth;
 global using MR.Domain.Enums;
 global using MR.Service.Exceptions;
+global using MR.Domain.Entities;
+global using MR.Shared.DTOs.Admin;
+global using Microsoft.OpenApi.Models;

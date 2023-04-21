@@ -1,5 +1,3 @@
-using Microsoft.OpenApi.Models;
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContextService(builder.Configuration);
@@ -13,6 +11,8 @@ builder.Services.AddDefaultIdentity<ApplicationUser>
 builder.Services.AddIdentityServer()
     .AddApiAuthorization<ApplicationUser, ApplicationDbContext>();
 
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
 builder.Services.AddAuthentication()
     .AddIdentityServerJwt();
 
@@ -20,7 +20,7 @@ builder.Services.AddRazorPages();
 
 builder.Services.AddController();
 
-builder.Services.AddAutoMapper();
+builder.Services.AddInfrastructureAutoMapper();
 
 builder.Services.AddScopedServices();
 

@@ -10,6 +10,7 @@ public partial class ApplicationDbContext : ApiAuthorizationDbContext<Applicatio
 
     public DbSet<Payment> Payments { get; set; }
     public DbSet<Payment_Log> Payment_Logs { get; set; }
+    public DbSet<AdminLog> Admin_Logs { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -1,3 +1,47 @@
 ﻿@page "/"
 
 <PageTitle>Index</PageTitle>
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm-12 col-md-6 col-lg-4">
+            <div class="card border-0 shadow-sm rounded mb-4" style="background-color: #eaf5e5;">
+                <div class="card-body">
+                    <h5 class="card-title"><span class="oi oi-info mr-2"></span>About MR</h5>
+                    <p class="card-text">MR is a signature collective system for referendums. Our unique monetization model includes payment for publication and signature collection.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12 col-md-6 col-lg-4">
+            <div class="card border-0 shadow-sm rounded mb-4" style="background-color: #d6edeb;">
+                <div class="card-body">
+                    <h5 class="card-title"><span class="oi oi-people mr-2"></span>How big a problem does MR solve?</h5>
+                    <p class="card-text">In Poland, 500,000 signatures from real people are required to submit a referendum. MR solves the problem of collecting signatures online from confirmed users, which has yet to be solved in modern democratic countries.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12 col-md-6 col-lg-4">
+            <div class="card border-0 shadow-sm rounded mb-4" style="background-color: #c3e0c8;">
+                <div class="card-body">
+                    <h5 class="card-title"><span class="oi oi-puzzle-piece mr-2"></span>The MR Business Model</h5>
+                    <p class="card-text">Our business model includes a monetization strategy that has not been applied anywhere else, making it an edge case model. Let's revolutionize democracy together!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <ul class="nav justify-content-center">
+                <li class="nav-item"><NavLink href="" Match="NavLinkMatch.All" class="nav-link"><span class="oi oi-home mr-2"></span>Home</NavLink></li>
+                <AuthorizeView>
+                    <Authorized>
+                        <li class="nav-item"><NavLink href="create-payment" class="nav-link"><span class="oi oi-plus mr-2"></span>Add Payment</NavLink></li>
+                        <li class="nav-item"><NavLink href="payments" class="nav-link"><span class="oi oi-list mr-2"></span>Payments</NavLink></li>
+                        <li class="nav-item"><NavLink href="/admin/payments" class="nav-link"><span class="oi oi-wrench mr-2"></span>Admin Seed Payments</NavLink></li>
+                    </Authorized>
+                </AuthorizeView>
+            </ul>
+        </div>
+    </div>
+</div>
