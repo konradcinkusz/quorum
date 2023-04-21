@@ -1,6 +1,14 @@
 ﻿namespace MR.Persistence;
 
-public partial class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>, IApplicationDbContext
+public interface IApplicationDbContext
+{
+    DbSet<Payment> Payments { get; set; }
+    DbSet<AdminLog> Admin_Logs { get; set; }
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken);
+    DbSet<Subscription> Subscriptions { get; set; }
+}
+
+public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>, IApplicationDbContext
 {
     public ApplicationDbContext(
         DbContextOptions options,
@@ -11,6 +19,7 @@ public partial class ApplicationDbContext : ApiAuthorizationDbContext<Applicatio
     public DbSet<Payment> Payments { get; set; }
     public DbSet<Payment_Log> Payment_Logs { get; set; }
     public DbSet<AdminLog> Admin_Logs { get; set; }
+    public DbSet<Subscription> Subscriptions { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

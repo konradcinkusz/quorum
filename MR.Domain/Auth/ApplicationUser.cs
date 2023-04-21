@@ -9,4 +9,5 @@ public class ApplicationUser : IdentityUser
     {
         return this.RefreshTokens?.Find(x => x.Token == token) != null;
     }
+    public virtual ICollection<Subscription> Subscriptions { get; set; }
 }

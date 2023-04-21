@@ -9,3 +9,4 @@ global using MR.Domain.Base;
 global using MR.Domain.Constants;
 global using MR.Domain.Auth;
 global using MR.Domain.Enums;
+global using MR.Domain.Entities;

@@ -60,4 +60,7 @@
   <ItemGroup>
     <None Include="Payment_Logs_Trigger_1.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Subscription_Logs_Trigger.sql" />
+  </ItemGroup>
 </Project>
