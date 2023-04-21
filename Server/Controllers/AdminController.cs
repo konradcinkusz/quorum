@@ -16,7 +16,10 @@ public class AdminController : MRBaseController
             CurrentPage = query.CurrentPage,
             PageSize = query.PageSize,
             Name = query.Name,
-            Question = query.Question
+            Question = query.Question,
+            LastHour = query.LastHour,
+            LastMonth = query.LastMonth,
+            ValuesText = query.ValuesText,
         });
 
         var adminLogsDTO = _mapper.Map<List<AdminLogDTO>>(result);

@@ -8,12 +8,12 @@
 <AuthorizeView>
     <Authorized>
         <div class="container-fluid">
-            <h1 class="h3 mb-3">Dashboard</h1>
+            <h1 class="mb-3">Dashboard</h1>
             <div class="row">
                 <div class="col-md-12">
                     <ul class="nav flex-column">
                         <li class="nav-item">
-                            <a class="nav-link active" href="#">Payments</a>
+                            <a class="nav-link active" href="payments"><span class="oi oi-list mr-2"></span> Payments</a>
                         </li>
                         <!-- Add more options here -->
                     </ul>
@@ -37,12 +37,16 @@
                     }
                     else
                     {
+                        <AdminBrowser Refresh="_refresh"
+                                  QuerySearch="AdminLogQuerySearchDTO"></AdminBrowser>
                         @if (AdminLogPagedListDto.Items.Count == 0)
                         {
                             <p><em>Brak kwestii spełniających kryteria wyszukiwania...</em></p>
                         }
                         else
                         {
+                            <br />
+                            <br />
                             <_Paging QueryBase="AdminLogQuerySearchDTO"
                              RefreshList="_refresh"
                              TotalPages="AdminLogPagedListDto.TotalPages"

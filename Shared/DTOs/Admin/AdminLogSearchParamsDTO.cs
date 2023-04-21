@@ -2,9 +2,8 @@
 
 public class AdminLogSearchParamsDTO : SearchParams
 {
-    public string UserEmail { get; set; } = string.Empty;
-    public string ClientReferenceId { get; set; } = string.Empty;
-    public string PaymentIntentId { get; set; } = string.Empty;
-    public decimal? MinPaymentValuePLN { get; set; }
-    public decimal? MaxPaymentValuePLN { get; set; }
+    public string Action { get; set; } = string.Empty;
+    public string ValuesText { get; set; } = string.Empty;
+    public bool LastMonth { get; set; } = false;
+    public bool LastHour { get; set; } = false;
 }

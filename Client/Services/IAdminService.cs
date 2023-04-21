@@ -18,6 +18,15 @@ public class AdminService : DataServiceBase, IAdminService
     {
         var q = BuildQuery(query);
 
+        if (!string.IsNullOrEmpty(query.ValuesText))
+            q[nameof(query.ValuesText)] = query.ValuesText;
+
+        if (!string.IsNullOrEmpty(query.Action))
+            q[nameof(query.Action)] = query.Action;
+
+        q[nameof(query.LastHour)] = query.LastHour.ToString();
+        q[nameof(query.LastMonth)] = query.LastMonth.ToString();
+
         var response = await _httpClient.GetAsync($"{_adminControllerPath}/GetAdminLogsByQuery?{q}");
 
         response.EnsureSuccessStatusCode();

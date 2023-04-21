@@ -7,22 +7,22 @@
 
 <AuthorizeView>
     <Authorized>
-        <PaymentBrowser Refresh="_refresh"
-                        QuerySearch="PaymentQuerySearchDTO"></PaymentBrowser>
-        <br />
-        <br />
         @if (PaymentPagedListDto == null)
         {
             <_Loading LoadingText="Ładowanie listy płatności" />
         }
         else
         {
+            <PaymentBrowser Refresh="_refresh"
+                        QuerySearch="PaymentQuerySearchDTO"></PaymentBrowser>
             @if (PaymentPagedListDto.Items.Count == 0)
             {
                 <p><em>Brak kwestii spełniających kryteria wyszukiwania...</em></p>
             }
             else
             {
+                <br />
+                <br />
                 <_Paging QueryBase="PaymentQuerySearchDTO"
                  RefreshList="_refresh"
                  TotalPages="PaymentPagedListDto.TotalPages"
