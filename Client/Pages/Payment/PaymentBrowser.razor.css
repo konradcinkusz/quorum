@@ -1,0 +1,52 @@
+﻿.domain-search {
+    margin: 0;
+    padding: 56px 0 10px 0;
+}
+
+.bg-green {
+    background-color: #4CAF50;
+}
+
+.domain-search .form-title {
+    margin-top: 0;
+    margin-bottom: 2px;
+    color: #fff;
+    font-family: "Poppins", sans-serif;
+    font-weight: 100
+}
+
+.domain-search p {
+    color: white;
+    margin: 0
+}
+
+.domain-search .form-title strong {
+    display: block
+}
+
+.domain-search .form-control {
+    height: 60px;
+    border-radius: 20px;
+    border: none;
+    background-color: #fff;
+    color: #8B0000;
+}
+
+    .domain-search .form-control:focus {
+        box-shadow: none !important;
+        border-color: #8B0000;
+    }
+
+.domain-search .btn {
+    padding: 0 54px;
+    line-height: 60px;
+    border-radius: 20px;
+    border: none;
+    background-color: #fff;
+    color: #8B0000;
+}
+
+    .domain-search .btn:hover {
+        background-color: #8B0000;
+        color: #fff;
+    }

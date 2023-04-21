@@ -7,6 +7,10 @@
 
 <AuthorizeView>
     <Authorized>
+        <PaymentBrowser Refresh="_refresh"
+                        QuerySearch="PaymentQuerySearchDTO"></PaymentBrowser>
+        <br />
+        <br />
         @if (PaymentPagedListDto == null)
         {
             <_Loading LoadingText="Ładowanie listy płatności" />

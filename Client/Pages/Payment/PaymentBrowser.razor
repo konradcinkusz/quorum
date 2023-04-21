@@ -1,0 +1,47 @@
+﻿<div class="row domain-search bg-green rounded">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                <h2 class="form-title">Search payments</h2>
+            </div>
+            <div class="col-md-9">
+                <div class="row g-3">
+                    <div class="col-md-9 col-sm-12">
+                        <input type="search" class="form-control rounded-0" placeholder="User name" @bind-value="phrase" @bind-value:event="oninput" required>
+                    </div>
+                    <div class="col-md-3 col-sm-12">
+                        <button type="submit" class="btn btn-outline-light btn-block w-100 rounded-0" @onclick="RefreshInternal"><span class="flex-center search">Search</span></button>
+                    </div>
+                </div>
+
+                <div class="centered mt-2">
+                    <div> <input type="checkbox" name="rr" id="r2" @bind-value="isDescription" @bind-value:event="onchange"> <label for="r2" class="text-white font-weight-bold">Search in description</label> </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public PaymentSearchParamsDTO QuerySearch { get; set; }
+    [Parameter]
+    public EventCallback Refresh { get; set; }
+
+    string phrase = string.Empty;
+
+    bool isDescription = false;
+
+    async Task RefreshInternal()
+    {
+        if (isDescription)
+        {
+            QuerySearch.Name = "";
+            QuerySearch.Question = phrase;
+        }
+
+        QuerySearch.UserEmail = phrase;
+        
+        await Refresh.InvokeAsync();
+    }
+}
