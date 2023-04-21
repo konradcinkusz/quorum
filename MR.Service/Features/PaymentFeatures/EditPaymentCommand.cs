@@ -37,16 +37,6 @@ public class EditPaymentCommand : IRequest<Guid>
             payment.PaymentStatus = request.PaymentStatus.ToString();
             payment.PaymentValuePLN = request.PaymentValuePLN;
 
-            if (payment.PaymentStatusHistories == null)
-            {
-                payment.PaymentStatusHistories = new List<PaymentStatusHistory>();
-            }
-
-            payment.PaymentStatusHistories.Add(new PaymentStatusHistory
-            {
-                PaymentStatus = request.PaymentStatus
-            });
-
             await _context.SaveChangesAsync(cancellationToken);
 
             return payment.Id;

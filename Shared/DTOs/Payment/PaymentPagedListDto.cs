@@ -1,5 +1,5 @@
 ﻿namespace MR.Shared.DTOs.Payment;
 
-public class PaymentPagedListDto : PagedListDto<PaymentDTO>
+public class PaymentPagedListDTO : PagedListDto<PaymentDTO>
 {
 }

@@ -1,6 +1,6 @@
 ﻿namespace MR.Shared.DTOs.Admin;
 
-public class AdminLogDto
+public class AdminLogDTO
 {
     public int Id { get; set; }
     public DateTime CreatedAt { get; set; }

@@ -13,6 +13,11 @@ builder.Services
     .AddHttpClient<IAuthorizedMRDataService, AuthorizedMRDataService>(MRAuthorizedDataService, client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress))
     .AddHttpMessageHandler<BaseAddressAuthorizationMessageHandler>();
 
+const string MRAdmintDataService = "MR.ServerAPI.Admin";
+builder.Services
+    .AddHttpClient<IAdminService, AdminService>(MRAdmintDataService, client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress))
+    .AddHttpMessageHandler<BaseAddressAuthorizationMessageHandler>();
+
 // Supply HttpClient instances that include access tokens when making requests to the server project
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient(MRPaymentDataService));
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient(MRAuthorizedDataService));

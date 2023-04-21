@@ -5,6 +5,65 @@ public interface IPaymentService
     Task<string> CreatePayment(PaymentCreateDTO paymentDto);
     Task<PaymentDTO> GetPayment(Guid id);
     Task<string> UpdatePayment(PaymentUpdateDTO paymentUpdateDTO);
-    Task<PaymentPagedListDto> GetPayments(PaymentSearchParamsDTO query);
-    Task<bool> SeedPayments();
+    Task<PaymentPagedListDTO> GetPayments(PaymentSearchParamsDTO query);
+}
+
+public class PaymentService : DataServiceBase, IPaymentService
+{
+    private const string _paymentControllerPath = @"/api/v1.0/Payment";
+
+    public PaymentService(HttpClient httpclient) : base(httpclient)
+    {
+    }
+
+    public async Task<string> CreatePayment(PaymentCreateDTO paymentDto)
+    {
+        var response = await _httpClient.PostAsJsonAsync($"{_paymentControllerPath}/CreatePayment", paymentDto);
+
+        response.EnsureSuccessStatusCode();
+
+        return response.Headers.Location.Segments.Last();
+    }
+    public async Task<PaymentDTO> GetPayment(Guid id)
+    {
+        var response = await _httpClient.GetAsync($"{_paymentControllerPath}/{id}");
+
+        if (!response.IsSuccessStatusCode)
+        {
+            return null;
+        }
+
+        var paymentDto = await response.Content.ReadFromJsonAsync<PaymentDTO>();
+
+        return paymentDto;
+    }
+
+    public async Task<PaymentPagedListDTO> GetPayments(PaymentSearchParamsDTO query)
+    {
+        var q = BuildQuery(query);
+
+        var response = await _httpClient.GetAsync($"{_paymentControllerPath}/GetPaymentsByQuery?{q}");
+
+        response.EnsureSuccessStatusCode();
+
+        var content = await response.Content.ReadAsStringAsync();
+
+        var result = JsonSerializer.Deserialize<PaymentPagedListDTO>(content, new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        });
+
+        return result ?? throw new Exception("Deserialized response is null.");
+    }
+
+    public async Task<string> UpdatePayment(PaymentUpdateDTO paymentUpdateDTO)
+    {
+        var response = await _httpClient.PutAsJsonAsync($"{_paymentControllerPath}/EditPayment/{paymentUpdateDTO.Id}", paymentUpdateDTO);
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new ApplicationException(await response.Content.ReadAsStringAsync());
+        }
+
+        return response.Headers.Location.Segments.Last();
+    }
 }

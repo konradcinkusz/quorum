@@ -12,5 +12,5 @@ global using MR.Client.Services;
 global using MR.Shared;
 global using System.Collections.Specialized;
 global using System.Web;
-global using MR.Client.Services.Base;
 global using System.Text.Json;
+global using MR.Shared.DTOs.Admin;

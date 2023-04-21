@@ -4,8 +4,8 @@ public class AdminLogProfile : Profile
 {
     public AdminLogProfile()
     {
-        CreateMap<AdminLog, AdminLogDto>();
-        CreateMap<AdminLogDto, AdminLog>();
+        CreateMap<AdminLog, AdminLogDTO>();
+        CreateMap<AdminLogDTO, AdminLog>();
     }
 }
 

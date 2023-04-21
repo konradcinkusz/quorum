@@ -83,7 +83,16 @@ public class SeedPaymentCommand : IRequest
                     }
                 };
 
+            
+
             await _context.Payments.AddRangeAsync(payments, cancellationToken);
+
+            await _context.Admin_Logs.AddAsync(new AdminLog
+            {
+                Action = "Seed Payments",
+                Values = string.Join(", ", new List<string> { "pi_123456789", "pi_987654321", "pi_135792468" })
+            }); ;
+
             await _context.SaveChangesAsync(cancellationToken);
 
             _logger.LogInformation($"Seeded {payments.Count} payments.");

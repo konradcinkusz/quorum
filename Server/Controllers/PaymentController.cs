@@ -2,10 +2,8 @@
 
 public class PaymentController : MRBaseController
 {
-    private readonly IConfiguration _configuration;
-    public PaymentController(IMapper mapper, IConfiguration configuration) : base(mapper)
+    public PaymentController(IMapper mapper) : base(mapper)
     {
-        _configuration = configuration;
     }
 
     [HttpPost(nameof(CreatePayment))]
@@ -55,7 +53,7 @@ public class PaymentController : MRBaseController
     }
 
     [HttpGet(nameof(GetPaymentsByQuery))]
-    public async Task<ActionResult<PaymentPagedListDto>> GetPaymentsByQuery([FromQuery] PaymentSearchParamsDTO query)
+    public async Task<ActionResult<PaymentPagedListDTO>> GetPaymentsByQuery([FromQuery] PaymentSearchParamsDTO query)
     {
         var result = await Mediator.Send(new GetPaymentsBySearchParamsQuery
         {
@@ -85,7 +83,7 @@ public class PaymentController : MRBaseController
                 .ToList()
         }).ToList();
 
-        return Ok(new PaymentPagedListDto { Items = paymentDTOs, CurrentPage = result.CurrentPage, PageSize = result.PageSize, TotalItems = result.TotalItems, TotalPages = result.TotalPages });
+        return Ok(new PaymentPagedListDTO { Items = paymentDTOs, CurrentPage = result.CurrentPage, PageSize = result.PageSize, TotalItems = result.TotalItems, TotalPages = result.TotalPages });
     }
 
     [HttpPut("EditPayment/{id}")]
@@ -127,20 +125,6 @@ public class PaymentController : MRBaseController
         {
             return StatusCode(500, ex.Message);
         }
-    }
-
-    [HttpPost(nameof(SeedPayments))]
-    public async Task<IActionResult> SeedPayments()
-    {
-        if (!_configuration.GetValue<bool>("SeedData:IsSeeded"))
-        {
-            var command = new SeedPaymentCommand(GetUserId());
-            await Mediator.Send(command);
-            _configuration["SeedData:IsSeeded"] = "true";
-
-            return Ok();
-        }
-        return BadRequest("Data has already been seeded");
     }
 
 }

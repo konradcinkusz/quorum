@@ -9,20 +9,20 @@ h1:focus {
 }
 
 a, .btn-link {
-    color: #0071c1;
+    color: #00bf5f; /* brighter green */
 }
 
 /* New styles for more shades of green */
 .btn-primary {
     color: #fff;
-    background-color: #3cb371;
-    border-color: #2e8b57;
+    background-color: #28a745; /* darker green */
+    border-color: #1e7e34;
 }
 
 .btn-success {
     color: #fff;
-    background-color: #2e8b57;
-    border-color: #20543d;
+    background-color: #32cd32; /* bright green */
+    border-color: #228b22;
 }
 
 .btn-info {
@@ -33,14 +33,14 @@ a, .btn-link {
 
 .btn-warning {
     color: #fff;
-    background-color: #9acd32;
-    border-color: #7cb305;
+    background-color: #ffda79; /* yellow-green */
+    border-color: #e6c100;
 }
 
 .btn-danger {
     color: #fff;
-    background-color: #dc143c;
-    border-color: #9f0f17;
+    background-color: #dc3545; /* red-green */
+    border-color: #c82333;
 }
 
 .btn:focus,
@@ -48,7 +48,7 @@ a, .btn-link {
 .btn-link.nav-link:focus,
 .form-control:focus,
 .form-check-input:focus {
-    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #2e8b57;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #28a745; /* white background, darker green border */
 }
 
 .content {
@@ -114,7 +114,7 @@ a, .btn-link {
     }
 
         .loading-progress circle:last-child {
-            stroke: #1b6ec2;
+            stroke: #28a745; /* darker green */
             stroke-dasharray: calc(3.141 * var(--blazor-load-percentage, 0%) * 0.8), 500%;
             transition: stroke-dasharray 0.05s ease-in-out;
         }

@@ -1,4 +1,4 @@
-﻿namespace MR.Client.Services.Base;
+﻿namespace MR.Client.Services;
 
 public abstract class DataServiceBase
 {
@@ -7,7 +7,7 @@ public abstract class DataServiceBase
     public DataServiceBase(HttpClient httpclient) => _httpClient = httpclient;
 
     public string GetBaseUrl() => _httpClient.BaseAddress.ToString();
-    
+
     protected NameValueCollection BuildQuery(SearchParams query)
     {
         var q = HttpUtility.ParseQueryString(string.Empty);
