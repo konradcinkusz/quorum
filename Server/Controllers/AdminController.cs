@@ -7,16 +7,19 @@ public class AdminController : MRBaseController
     {
         _configuration = configuration;
     }
-    
+
     [HttpGet(nameof(GetAdminLogsByQuery))]
     public async Task<ActionResult<AdminLogPagedListDTO>> GetAdminLogsByQuery([FromQuery] AdminLogSearchParamsDTO query)
     {
         var result = await Mediator.Send(new GetAdminLogsBySearchParamsQuery
         {
-            CurrentPage = query.CurrentPage,
-            PageSize = query.PageSize,
-            Name = query.Name,
-            Question = query.Question,
+            SearchParams = new()
+            {
+                CurrentPage = query.CurrentPage,
+                PageSize = query.PageSize,
+                Name = query.Name,
+                Question = query.Question,
+            },
             LastHour = query.LastHour,
             LastMonth = query.LastMonth,
             ValuesText = query.ValuesText,

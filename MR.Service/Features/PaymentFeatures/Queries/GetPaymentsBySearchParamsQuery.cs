@@ -1,4 +1,4 @@
-﻿namespace MR.Service.Features.Queries;
+﻿namespace MR.Service.Features.PaymentFeatures.Queries;
 
 public class GetPaymentsBySearchParamsQuery : QueryBase, IRequest<PagedList<Payment>>
 {
@@ -17,7 +17,7 @@ public class GetPaymentsBySearchParamsQuery : QueryBase, IRequest<PagedList<Paym
 
         public override async Task<PagedList<Payment>> Handle(GetPaymentsBySearchParamsQuery request, CancellationToken cancellationToken)
         {
-            var query = _context.Payments.Include(x=>x.PaymentStatusHistories).AsQueryable();
+            var query = _context.Payments.Include(x => x.PaymentStatusHistories).AsQueryable();
 
             if (!string.IsNullOrEmpty(request.UserEmail))
             {
@@ -49,7 +49,7 @@ public class GetPaymentsBySearchParamsQuery : QueryBase, IRequest<PagedList<Paym
                 query = query.Where(p => p.PaymentValuePLN <= request.MaxPaymentValuePLN.Value);
             }
 
-            return new PagedList<Payment>(query, request);
+            return new PagedList<Payment>(query, request.SearchParams);
         }
     }
 }

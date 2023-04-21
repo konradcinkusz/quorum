@@ -7,7 +7,7 @@ public class PagedList<T> : List<T>
     public int TotalPages { get; set; }
     public int TotalItems { get; set; }
 
-    public PagedList(IQueryable<T> query, QueryBase options)
+    public PagedList(IQueryable<T> query, SearchParams options)
     {
         CurrentPage = options.CurrentPage;
         PageSize = options.PageSize;

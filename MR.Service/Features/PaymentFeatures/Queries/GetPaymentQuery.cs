@@ -1,4 +1,4 @@
-﻿namespace MR.Service.Features.Queries;
+﻿namespace MR.Service.Features.PaymentFeatures.Queries;
 
 public class GetPaymentQuery : IRequest<Payment>
 {

@@ -32,3 +32,4 @@ global using MR.Service.Exceptions;
 global using MR.Domain.Entities;
 global using MR.Shared.DTOs.Admin;
 global using Microsoft.OpenApi.Models;
+global using MR.Service.Features.PaymentFeatures.Queries;

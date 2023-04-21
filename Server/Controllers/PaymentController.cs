@@ -62,10 +62,13 @@ public class PaymentController : MRBaseController
             PaymentIntentId = query.PaymentIntentId,
             MinPaymentValuePLN = query.MinPaymentValuePLN,
             MaxPaymentValuePLN = query.MaxPaymentValuePLN,
-            CurrentPage = query.CurrentPage,
-            PageSize = query.PageSize,
-            Name = query.Name,
-            Question = query.Question
+            SearchParams = new SearchParams
+            {
+                CurrentPage = query.CurrentPage,
+                PageSize = query.PageSize,
+                Name = query.Name,
+                Question = query.Question
+            }
         });
 
         var paymentDTOs = result.Select(payment => new PaymentDTO
