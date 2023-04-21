@@ -1,3 +1,26 @@
 ﻿.nav-link:hover {
     background-color: #d6edeb;
 }
+.icon-lg {
+    font-size: 2em;
+}
+
+.nav-link-container {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-radius: 5px;
+    transition: background-color 0.2s ease-in-out;
+}
+
+    .nav-link-container:hover {
+        background-color: #e5f4e8;
+    }
+
+    .nav-link-container .oi {
+        font-size: 1.2rem;
+    }
+
+    .nav-link-container .mr-2 {
+        margin-right: 0.5rem;
+    }
