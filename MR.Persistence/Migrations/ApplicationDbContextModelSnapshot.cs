@@ -314,7 +314,7 @@ namespace MR.Persistence.Migrations
 
                     b.HasIndex("ApplicationUserId");
 
-                    b.ToTable("RefreshToken");
+                    b.ToTable("RefreshToken", (string)null);
                 });
 
             modelBuilder.Entity("MR.Domain.Entities.AdminLog", b =>
