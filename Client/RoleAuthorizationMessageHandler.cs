@@ -1,0 +1,26 @@
+﻿namespace MR.Client;
+
+public class RoleAuthorizationMessageHandler : DelegatingHandler
+{
+    private readonly AuthenticationStateProvider _authStateProvider;
+
+    public RoleAuthorizationMessageHandler(AuthenticationStateProvider authStateProvider)
+    {
+        _authStateProvider = authStateProvider;
+    }
+
+    protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+    {
+        var authState = await _authStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated && !user.HasClaim(c => c.Type == "role" && Extensions.ExtractStringList(c.Value).Any(d => d == "Basic")))
+        {
+            return new HttpResponseMessage(HttpStatusCode.Forbidden);
+        }
+
+        return await base.SendAsync(request, cancellationToken);
+    }
+
+
+}

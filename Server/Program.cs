@@ -1,3 +1,6 @@
+
+using IdentityModel;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContextService(builder.Configuration);
@@ -6,10 +9,18 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<ApplicationUser>
     (options => options.SignIn.RequireConfirmedAccount = true)
+    .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
+//https://stackoverflow.com/q/70563303
+//https://github.com/dotnet/AspNetCore.Docs/issues/14944
 builder.Services.AddIdentityServer()
-    .AddApiAuthorization<ApplicationUser, ApplicationDbContext>();
+    .AddApiAuthorization<ApplicationUser, ApplicationDbContext>(opt => {
+        opt.IdentityResources["openid"].UserClaims.Add("name");
+        opt.ApiResources.Single().UserClaims.Add("name");
+        opt.IdentityResources["openid"].UserClaims.Add("role");
+        opt.ApiResources.Single().UserClaims.Add("role");
+    });
 
 
 builder.Services.AddAuthentication()

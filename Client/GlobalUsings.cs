@@ -14,3 +14,7 @@ global using System.Collections.Specialized;
 global using System.Web;
 global using System.Text.Json;
 global using MR.Shared.DTOs.Admin;
+global using Microsoft.AspNetCore.Components.Authorization;
+global using System.Net;
+global using System.Security.Claims;
+global using Microsoft.AspNetCore.Authorization;
