@@ -23,12 +23,9 @@ public class SeedPaymentCommand : IRequest
                 {
                     new Payment
                     {
-                        UserEmail = "user1@example.com",
-                        PaymentLink = "https://example.com/payments/12345",
-                        ClientReferenceId = "ref123",
-                        PaymentIntentId = "pi_123456789",
-                        SessionId = "sess_123456789",
-                        PaymentStatus = PaymentStatus.Unknown.ToString(),
+                        ReferenceNumber = "pi_123456789",
+                        PaymentMethod = "sess_123456789",
+                        PaymentStatus = PaymentStatus.Unknown,
                         ApplicationUserId = request.ApplicationUserId,
                         PaymentValuePLN = 100.00M,
                         PaymentStatusHistories = new List<PaymentStatusHistory> {
@@ -45,12 +42,9 @@ public class SeedPaymentCommand : IRequest
                     },
                     new Payment
                     {
-                        UserEmail = "user2@example.com",
-                        PaymentLink = "https://example.com/payments/67890",
-                        ClientReferenceId = "ref456",
-                        PaymentIntentId = "pi_987654321",
-                        SessionId = "sess_987654321",
-                        PaymentStatus = PaymentStatus.Rejected.ToString(),
+                        ReferenceNumber = "pi_123456789",
+                        PaymentMethod = "sess_123456789",
+                        PaymentStatus = PaymentStatus.Unknown,
                         ApplicationUserId = request.ApplicationUserId,
                         PaymentValuePLN = 50.00M,
                         PaymentStatusHistories = new List<PaymentStatusHistory> {
@@ -64,12 +58,7 @@ public class SeedPaymentCommand : IRequest
                     },
                     new Payment
                     {
-                        UserEmail = "user3@example.com",
-                        PaymentLink = "https://example.com/payments/24680",
-                        ClientReferenceId = "ref789",
-                        PaymentIntentId = "pi_135792468",
-                        SessionId = "sess_135792468",
-                        PaymentStatus = PaymentStatus.Pending.ToString(),
+                        ReferenceNumber = "pi_123456789", PaymentMethod = "sess_123456789", PaymentStatus = PaymentStatus.Unknown,
                         ApplicationUserId = request.ApplicationUserId,
                         PaymentValuePLN = 200.00M,
                         PaymentStatusHistories = new List<PaymentStatusHistory> {

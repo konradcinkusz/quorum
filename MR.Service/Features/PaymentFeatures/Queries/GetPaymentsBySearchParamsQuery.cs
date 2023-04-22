@@ -1,11 +1,12 @@
 ﻿namespace MR.Service.Features.PaymentFeatures.Queries;
 
-public class GetPaymentsBySearchParamsQuery : QueryBase, IRequest<PagedList<Payment>>
+public class GetPaymentsBySearchParamsQuery : QueryBase, IPaymentBaseFeature, IRequest<PagedList<Payment>>
 {
-    public string UserEmail { get; set; } = string.Empty;
-    public string ClientReferenceId { get; set; } = string.Empty;
-    public string PaymentIntentId { get; set; } = string.Empty;
-    public PaymentStatus? PaymentStatus { get; set; }
+    public PaymentStatus PaymentStatus { get; set; }
+    public string ApplicationUserId { get; set; }
+    public decimal PaymentValuePLN { get; set; }
+    public string PaymentMethod { get; set; } // the payment method used (e.g. credit card, PayPal, etc.)
+    public string ReferenceNumber { get; set; }// a reference number associated with the payment (e.g. transaction ID)
     public decimal? MinPaymentValuePLN { get; set; }
     public decimal? MaxPaymentValuePLN { get; set; }
 
@@ -19,24 +20,24 @@ public class GetPaymentsBySearchParamsQuery : QueryBase, IRequest<PagedList<Paym
         {
             var query = _context.Payments.Include(x => x.PaymentStatusHistories).AsQueryable();
 
-            if (!string.IsNullOrEmpty(request.UserEmail))
+            if (!string.IsNullOrEmpty(request.ApplicationUserId))
             {
-                query = query.Where(p => p.UserEmail.Contains(request.UserEmail));
+                query = query.Where(p => p.ApplicationUserId.Contains(request.ApplicationUserId));
             }
 
-            if (!string.IsNullOrEmpty(request.ClientReferenceId))
+            if (!string.IsNullOrEmpty(request.PaymentMethod))
             {
-                query = query.Where(p => p.ClientReferenceId == request.ClientReferenceId);
+                query = query.Where(p => p.PaymentMethod == request.PaymentMethod);
             }
 
-            if (!string.IsNullOrEmpty(request.PaymentIntentId))
+            if (!string.IsNullOrEmpty(request.ReferenceNumber))
             {
-                query = query.Where(p => p.PaymentIntentId == request.PaymentIntentId);
+                query = query.Where(p => p.ReferenceNumber == request.ReferenceNumber);
             }
 
-            if (request.PaymentStatus.HasValue)
+            if (request.PaymentStatus != PaymentStatus.None)
             {
-                query = query.Where(p => p.PaymentStatus == request.PaymentStatus.Value.ToString());
+                query = query.Where(p => p.PaymentStatus == request.PaymentStatus);
             }
 
             if (request.MinPaymentValuePLN.HasValue)

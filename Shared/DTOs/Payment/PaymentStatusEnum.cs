@@ -1,8 +1,7 @@
-﻿namespace MR.Domain.Enums;
+﻿namespace MR.Shared.DTOs.Payment;
 
-public enum PaymentStatus
+public enum PaymentStatusEnum
 {
-    None,
     New,
     Pending,
     Rejected,

@@ -2,6 +2,6 @@
 
 public class PaymentStatusHistoryDTO
 {
-    public string PaymentStatus { get; set; }
-    public DateTime StatusDate { get; set; }
+    public PaymentStatusEnum PaymentStatus { get; set; }
+    public DateTime CreatedAt { get; set; }
 }

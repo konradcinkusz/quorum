@@ -15,8 +15,8 @@
                     <p class="form-control-plaintext" id="payment-id">@Payment.Id</p>
                 </div>
                 <div class="col-sm-4">
-                    <label for="user-email" class="form-label">User Email:</label>
-                    <p class="form-control-plaintext" id="user-email">@Payment.UserEmail</p>
+                    <label for="user-email" class="form-label">ApplicationUserId:</label>
+                    <p class="form-control-plaintext" id="user-email">@Payment.ApplicationUserId</p>
                 </div>
                 <div class="col-sm-4">
                     <label for="payment-value" class="form-label">Payment Value:</label>
@@ -34,16 +34,10 @@
                 <h5>Payment Details</h5>
                 <dl class="row mb-3">
                     <dt class="col-sm-3">Payment Link:</dt>
-                    <dd class="col-sm-9"><a href="@Payment.PaymentLink">@Payment.PaymentLink</a></dd>
+                    <dd class="col-sm-9"><a href="@Payment.PaymentMethod">@Payment.PaymentMethod</a></dd>
 
                     <dt class="col-sm-3">Reference ID:</dt>
-                    <dd class="col-sm-9">@Payment.ClientReferenceId</dd>
-
-                    <dt class="col-sm-3">Payment Intent ID:</dt>
-                    <dd class="col-sm-9">@Payment.PaymentIntentId</dd>
-
-                    <dt class="col-sm-3">Session ID:</dt>
-                    <dd class="col-sm-9">@Payment.SessionId</dd>
+                    <dd class="col-sm-9">@Payment.ReferenceNumber</dd>
 
                     <dt class="col-sm-3">Created At:</dt>
                     <dd class="col-sm-9">@Payment.CreatedAt.ToString("g", CultureInfo.InvariantCulture)</dd>
@@ -53,7 +47,7 @@
 
                     <dt class="col-sm-3">Payment Status History:</dt>
                     <dd class="col-sm-9">
-                        @if (Payment.PaymentStatusHistory != null && Payment.PaymentStatusHistory.Any())
+                        @if (Payment.PaymentStatusHistories != null && Payment.PaymentStatusHistories.Any())
                         {
                             <table class="table">
                                 <thead>
@@ -63,11 +57,11 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach (var history in Payment.PaymentStatusHistory)
+                                    @foreach (var history in Payment.PaymentStatusHistories)
                                     {
                                         <tr>
                                             <td>@history.PaymentStatus</td>
-                                            <td>@history.StatusDate.ToString("g", CultureInfo.InvariantCulture)</td>
+                                            <td>@history.CreatedAt.ToString("g", CultureInfo.InvariantCulture)</td>
                                         </tr>
                                     }
                                 </tbody>

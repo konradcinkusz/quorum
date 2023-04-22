@@ -42,8 +42,8 @@ public class PaymentService : DataServiceBase, IPaymentService
     {
         var q = BuildQuery(query);
 
-        if (!string.IsNullOrEmpty(query.UserEmail))
-            q[nameof(query.UserEmail)] = query.UserEmail;
+        if (!string.IsNullOrEmpty(query.ApplicationUserId))
+            q[nameof(query.ApplicationUserId)] = query.ApplicationUserId;
 
         var response = await _httpClient.GetAsync($"{_paymentControllerPath}/GetPaymentsByQuery?{q}");
 

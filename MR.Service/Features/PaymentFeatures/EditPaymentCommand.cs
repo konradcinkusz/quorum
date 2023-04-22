@@ -1,16 +1,13 @@
 ﻿namespace MR.Service.Features.PaymentFeatures;
 
-public class EditPaymentCommand : IRequest<Guid>
+public class EditPaymentCommand : IPaymentBaseFeature, IRequest<Guid>
 {
     public Guid PaymentId { get; set; }
-    public string UserEmail { get; set; }
-    public string PaymentLink { get; set; }
-    public string ClientReferenceId { get; set; }
-    public string PaymentIntentId { get; set; }
-    public string SessionId { get; set; }
     public PaymentStatus PaymentStatus { get; set; }
     public string ApplicationUserId { get; set; }
     public decimal PaymentValuePLN { get; set; }
+    public string PaymentMethod { get; set; } // the payment method used (e.g. credit card, PayPal, etc.)
+    public string ReferenceNumber { get; set; }// a reference number associated with the payment (e.g. transaction ID)
 
     public class EditPaymentCommandHandler : CommandHandlerBase<EditPaymentCommand, Guid>
     {
@@ -29,12 +26,14 @@ public class EditPaymentCommand : IRequest<Guid>
                 throw new NotFoundException(nameof(Payment), request.PaymentId);
             }
 
-            payment.UserEmail = request.UserEmail;
-            payment.PaymentLink = request.PaymentLink;
-            payment.ClientReferenceId = request.ClientReferenceId;
-            payment.PaymentIntentId = request.PaymentIntentId;
-            payment.SessionId = request.SessionId;
-            payment.PaymentStatus = request.PaymentStatus.ToString();
+            if (payment.PaymentStatus != request.PaymentStatus)
+            {
+                payment.PaymentStatusHistories.Add(new PaymentStatusHistory { PaymentStatus = request.PaymentStatus });
+            }
+
+            payment.ReferenceNumber = request.ReferenceNumber;
+            payment.PaymentMethod = request.PaymentMethod;
+            payment.PaymentStatus = request.PaymentStatus;
             payment.PaymentValuePLN = request.PaymentValuePLN;
 
             await _context.SaveChangesAsync(cancellationToken);

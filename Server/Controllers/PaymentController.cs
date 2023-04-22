@@ -12,13 +12,11 @@ public class PaymentController : MRBaseController
         string uId = GetUserId();
         var paymentId = await Mediator.Send(new CreatePaymentCommand
         {
-            UserEmail = paymentDto.UserEmail,
-            PaymentLink = paymentDto.PaymentLink,
-            ClientReferenceId = paymentDto.ClientReferenceId,
-            PaymentIntentId = paymentDto.PaymentIntentId,
-            SessionId = paymentDto.SessionId,
+            PaymentStatus = PaymentStatus.New,
+            PaymentMethod = paymentDto.PaymentMethod,
+            ReferenceNumber = paymentDto.ReferenceNumber,            
             ApplicationUserId = uId,
-            PaymentValuePLN = paymentDto.PaymentValuePLN.HasValue ? paymentDto.PaymentValuePLN.Value : -1
+            PaymentValuePLN = paymentDto.PaymentValuePLN
         });
 
         return CreatedAtAction(nameof(GetPayment), new { id = paymentId }, null);
@@ -34,20 +32,7 @@ public class PaymentController : MRBaseController
             return NotFound();
         }
 
-        var paymentDto = new PaymentDTO
-        {
-            Id = payment.Id,
-            UserEmail = payment.UserEmail,
-            PaymentLink = payment.PaymentLink,
-            ClientReferenceId = payment.ClientReferenceId,
-            PaymentIntentId = payment.PaymentIntentId,
-            SessionId = payment.SessionId,
-            CreatedAt = payment.CreatedAt,
-            PaymentValuePLN = payment.PaymentValuePLN,
-            PaymentStatusHistory = payment.PaymentStatusHistories
-                .Select(h => new PaymentStatusHistoryDTO { PaymentStatus = EnumHelper.EnumToString(h.PaymentStatus), StatusDate = h.CreatedAt })
-                .ToList()
-        };
+        var paymentDto = _mapper.Map<PaymentDTO>(payment);
 
         return paymentDto;
     }
@@ -57,9 +42,7 @@ public class PaymentController : MRBaseController
     {
         var result = await Mediator.Send(new GetPaymentsBySearchParamsQuery
         {
-            UserEmail = query.UserEmail,
-            ClientReferenceId = query.ClientReferenceId,
-            PaymentIntentId = query.PaymentIntentId,
+            ApplicationUserId = query.ApplicationUserId,
             MinPaymentValuePLN = query.MinPaymentValuePLN,
             MaxPaymentValuePLN = query.MaxPaymentValuePLN,
             SearchParams = new SearchParams
@@ -71,20 +54,7 @@ public class PaymentController : MRBaseController
             }
         });
 
-        var paymentDTOs = result.Select(payment => new PaymentDTO
-        {
-            Id = payment.Id,
-            UserEmail = payment.UserEmail,
-            PaymentLink = payment.PaymentLink,
-            ClientReferenceId = payment.ClientReferenceId,
-            PaymentIntentId = payment.PaymentIntentId,
-            SessionId = payment.SessionId,
-            CreatedAt = payment.CreatedAt,
-            PaymentValuePLN = payment.PaymentValuePLN,
-            PaymentStatusHistory = payment.PaymentStatusHistories
-                .Select(h => new PaymentStatusHistoryDTO { PaymentStatus = EnumHelper.EnumToString(h.PaymentStatus), StatusDate = h.CreatedAt })
-                .ToList()
-        }).ToList();
+        var paymentDTOs = _mapper.Map<List<PaymentDTO>>(result);
 
         return Ok(new PaymentPagedListDTO { Items = paymentDTOs, CurrentPage = result.CurrentPage, PageSize = result.PageSize, TotalItems = result.TotalItems, TotalPages = result.TotalPages });
     }
@@ -101,19 +71,9 @@ public class PaymentController : MRBaseController
         {
             return BadRequest(ModelState);
         }
-
-        var command = new EditPaymentCommand
-        {
-            PaymentId = id,
-            UserEmail = paymentDto.UserEmail,
-            PaymentLink = paymentDto.PaymentLink,
-            ClientReferenceId = paymentDto.ClientReferenceId,
-            PaymentIntentId = paymentDto.PaymentIntentId,
-            SessionId = paymentDto.SessionId,
-            PaymentStatus = PaymentStatus.Pending,
-            ApplicationUserId = GetUserId(),
-            PaymentValuePLN = paymentDto.PaymentValuePLN
-        };
+        EditPaymentCommand command = _mapper.Map<EditPaymentCommand>(paymentDto);
+        command.ApplicationUserId = GetUserId();
+        command.PaymentId = id;
 
         try
         {

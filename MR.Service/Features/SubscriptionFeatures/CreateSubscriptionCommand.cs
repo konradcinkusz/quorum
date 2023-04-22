@@ -24,7 +24,7 @@ public class CreateSubscriptionCommand : IRequest<Guid>
                 throw new ApplicationException("User already has an active subscription");
             }
 
-            if (await activeSubscriptionExists.AnyAsync(x => x.Payment != null && x.Payment.PaymentStatus == PaymentStatus.Pending.ToString()))
+            if (await activeSubscriptionExists.AnyAsync(x => x.Payment != null && x.Payment.PaymentStatus == PaymentStatus.Pending))
             {
                 throw new ApplicationException("User already has started buying the sub");
             }

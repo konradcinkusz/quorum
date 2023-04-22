@@ -1,16 +1,11 @@
 ﻿namespace MR.Service.Features.PaymentFeatures;
-
-public class CreatePaymentCommand : IRequest<Guid>
+public class CreatePaymentCommand : IPaymentBaseFeature, IRequest<Guid>
 {
-    public string UserEmail { get; set; }
-    public string PaymentLink { get; set; }
-    public string ClientReferenceId { get; set; }
-    public string PaymentIntentId { get; set; }
-    public string SessionId { get; set; }
     public PaymentStatus PaymentStatus { get; set; }
     public string ApplicationUserId { get; set; }
     public decimal PaymentValuePLN { get; set; }
-
+    public string PaymentMethod { get; set; } // the payment method used (e.g. credit card, PayPal, etc.)
+    public string ReferenceNumber { get; set; }// a reference number associated with the payment (e.g. transaction ID)
     public class CreatePaymentCommandHandler : CommandHandlerBase<CreatePaymentCommand, Guid>
     {
         public CreatePaymentCommandHandler(IApplicationDbContext context, ILogger<CreatePaymentCommand> logger)
@@ -20,14 +15,21 @@ public class CreatePaymentCommand : IRequest<Guid>
 
         public override async Task<Guid> Handle(CreatePaymentCommand request, CancellationToken cancellationToken)
         {
-            var payment = new Payment
+            var payment = MakePayment(request);
+
+            await _context.Payments.AddAsync(payment, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
+
+            return payment.Id;
+        }
+
+        private Payment MakePayment(CreatePaymentCommand request)
+        {
+            return new Payment
             {
-                UserEmail = request.UserEmail,
-                PaymentLink = request.PaymentLink,
-                ClientReferenceId = request.ClientReferenceId,
-                PaymentIntentId = request.PaymentIntentId,
-                SessionId = request.SessionId,
-                PaymentStatus = request.PaymentStatus.ToString(),
+                PaymentMethod = request.PaymentMethod,
+                ReferenceNumber = request.ReferenceNumber,
+                PaymentStatus = request.PaymentStatus,
                 ApplicationUserId = request.ApplicationUserId,
                 PaymentValuePLN = request.PaymentValuePLN,
                 PaymentStatusHistories = new List<PaymentStatusHistory> {
@@ -36,12 +38,6 @@ public class CreatePaymentCommand : IRequest<Guid>
                     }
                 }
             };
-
-            await _context.Payments.AddAsync(payment, cancellationToken);
-            await _context.SaveChangesAsync(cancellationToken);
-
-            return payment.Id;
         }
-
     }
 }

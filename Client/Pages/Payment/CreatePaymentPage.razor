@@ -15,33 +15,15 @@
 
             <div class="row">
                 <div class="col-md-6 mb-4">
-                    <label for="user-email" class="form-label">User Email</label>
-                    <InputText id="user-email" class="form-control rounded-pill" @bind-Value="@paymentDto.UserEmail" required />
-                    <ValidationMessage For="@(() => paymentDto.UserEmail)" />
+                    <label for="client-reference-id" class="form-label">ReferenceNumber</label>
+                    <InputText id="client-reference-id" class="form-control rounded-pill" @bind-Value="@paymentDto.ReferenceNumber" required />
+                    <ValidationMessage For="@(() => paymentDto.ReferenceNumber)" />
                 </div>
 
                 <div class="col-md-6 mb-4">
-                    <label for="client-reference-id" class="form-label">Client Reference ID</label>
-                    <InputText id="client-reference-id" class="form-control rounded-pill" @bind-Value="@paymentDto.ClientReferenceId" required />
-                    <ValidationMessage For="@(() => paymentDto.ClientReferenceId)" />
-                </div>
-
-                <div class="col-md-6 mb-4">
-                    <label for="payment-link" class="form-label">Payment Link</label>
-                    <InputText id="payment-link" class="form-control rounded-pill" @bind-Value="@paymentDto.PaymentLink" required />
-                    <ValidationMessage For="@(() => paymentDto.PaymentLink)" />
-                </div>
-
-                <div class="col-md-6 mb-4">
-                    <label for="payment-intent-id" class="form-label">Payment Intent ID</label>
-                    <InputText id="payment-intent-id" class="form-control rounded-pill" @bind-Value="@paymentDto.PaymentIntentId" required />
-                    <ValidationMessage For="@(() => paymentDto.PaymentIntentId)" />
-                </div>
-
-                <div class="col-md-12 mb-4">
-                    <label for="session-id" class="form-label">Session ID</label>
-                    <InputText id="session-id" class="form-control rounded-pill" @bind-Value="@paymentDto.SessionId" required />
-                    <ValidationMessage For="@(() => paymentDto.SessionId)" />
+                    <label for="payment-link" class="form-label">Payment Method</label>
+                    <InputText id="payment-link" class="form-control rounded-pill" @bind-Value="@paymentDto.PaymentMethod" required />
+                    <ValidationMessage For="@(() => paymentDto.PaymentMethod)" />
                 </div>
 
                 <div class="col-md-12 mb-4">
