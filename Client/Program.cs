@@ -1,3 +1,5 @@
+using MR.Client.Features;
+
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
@@ -8,12 +10,6 @@ builder.Services.AddTransient<RoleAuthorizationMessageHandler>();
 const string MRPaymentDataService = "MR.ServerAPI";
 builder.Services
     .AddHttpClient<IPaymentService, PaymentService>(MRPaymentDataService, client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress))
-    .AddHttpMessageHandler<BaseAddressAuthorizationMessageHandler>()
-    .AddHttpMessageHandler<RoleAuthorizationMessageHandler>();
-
-const string MRAuthorizedDataService = "MR.ServerAPI.Authorized";
-builder.Services
-    .AddHttpClient<IAuthorizedMRDataService, AuthorizedMRDataService>(MRAuthorizedDataService, client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress))
     .AddHttpMessageHandler<BaseAddressAuthorizationMessageHandler>()
     .AddHttpMessageHandler<RoleAuthorizationMessageHandler>();
 

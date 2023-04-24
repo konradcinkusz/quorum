@@ -23,6 +23,16 @@ builder.Services.AddIdentityServer()
 builder.Services.AddAuthentication()
     .AddIdentityServerJwt();
 
+//Roles not working - erroneously appears as if User is not in a Role, .NET 6 (upgrading from .Net Core 3.2)
+//https://stackoverflow.com/a/73930254/4510954
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("RequireAdminRole", policy =>
+    {
+        policy.RequireClaim(ClaimTypes.Role, new[] { "Admin", "SuperAdmin" });
+    });
+});
+
 builder.Services.AddRazorPages();
 
 builder.Services.AddController();

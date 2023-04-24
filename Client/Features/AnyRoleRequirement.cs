@@ -1,4 +1,6 @@
-﻿public class AnyRoleRequirement : IAuthorizationRequirement
+﻿using MR.Client.Features;
+
+public class AnyRoleRequirement : IAuthorizationRequirement
 {
     public string[] Roles { get; }
 

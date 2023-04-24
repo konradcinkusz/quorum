@@ -1,4 +1,4 @@
-﻿namespace MR.Client;
+﻿namespace MR.Client.Features;
 
 public static class Extensions
 {
