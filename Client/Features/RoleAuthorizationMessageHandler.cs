@@ -21,6 +21,4 @@ public class RoleAuthorizationMessageHandler : DelegatingHandler
 
         return await base.SendAsync(request, cancellationToken);
     }
-
-
 }
