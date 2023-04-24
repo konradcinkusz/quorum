@@ -1,8 +1,16 @@
 ﻿namespace MR.Service.Features.SubscriptionFeatures;
 
-public class CreateSubscriptionCommand : IRequest<Guid>
+public interface ISubscriptionBaseCommand
 {
-    public Guid PaymentId { get; set; }
+    Guid? PaymentId { get; set; }
+    string ApplicationUserId { get; set; }
+    DateTime? Begin { get; set; }
+    DateTime? End { get; set; }
+}
+
+public class CreateSubscriptionCommand : ISubscriptionBaseCommand, IRequest<Guid>
+{
+    public Guid? PaymentId { get; set; }
     public string ApplicationUserId { get; set; }
     public DateTime? Begin { get; set; }
     public DateTime? End { get; set; }
@@ -16,10 +24,10 @@ public class CreateSubscriptionCommand : IRequest<Guid>
 
         public override async Task<Guid> Handle(CreateSubscriptionCommand request, CancellationToken cancellationToken)
         {
-            var activeSubscriptionExists = _context.Subscriptions.Include(x=>x.Payment)
+            var activeSubscriptionExists = _context.Subscriptions.Include(x => x.Payment)
                 .Where(s => s.ApplicationUserId == request.ApplicationUserId);
 
-            if (await activeSubscriptionExists.AnyAsync(x=>x.IsActive()))
+            if (await activeSubscriptionExists.AnyAsync(x => x.IsActive()))
             {
                 throw new ApplicationException("User already has an active subscription");
             }
