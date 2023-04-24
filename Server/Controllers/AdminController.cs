@@ -1,5 +1,6 @@
 ﻿namespace MR.Server.Controllers;
 
+[Authorize(Policy = "RequireAdminRole")]
 public class AdminController : MRBaseController
 {
     private readonly IConfiguration _configuration;

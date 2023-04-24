@@ -52,7 +52,7 @@ builder.Services.AddVersion();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "MyBlazor", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "MR", Version = "v1" });
 });
 
 var app = builder.Build();
