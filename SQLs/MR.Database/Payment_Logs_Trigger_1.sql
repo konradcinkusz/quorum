@@ -1,74 +1,40 @@
-﻿CREATE TRIGGER trg_Payment_Log
-ON MRPayments.Payments
+﻿USE [aspnet-mreferenda.Server-44bd1c16-4782-4de1-8743-3aee3305f17d]
+GO
+/****** Object:  Trigger [MRPayments].[trg_Payment_Log]    Script Date: 26/04/2023 12:49:03 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+create or ALTER TRIGGER [MRPayments].[trg_Payment_Log]
+ON [MRPayments].[Payments]
 AFTER INSERT, UPDATE, DELETE
 AS
-BEGIN
-    DECLARE @Action nvarchar(10)
 
-    IF EXISTS (SELECT * FROM inserted)
-    BEGIN
-        IF EXISTS (SELECT * FROM deleted)
-            SET @Action = 'UPDATE'
-        ELSE
-            SET @Action = 'INSERT'
-    END
-    ELSE
-        SET @Action = 'DELETE'
+SET NOCOUNT ON;
 
-    INSERT INTO MRLogs.Payment_Logs (PaymentId, EntityName, Action, OldValues, NewValues, LogDate)
-    SELECT 
-        CASE 
-            WHEN @Action = 'DELETE' THEN deleted.Id 
-            ELSE inserted.Id 
-        END,
-        'Payment',
-        @Action,
-        CASE 
-            WHEN @Action = 'UPDATE' THEN dbo.GetOldValues_Payment(deleted.Id) 
-            ELSE NULL 
-        END,
-        CASE 
-            WHEN @Action = 'INSERT' THEN dbo.GetNewValues_Payment(inserted.Id) 
-            ELSE dbo.GetNewValues_Payment(deleted.Id) 
-        END,
-        GETDATE()
-    FROM inserted
-    FULL OUTER JOIN deleted ON inserted.Id = deleted.Id
-END
+INSERT INTO MRPayments.Payment_Logs
+    (PaymentId, Action, OldValues, NewValues, LogDate)
+SELECT
+  ISNULL(i.Id, d.Id),
 
-GO
+  IIF(i.Id IS NULL, 'DELETE', IIF(d.Id IS NULL, 'INSERT', 'UPDATE')),
 
-CREATE FUNCTION dbo.GetOldValues_Payment(@PaymentId uniqueidentifier)
-RETURNS nvarchar(max)
-AS
-BEGIN
-    DECLARE @OldValues nvarchar(max)
-
-    SELECT @OldValues = 
-        'PaymentStatus: ' + COALESCE(CONVERT(nvarchar(max), deleted.PaymentStatus), 'NULL') + CHAR(13) + CHAR(10) +
-        'ApplicationUserId: ' + COALESCE(CONVERT(nvarchar(max), deleted.ApplicationUserId), 'NULL') + CHAR(13) + CHAR(10) +
-        'PaymentValuePLN: ' + COALESCE(CONVERT(nvarchar(max), deleted.PaymentValuePLN), 'NULL') + CHAR(13) + CHAR(10)
-    FROM deleted
-    WHERE deleted.Id = @PaymentId
-
-    RETURN @OldValues
-END
-
-GO
-
-CREATE FUNCTION GetNewValues_Payment (@PaymentId uniqueidentifier)
-RETURNS nvarchar(max)
-AS
-BEGIN
-    DECLARE @NewValues nvarchar(max)
-
-    SELECT @NewValues = CONCAT(
-        'PaymentStatus: ', COALESCE(NEW.PaymentStatus, 'NULL'), CHAR(13), CHAR(10),
-        'ApplicationUserId: ', COALESCE(NEW.ApplicationUserId, 'NULL'), CHAR(13), CHAR(10),
-        'PaymentValuePLN: ', COALESCE(CAST(NEW.PaymentValuePLN AS nvarchar(max)), 'NULL')
+  CASE WHEN i.Id IS NOT NULL AND d.Id IS NOT NULL THEN
+    CONCAT_WS(NCHAR(13) + NCHAR(10),
+      'PaymentStatus: ' + ISNULL(CONVERT(nvarchar(max), d.PaymentStatus), 'NULL'),
+      'ApplicationUserId: ' + ISNULL(CONVERT(nvarchar(max), d.ApplicationUserId), 'NULL'),
+    'PaymentValuePLN: ' + ISNULL(CONVERT(nvarchar(max), d.PaymentValuePLN), 'NULL')
     )
-    FROM inserted AS NEW
-    WHERE NEW.Id = @PaymentId
+  END,
 
-    RETURN @NewValues
-END
+  CONCAT_WS(NCHAR(13) + NCHAR(10),
+    'PaymentStatus: ' + ISNULL(CAST(i.PaymentStatus AS nvarchar(max)), 'NULL'),
+    'ApplicationUserId: ' + ISNULL(i.ApplicationUserId, 'NULL'),
+    'PaymentValuePLN: ' + ISNULL(CAST(i.PaymentValuePLN AS nvarchar(max)), 'NULL')
+    ),
+
+  GETDATE()
+
+FROM inserted i
+FULL JOIN deleted d ON i.Id = d.Id;
+

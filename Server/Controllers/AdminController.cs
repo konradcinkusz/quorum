@@ -17,9 +17,7 @@ public class AdminController : MRBaseController
             SearchParams = new()
             {
                 CurrentPage = query.CurrentPage,
-                PageSize = query.PageSize,
-                Name = query.Name,
-                Question = query.Question,
+                PageSize = query.PageSize
             },
             LastHour = query.LastHour,
             LastMonth = query.LastMonth,

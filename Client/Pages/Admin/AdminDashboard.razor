@@ -8,68 +8,91 @@
 
 <div class="container-fluid">
     <h1 class="mb-3">Dashboard</h1>
+
     <div class="row">
         <div class="col-md-12">
             <ul class="nav flex-column">
                 <li class="nav-item">
                     <a class="nav-link active" href="payments"><span class="oi oi-list mr-2"></span> Payments</a>
                 </li>
-                <!-- Add more options here -->
             </ul>
         </div>
     </div>
-    <div class="row mt-4">
-        <div class="col-md-12">
-            <h2>Payments Administration</h2>
-            <hr />
-            <button class="btn btn-primary" @onclick="SeedPayments">Seed Payments</button>
-            <!-- Add payment read page here -->
-        </div>
-    </div>
-    <div class="row mt-4">
-        <div class="col-md-12">
-            <h2>Admin logs</h2>
-            <hr />
-            @if (AdminLogPagedListDto == null)
-            {
-                <_Loading LoadingText="Ładowanie listy płatności" />
-            }
-            else
-            {
-                <AdminBrowser Refresh="_refresh"
-                          QuerySearch="AdminLogQuerySearchDTO"></AdminBrowser>
-                @if (AdminLogPagedListDto.Items.Count == 0)
-                {
-                    <p><em>Brak kwestii spełniających kryteria wyszukiwania...</em></p>
-                }
-                else
-                {
-                    <br />
-                    <br />
-                    <_Paging QueryBase="AdminLogQuerySearchDTO"
-                     RefreshList="_refresh"
-                     TotalPages="AdminLogPagedListDto.TotalPages"
-                     TotalItems="AdminLogPagedListDto.TotalItems"></_Paging>
 
-                    <div class="content">
-                        <div class="container">
-                            <div class="row align-content-center justify-content-center">
-                                @foreach (var p in AdminLogPagedListDto.Items)
-                                {
-                                    <AdminLogReadForList AdminLog="p"></AdminLogReadForList>
-                                }
+    <!-- Payment details -->
+    <div class="row">
+        <div class="btn-group my-2" role="group">
+            <button class="btn btn-primary btn-sm" type="button" @onclick="ToggleDetails">@ShowDetailsButtonText</button>
+        </div>
+        <div class="@DetailsCssClass">
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <h2>Payments Administration</h2>
+                    <hr />
+                    <button class="btn btn-primary" @onclick="SeedPayments">Seed Payments</button>
+                </div>
+            </div>
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <h2>Admin logs</h2>
+                    <hr />
+                    @if (AdminLogPagedListDto == null)
+                    {
+                        <_Loading LoadingText="Ładowanie listy płatności" />
+                    }
+                    else
+                    {
+                        <AdminBrowser Refresh="_refresh"
+                                  QuerySearch="AdminLogQuerySearchDTO"></AdminBrowser>
+                        @if (AdminLogPagedListDto.Items.Count == 0)
+                        {
+                            <p><em>Brak kwestii spełniających kryteria wyszukiwania...</em></p>
+                        }
+                        else
+                        {
+                            <br />
+                            <br />
+                            <_Paging QueryBase="AdminLogQuerySearchDTO"
+                             RefreshList="_refresh"
+                             TotalPages="AdminLogPagedListDto.TotalPages"
+                             TotalItems="AdminLogPagedListDto.TotalItems"></_Paging>
+
+                            <div class="content">
+                                <div class="container">
+                                    <div class="row align-content-center justify-content-center">
+                                        @foreach (var p in AdminLogPagedListDto.Items)
+                                        {
+                                            <AdminLogReadForList AdminLog="p"></AdminLogReadForList>
+                                        }
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
 
-                    <_Paging QueryBase="AdminLogQuerySearchDTO"
-                     RefreshList="_refresh"
-                     TotalPages="AdminLogPagedListDto.TotalPages"
-                     TotalItems="AdminLogPagedListDto.TotalItems"></_Paging>
-                }
-            }
+                            <_Paging QueryBase="AdminLogQuerySearchDTO"
+                             RefreshList="_refresh"
+                             TotalPages="AdminLogPagedListDto.TotalPages"
+                             TotalItems="AdminLogPagedListDto.TotalItems"></_Paging>
+                        }
+                    }
+                </div>
+            </div>
         </div>
     </div>
+
+    <!-- Subscriptions details -->
+    <div class="row">
+        <div class="btn-group my-2" role="group">
+            <button class="btn btn-primary btn-sm" type="button" @onclick="ToggleSubscriptionDetails">@ShowSubscriptionDetailsButtonText</button>
+        </div>
+        <div class="@DetailsSubscriptionCssClass">
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <SubscriptionAdminPage></SubscriptionAdminPage>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 @code {
@@ -101,5 +124,46 @@
             Console.WriteLine("Failed to seed payments.");
         }
         await _refresh();
+    }
+
+    private string ShowDetailsButtonText { get; set; } = "Show payments details";
+    private string GetDetailsButtonText { get; set; } = "Get payments details etails";
+    private string DetailsCssClass => showDetails ? "d-block" : "d-none";
+    private bool showDetails = false;
+    private void ToggleDetails()
+    {
+        showDetails = !showDetails;
+
+        if (showDetails)
+        {
+            GetDetailsButtonText = "Hide payments details";
+            ShowDetailsButtonText = GetDetailsButtonText;
+        }
+        else
+        {
+            GetDetailsButtonText = "Get payments details";
+            ShowDetailsButtonText = GetDetailsButtonText;
+        }
+    }
+
+
+    private string ShowSubscriptionDetailsButtonText { get; set; } = "Show Subscription details";
+    private string GetSubscriptionDetailsButtonText { get; set; } = "Get Subscription details etails";
+    private string DetailsSubscriptionCssClass => showSubscriptionDetails ? "d-block" : "d-none";
+    private bool showSubscriptionDetails = false;
+    private void ToggleSubscriptionDetails()
+    {
+        showSubscriptionDetails = !showSubscriptionDetails;
+
+        if (showSubscriptionDetails)
+        {
+            GetSubscriptionDetailsButtonText = "Hide Subscription details";
+            ShowSubscriptionDetailsButtonText = GetSubscriptionDetailsButtonText;
+        }
+        else
+        {
+            GetSubscriptionDetailsButtonText = "Get Subscription details";
+            ShowSubscriptionDetailsButtonText = GetSubscriptionDetailsButtonText;
+        }
     }
 }

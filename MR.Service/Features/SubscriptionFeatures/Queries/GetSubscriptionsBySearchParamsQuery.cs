@@ -2,6 +2,7 @@
 
 public class GetSubscriptionsBySearchParamsQuery : QueryBase, IRequest<PagedList<Subscription>>
 {
+    public Guid SubscriptionId { get; set; }
     public string ApplicationUserId { get; set; } = string.Empty;
     public bool OnlyActives { get; set; }
     public DateTime? BeginDate { get; set; }
@@ -15,7 +16,7 @@ public class GetSubscriptionsBySearchParamsQuery : QueryBase, IRequest<PagedList
 
         public override async Task<PagedList<Subscription>> Handle(GetSubscriptionsBySearchParamsQuery request, CancellationToken cancellationToken)
         {
-            var query = _context.Subscriptions.Include(x => x.Payment)
+            var query = _context.Subscriptions
                 .AsQueryable();
             
             if (!string.IsNullOrEmpty(request.ApplicationUserId))

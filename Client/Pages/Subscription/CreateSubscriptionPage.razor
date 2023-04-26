@@ -1,0 +1,65 @@
+﻿@page "/create-subscription"
+@using MR.Client.Services
+@using MR.Shared.DTOs.Subscription;
+@inject ISubscriptionService subscriptionService
+
+<div class="card shadow rounded-3">
+    <div class="card-header bg-primary text-white py-3 rounded-3">
+        <h5 class="card-title mb-0">Create Subscription</h5>
+    </div>
+
+    <div class="card-body">
+        <EditForm Model="@Subscription" OnValidSubmit="@CreateSubscription">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <label for="application-user-id" class="form-label">Application User Id</label>
+                    <InputText id="application-user-id" class="form-control rounded-pill" @bind-Value="@Subscription.ApplicationUserId" required />
+                    <ValidationMessage For="@(() => Subscription.ApplicationUserId)" />
+                </div>
+
+                <div class="col-md-6 mb-4">
+                    <label for="begin" class="form-label">Begin</label>
+                    <InputDate id="begin" class="form-control rounded-pill" @bind-Value="@Subscription.Begin" />
+                    <ValidationMessage For="@(() => Subscription.Begin)" />
+                </div>
+
+                <div class="col-md-6 mb-4">
+                    <label for="end" class="form-label">End</label>
+                    <InputDate id="end" class="form-control rounded-pill" @bind-Value="@Subscription.End" />
+                    <ValidationMessage For="@(() => Subscription.End)" />
+                </div>
+
+                <div class="col-md-12 d-grid">
+                    <button type="submit" class="btn btn-primary rounded-pill">Create Subscription</button>
+                </div>
+            </div>
+        </EditForm>
+    </div>
+</div>
+@if (created)
+{
+    <div class="alert alert-success" role="alert">
+        Subscription created successfully.
+    </div>
+}
+
+@code {
+    private SubscriptionCreateForUserDTO Subscription = new SubscriptionCreateForUserDTO();
+    private bool created = false;
+    [Parameter]
+    public EventCallback Refresh { get; set; }
+
+    private async Task CreateSubscription()
+    {
+        string result = await subscriptionService.CreateSubscription(Subscription);
+        created = !string.IsNullOrWhiteSpace(result);
+
+        if(Refresh.HasDelegate)
+        {
+            await Refresh.InvokeAsync();
+        }
+    }
+}

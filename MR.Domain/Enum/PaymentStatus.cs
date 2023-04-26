@@ -6,9 +6,6 @@ public enum PaymentStatus
     New,
     Pending,
     Rejected,
-    ActivatedByAdmin,
-    DeactivatedByAdmin,
-    AddedByCode,
     Completed,
     Unknown,
     Refunded

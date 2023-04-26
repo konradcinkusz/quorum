@@ -4,6 +4,7 @@ using MR.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MR.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230424203219_sub_payment")]
+    partial class sub_payment
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -240,7 +243,7 @@ namespace MR.Persistence.Migrations
                         {
                             Id = "E97336F4-CF5A-4C72-8C61-997E5C621143",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "f4092cd3-47d1-4f18-b500-508a0925d1ae",
+                            ConcurrencyStamp = "627695ee-ea20-40b0-ba66-9f6bca0cc967",
                             Email = "superadmin@gmail.com",
                             EmailConfirmed = true,
                             FirstName = "Amit",
@@ -250,7 +253,7 @@ namespace MR.Persistence.Migrations
                             NormalizedUserName = "SUPERADMIN",
                             PasswordHash = "AQAAAAEAACcQAAAAEBLjouNqaeiVWbN0TbXUS3+ChW3d7aQIk/BQEkWBxlrdRRngp14b0BIH0Rp65qD6mA==",
                             PhoneNumberConfirmed = true,
-                            SecurityStamp = "b1f825b6-1f87-404e-b422-46af64f2f9c6",
+                            SecurityStamp = "7c481872-b417-41b5-8187-d8fbd135c1cc",
                             TwoFactorEnabled = false,
                             UserName = "superadmin"
                         },
@@ -258,7 +261,7 @@ namespace MR.Persistence.Migrations
                         {
                             Id = "B2BED4FF-47C0-47A1-9AE0-7AEF44CC14BB",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "f0ca7720-1ebc-418e-ab33-ef3db8edd709",
+                            ConcurrencyStamp = "22ce7b3c-ce5a-48fa-a4ce-003626ae28f4",
                             Email = "basicuser@gmail.com",
                             EmailConfirmed = true,
                             FirstName = "Basic",
@@ -268,7 +271,7 @@ namespace MR.Persistence.Migrations
                             NormalizedUserName = "BASICUSER",
                             PasswordHash = "AQAAAAEAACcQAAAAEBLjouNqaeiVWbN0TbXUS3+ChW3d7aQIk/BQEkWBxlrdRRngp14b0BIH0Rp65qD6mA==",
                             PhoneNumberConfirmed = true,
-                            SecurityStamp = "29781c7b-2061-459c-bbe7-d8c8145e46ab",
+                            SecurityStamp = "c2d5775e-06ad-4cc5-a53b-a3e16df296ee",
                             TwoFactorEnabled = false,
                             UserName = "basicuser"
                         });
@@ -353,6 +356,7 @@ namespace MR.Persistence.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("PaymentMethod")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("PaymentStatus")
@@ -362,6 +366,7 @@ namespace MR.Persistence.Migrations
                         .HasColumnType("money");
 
                     b.Property<string>("ReferenceNumber")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -449,10 +454,7 @@ namespace MR.Persistence.Migrations
 
                     b.HasIndex("ApplicationUserId");
 
-                    b.ToTable("Subscriptions", "MRBasics", t =>
-                        {
-                            t.HasTrigger("trg_Subscription_Log");
-                        });
+                    b.ToTable("Subscriptions", "MRBasics");
                 });
 
             modelBuilder.Entity("MR.Domain.Entities.SubscriptionPayment", b =>

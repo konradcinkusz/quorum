@@ -1,0 +1,43 @@
+﻿@if (Subscription != null)
+{
+    <div class="card m-1 p-1">
+        <div class="card-header">
+            <h4 class="card-title">Subscription Details</h4>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-sm-4">
+                    <label for="payment-id" class="form-label">Subscription ID:</label>
+                    <p class="form-control-plaintext" id="payment-id">@Subscription.Id</p>
+                </div>
+                <div class="col-sm-4">
+                    <label for="user-email" class="form-label">ApplicationUserId:</label>
+                    <p class="form-control-plaintext" id="user-email">@Subscription.ApplicationUserId</p>
+                </div>
+                <div class="col-sm-4">
+                    <label for="begin-date" class="form-label">Begin Date:</label>
+                    <p class="form-control-plaintext" id="begin-date">@Subscription.Begin?.ToString("MM/dd/yyyy")</p>
+                </div>
+                <div class="col-sm-4">
+                    <label for="end-date" class="form-label">End Date:</label>
+                    <p class="form-control-plaintext" id="end-date">@Subscription.End?.ToString("MM/dd/yyyy")</p>
+                </div>
+                <div class="col-sm-4">
+                    <label for="is-active" class="form-label">Is Active:</label>
+                    <p class="form-control-plaintext" id="is-active">@Subscription.IsActive</p>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <p>No Subscription to display.</p>
+}
+
+
+
+@code {
+    [Parameter]
+    public SubscriptionDTO Subscription { get; set; }
+}

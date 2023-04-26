@@ -1,74 +1,39 @@
-﻿CREATE TRIGGER trg_Subscription_Log
+﻿USE [aspnet-mreferenda.Server-44bd1c16-4782-4de1-8743-3aee3305f17d]
+GO
+/****** Object:  Trigger [MRPayments].[trg_Payment_Log]    Script Date: 26/04/2023 12:49:03 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+create or ALTER TRIGGER MRBasics.trg_Subscription_Log
 ON MRBasics.Subscriptions
 AFTER INSERT, UPDATE, DELETE
 AS
-BEGIN
-    DECLARE @Action nvarchar(10)
 
-    IF EXISTS (SELECT * FROM inserted)
-    BEGIN
-        IF EXISTS (SELECT * FROM deleted)
-            SET @Action = 'UPDATE'
-        ELSE
-            SET @Action = 'INSERT'
-    END
-    ELSE
-        SET @Action = 'DELETE'
+SET NOCOUNT ON;
 
-    INSERT INTO MRBasics.Subscription_Logs (SubscriptionId, EntityName, Action, OldValues, NewValues, LogDate)
-    SELECT 
-        CASE 
-            WHEN @Action = 'DELETE' THEN deleted.Id 
-            ELSE inserted.Id 
-        END,
-        'Subscription',
-        @Action,
-        CASE 
-            WHEN @Action = 'UPDATE' THEN dbo.GetOldValues_Subscription(deleted.Id) 
-            ELSE NULL 
-        END,
-        CASE 
-            WHEN @Action = 'INSERT' THEN dbo.GetNewValues_Subscription(inserted.Id) 
-            ELSE dbo.GetNewValues_Subscription(deleted.Id) 
-        END,
-        GETDATE()
-    FROM inserted
-    FULL OUTER JOIN deleted ON inserted.Id = deleted.Id
-END
+INSERT INTO MRBasics.Subscription_Logs
+    (SubscriptionId, Action, OldValues, NewValues, LogDate)
+SELECT
+  ISNULL(i.Id, d.Id),
 
-GO
+  IIF(i.Id IS NULL, 'DELETE', IIF(d.Id IS NULL, 'INSERT', 'UPDATE')),
 
-CREATE FUNCTION dbo.GetOldValues_Subscription(@SubscriptionId uniqueidentifier)
-RETURNS nvarchar(max)
-AS
-BEGIN
-    DECLARE @OldValues nvarchar(max)
-
-    SELECT @OldValues = 
-        'ApplicationUserId: ' + COALESCE(CONVERT(nvarchar(max), deleted.ApplicationUserId), 'NULL') + CHAR(13) + CHAR(10) +
-        'PaymentId: ' + COALESCE(CONVERT(nvarchar(max), deleted.PaymentId), 'NULL') + CHAR(13) + CHAR(10) +
-        'Id: ' + COALESCE(CONVERT(nvarchar(max), deleted.Id), 'NULL') + CHAR(13) + CHAR(10)
-    FROM deleted
-    WHERE deleted.Id = @SubscriptionId
-
-    RETURN @OldValues
-END
-
-GO
-
-CREATE FUNCTION GetNewValues_Subscription (@SubscriptionId uniqueidentifier)
-RETURNS nvarchar(max)
-AS
-BEGIN
-    DECLARE @NewValues nvarchar(max)
-
-    SELECT @NewValues = CONCAT(
-        'Id: ', COALESCE(NEW.Id, 'NULL'), CHAR(13), CHAR(10),
-        'ApplicationUserId: ', COALESCE(NEW.ApplicationUserId, 'NULL'), CHAR(13), CHAR(10),
-        'PaymentId: ', COALESCE(CAST(NEW.PaymentId AS nvarchar(max)), 'NULL')
+  CASE WHEN i.Id IS NOT NULL AND d.Id IS NOT NULL THEN
+    CONCAT_WS(NCHAR(13) + NCHAR(10),
+      'Id: ' + ISNULL(CONVERT(nvarchar(max), d.Id), 'NULL'),
+      'ApplicationUserId: ' + ISNULL(CONVERT(nvarchar(max), d.ApplicationUserId), 'NULL')
     )
-    FROM inserted AS NEW
-    WHERE NEW.Id = @SubscriptionId
+  END,
 
-    RETURN @NewValues
-END
+  CONCAT_WS(NCHAR(13) + NCHAR(10),
+    'Id: ' + ISNULL(CAST(i.Id AS nvarchar(max)), 'NULL'),
+    'ApplicationUserId: ' + ISNULL(i.ApplicationUserId, 'NULL')
+    ),
+
+  GETDATE()
+
+FROM inserted i
+FULL JOIN deleted d ON i.Id = d.Id;
+
+Go

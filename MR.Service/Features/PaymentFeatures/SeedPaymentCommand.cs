@@ -2,6 +2,7 @@
 
 public class SeedPaymentCommand : IRequest
 {
+    public int Count { get; set; } = 1;
     public string ApplicationUserId { get; }
 
     public SeedPaymentCommand(string applicationUserId)
@@ -19,67 +20,19 @@ public class SeedPaymentCommand : IRequest
 
         public override async Task<Unit> Handle(SeedPaymentCommand request, CancellationToken cancellationToken)
         {
-            var payments = new List<Payment>
-                {
-                    new Payment
-                    {
-                        ReferenceNumber = "pi_123456789",
-                        PaymentMethod = "sess_123456789",
-                        PaymentStatus = PaymentStatus.Unknown,
-                        ApplicationUserId = request.ApplicationUserId,
-                        PaymentValuePLN = 100.00M,
-                        PaymentStatusHistories = new List<PaymentStatusHistory> {
-                            new PaymentStatusHistory {
-                                PaymentStatus = PaymentStatus.New,
-                            },
-                            new PaymentStatusHistory {
-                                PaymentStatus = PaymentStatus.Pending,
-                            },
-                            new PaymentStatusHistory {
-                                PaymentStatus = PaymentStatus.Unknown,
-                            }
-                        }
-                    },
-                    new Payment
-                    {
-                        ReferenceNumber = "pi_123456789",
-                        PaymentMethod = "sess_123456789",
-                        PaymentStatus = PaymentStatus.Unknown,
-                        ApplicationUserId = request.ApplicationUserId,
-                        PaymentValuePLN = 50.00M,
-                        PaymentStatusHistories = new List<PaymentStatusHistory> {
-                            new PaymentStatusHistory {
-                                PaymentStatus = PaymentStatus.New
-                            },
-                            new PaymentStatusHistory {
-                                PaymentStatus = PaymentStatus.Rejected
-                            }
-                        }
-                    },
-                    new Payment
-                    {
-                        ReferenceNumber = "pi_123456789", PaymentMethod = "sess_123456789", PaymentStatus = PaymentStatus.Unknown,
-                        ApplicationUserId = request.ApplicationUserId,
-                        PaymentValuePLN = 200.00M,
-                        PaymentStatusHistories = new List<PaymentStatusHistory> {
-                            new PaymentStatusHistory {
-                                PaymentStatus = PaymentStatus.New
-                            },
-                            new PaymentStatusHistory {
-                                PaymentStatus = PaymentStatus.Pending
-                            }
-                        }
-                    }
-                };
+            var payments = new List<Payment>();
 
-            
+            for (int i = 0; i < request.Count; i++)
+            {
+                payments.Add(PaymentGenerator.GenerateRandomPayment(request.ApplicationUserId));
+            }
 
             await _context.Payments.AddRangeAsync(payments, cancellationToken);
 
             await _context.Admin_Logs.AddAsync(new AdminLog
             {
                 Action = "Seed Payments",
-                Values = string.Join(", ", new List<string> { "pi_123456789", "pi_987654321", "pi_135792468" })
+                Values = string.Join(", ", payments.Select(x => x.ReferenceNumber))
             }); ;
 
             await _context.SaveChangesAsync(cancellationToken);
@@ -90,4 +43,48 @@ public class SeedPaymentCommand : IRequest
         }
 
     }
+    public static class PaymentGenerator
+    {
+        private static readonly Random random = new Random();
+
+        private static string GenerateReferenceNumber()
+        {
+            return $"pi_{random.Next(100000000, 999999999)}";
+        }
+
+        private static string GeneratePaymentMethod()
+        {
+            return $"sess_{random.Next(100000000, 999999999)}";
+        }
+
+        private static PaymentStatus GeneratePaymentStatus()
+        {
+            Array values = Enum.GetValues(typeof(PaymentStatus));
+            return (PaymentStatus)values.GetValue(random.Next(values.Length));
+        }
+
+        public static Payment GenerateRandomPayment(string applicationUserId)
+        {
+            return new Payment
+            {
+                ReferenceNumber = GenerateReferenceNumber(),
+                PaymentMethod = GeneratePaymentMethod(),
+                PaymentStatus = GeneratePaymentStatus(),
+                ApplicationUserId = applicationUserId,
+                PaymentValuePLN = (decimal)random.Next(1000, 10000) / 100,
+                PaymentStatusHistories = new List<PaymentStatusHistory> {
+                new PaymentStatusHistory {
+                    PaymentStatus = GeneratePaymentStatus(),
+                },
+                new PaymentStatusHistory {
+                    PaymentStatus = GeneratePaymentStatus(),
+                },
+                new PaymentStatusHistory {
+                    PaymentStatus = GeneratePaymentStatus(),
+                }
+            }
+            };
+        }
+    }
+
 }

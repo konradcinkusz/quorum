@@ -50,8 +50,7 @@ public class PaymentController : MRBaseController
             {
                 CurrentPage = query.CurrentPage,
                 PageSize = query.PageSize,
-                Name = query.Name,
-                Question = query.Question
+                Question = query.Description
             }
         });
 

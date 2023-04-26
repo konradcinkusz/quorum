@@ -9,12 +9,15 @@ public class Payment : BaseEntity<Guid>
     //Kwota płatności w PLN
     [Column(TypeName = "money")]
     public decimal PaymentValuePLN { get; set; }
-    public string PaymentMethod { get; set; } // the payment method used (e.g. credit card, PayPal, etc.)
-    public string ReferenceNumber { get; set; } // a reference number associated with the payment (e.g. transaction ID)
+    public string? PaymentMethod { get; set; } // the payment method used (e.g. credit card, PayPal, etc.)
+    public string? ReferenceNumber { get; set; } // a reference number associated with the payment (e.g. transaction ID)
     public PaymentStatus PaymentStatus { get; set; }
     [InverseProperty(EntityNames.Payment)]
     public ICollection<PaymentStatusHistory> PaymentStatusHistories { get; set; }
+    [InverseProperty(EntityNames.Payment)]
+    public ICollection<SubscriptionPayment> SubscriptionPayments { get; set; }
 }
+
 
 [Table(nameof(TableNames.Payment_Logs), Schema = SchemasNames.MRPayments)]
 public class Payment_Log : BaseEntityLog

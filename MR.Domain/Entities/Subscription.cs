@@ -3,10 +3,6 @@
 [Table(nameof(TableNames.Subscriptions), Schema = SchemasNames.MRBasics)]
 public class Subscription : BaseEntity<Guid>
 {
-    [ForeignKey(nameof(Payment))]
-    public Guid? PaymentId { get; set; }
-    public Payment? Payment { get; set; }
-
     [ForeignKey(nameof(ApplicationUser))]
     public string ApplicationUserId { get; set; }
     public ApplicationUser ApplicationUser { get; set; }
@@ -24,6 +20,9 @@ public class Subscription : BaseEntity<Guid>
         var currentDate = DateTime.UtcNow;
         return currentDate >= Begin && currentDate <= End;
     }
+    [InverseProperty(EntityNames.Subscription)]
+    public ICollection<SubscriptionPayment> SubscriptionPayments { get; set; }
+
 }
 
 [Table(nameof(TableNames.Subscription_Logs), Schema = SchemasNames.MRBasics)]

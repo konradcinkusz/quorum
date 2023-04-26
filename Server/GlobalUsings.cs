@@ -33,3 +33,6 @@ global using MR.Domain.Entities;
 global using MR.Shared.DTOs.Admin;
 global using Microsoft.OpenApi.Models;
 global using MR.Service.Features.PaymentFeatures.Queries;
+global using MR.Service.Features.SubscriptionFeatures;
+global using MR.Service.Features.SubscriptionFeatures.Queries;
+global using MR.Shared.DTOs.Subscription;

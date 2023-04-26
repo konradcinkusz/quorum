@@ -17,10 +17,10 @@ public class TableNames
     public const string IssueRatingHistories = "IssueRatingHistories";
     public const string Admin_Logs = "Admin_Logs";
     public const string Subscription_Logs = "Subscription_Logs";
+    public const string Subscriptions = "Subscriptions";
     #endregion
 
     #region MRPayments
-    public const string Subscriptions = "Subscriptions";
     public const string Payments = "Payments";
     public const string PaymentStatusHistories = "PaymentStatusHistories";
     public const string Payment_Logs = "Payment_Logs";
