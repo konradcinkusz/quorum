@@ -1,6 +1,6 @@
 ﻿namespace MR.Service.Features.SubscriptionFeatures;
 
-public class BuySubscriptionCommand : ISubscriptionBaseCommand, IRequest<Guid>
+public class BuySubscriptionCommand : ISubscriptionBaseCommand, IRequest<bool>
 {
     public Guid? PaymentId { get; set; }
     public string ApplicationUserId { get; set; }
@@ -8,14 +8,14 @@ public class BuySubscriptionCommand : ISubscriptionBaseCommand, IRequest<Guid>
     public DateTime? End { get; set; }
     public decimal Price { get; set; }
 
-    public class BuySubscriptionCommandHandler : CommandHandlerBase<BuySubscriptionCommand, Guid>
+    public class BuySubscriptionCommandHandler : CommandHandlerBase<BuySubscriptionCommand, bool>
     {
         public BuySubscriptionCommandHandler(IApplicationDbContext context, ILogger<BuySubscriptionCommand> logger)
             : base(context, logger)
         {
         }
 
-        public override async Task<Guid> Handle(BuySubscriptionCommand request, CancellationToken cancellationToken)
+        public override async Task<bool> Handle(BuySubscriptionCommand request, CancellationToken cancellationToken)
         {
             var activeSubscriptionExists = _context.Subscriptions
                 .Where(s => s.ApplicationUserId == request.ApplicationUserId);
@@ -33,9 +33,9 @@ public class BuySubscriptionCommand : ISubscriptionBaseCommand, IRequest<Guid>
             };
 
             await _context.Subscriptions.AddAsync(subscription, cancellationToken);
-            await _context.SaveChangesAsync(cancellationToken);
+            var result = await _context.SaveChangesAsync(cancellationToken);
 
-            return subscription.Id;
+            return result > 0;
         }
     }
 }

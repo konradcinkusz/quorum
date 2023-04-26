@@ -14,7 +14,26 @@ namespace MR.Persistence.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.EnsureSchema(
+                name: "MRBasics");
+
+            migrationBuilder.EnsureSchema(
                 name: "MRPayments");
+
+            migrationBuilder.CreateTable(
+                name: "Admin_Logs",
+                schema: "MRBasics",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Action = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Values = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Admin_Logs", x => x.Id);
+                });
 
             migrationBuilder.CreateTable(
                 name: "AspNetRoles",
@@ -226,14 +245,11 @@ namespace MR.Persistence.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserEmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PaymentLink = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ClientReferenceId = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PaymentIntentId = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SessionId = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PaymentStatus = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     PaymentValuePLN = table.Column<decimal>(type: "money", nullable: false),
+                    PaymentMethod = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ReferenceNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PaymentStatus = table.Column<int>(type: "int", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
@@ -273,6 +289,52 @@ namespace MR.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Subscriptions",
+                schema: "MRBasics",
+                columns: table => new
+                {
+                    ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Begin = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    End = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Subscriptions", x => x.ApplicationUserId);
+                    table.ForeignKey(
+                        name: "FK_Subscriptions_AspNetUsers_ApplicationUserId",
+                        column: x => x.ApplicationUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Payment_Logs",
+                schema: "MRPayments",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PaymentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Action = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    OldValues = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NewValues = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LogDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Payment_Logs", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Payment_Logs_Payments_PaymentId",
+                        column: x => x.PaymentId,
+                        principalSchema: "MRPayments",
+                        principalTable: "Payments",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "PaymentStatusHistories",
                 schema: "MRPayments",
                 columns: table => new
@@ -294,6 +356,57 @@ namespace MR.Persistence.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Subscription_Logs",
+                schema: "MRBasics",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SubscriptionId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Action = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    OldValues = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NewValues = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LogDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Subscription_Logs", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Subscription_Logs_Subscriptions_SubscriptionId",
+                        column: x => x.SubscriptionId,
+                        principalSchema: "MRBasics",
+                        principalTable: "Subscriptions",
+                        principalColumn: "ApplicationUserId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SubscriptionPayment",
+                columns: table => new
+                {
+                    SubscriptionId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    PaymentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SubscriptionPayment", x => new { x.SubscriptionId, x.PaymentId });
+                    table.ForeignKey(
+                        name: "FK_SubscriptionPayment_Payments_PaymentId",
+                        column: x => x.PaymentId,
+                        principalSchema: "MRPayments",
+                        principalTable: "Payments",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_SubscriptionPayment_Subscriptions_SubscriptionId",
+                        column: x => x.SubscriptionId,
+                        principalSchema: "MRBasics",
+                        principalTable: "Subscriptions",
+                        principalColumn: "ApplicationUserId",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
@@ -310,8 +423,8 @@ namespace MR.Persistence.Migrations
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "FirstName", "LastName", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
                 values: new object[,]
                 {
-                    { "B2BED4FF-47C0-47A1-9AE0-7AEF44CC14BB", 0, "6064bdb8-180e-4870-a86d-947a755240d1", "basicuser@gmail.com", true, "Basic", "User", false, null, "BASICUSER@GMAIL.COM", "BASICUSER", "AQAAAAEAACcQAAAAEBLjouNqaeiVWbN0TbXUS3+ChW3d7aQIk/BQEkWBxlrdRRngp14b0BIH0Rp65qD6mA==", null, true, "5969a396-3930-4ee3-b7dd-8c699798deff", false, "basicuser" },
-                    { "E97336F4-CF5A-4C72-8C61-997E5C621143", 0, "4e33be2c-561d-4570-a1d7-0c698b50035c", "superadmin@gmail.com", true, "Amit", "Naik", false, null, "SUPERADMIN@GMAIL.COM", "SUPERADMIN", "AQAAAAEAACcQAAAAEBLjouNqaeiVWbN0TbXUS3+ChW3d7aQIk/BQEkWBxlrdRRngp14b0BIH0Rp65qD6mA==", null, true, "bae0bd5b-43f5-4dc7-b722-ee20fd159f8b", false, "superadmin" }
+                    { "B2BED4FF-47C0-47A1-9AE0-7AEF44CC14BB", 0, "74a28857-0e9f-488f-bb11-22212ca42468", "basicuser@gmail.com", true, "Basic", "User", false, null, "BASICUSER@GMAIL.COM", "BASICUSER", "AQAAAAEAACcQAAAAEBLjouNqaeiVWbN0TbXUS3+ChW3d7aQIk/BQEkWBxlrdRRngp14b0BIH0Rp65qD6mA==", null, true, "28a72d0e-7818-4a21-b9d9-c9a7dd3d01ac", false, "basicuser" },
+                    { "E97336F4-CF5A-4C72-8C61-997E5C621143", 0, "ca8aa5be-cb65-4877-8978-56f123152b29", "superadmin@gmail.com", true, "Amit", "Naik", false, null, "SUPERADMIN@GMAIL.COM", "SUPERADMIN", "AQAAAAEAACcQAAAAEBLjouNqaeiVWbN0TbXUS3+ChW3d7aQIk/BQEkWBxlrdRRngp14b0BIH0Rp65qD6mA==", null, true, "532972bb-c278-424d-8dc4-b4aad02c7091", false, "superadmin" }
                 });
 
             migrationBuilder.InsertData(
@@ -382,6 +495,12 @@ namespace MR.Persistence.Migrations
                 column: "Use");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Payment_Logs_PaymentId",
+                schema: "MRPayments",
+                table: "Payment_Logs",
+                column: "PaymentId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Payments_ApplicationUserId",
                 schema: "MRPayments",
                 table: "Payments",
@@ -417,11 +536,26 @@ namespace MR.Persistence.Migrations
                 name: "IX_RefreshToken_ApplicationUserId",
                 table: "RefreshToken",
                 column: "ApplicationUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Subscription_Logs_SubscriptionId",
+                schema: "MRBasics",
+                table: "Subscription_Logs",
+                column: "SubscriptionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SubscriptionPayment_PaymentId",
+                table: "SubscriptionPayment",
+                column: "PaymentId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "Admin_Logs",
+                schema: "MRBasics");
+
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
@@ -444,6 +578,10 @@ namespace MR.Persistence.Migrations
                 name: "Keys");
 
             migrationBuilder.DropTable(
+                name: "Payment_Logs",
+                schema: "MRPayments");
+
+            migrationBuilder.DropTable(
                 name: "PaymentStatusHistories",
                 schema: "MRPayments");
 
@@ -454,11 +592,22 @@ namespace MR.Persistence.Migrations
                 name: "RefreshToken");
 
             migrationBuilder.DropTable(
+                name: "Subscription_Logs",
+                schema: "MRBasics");
+
+            migrationBuilder.DropTable(
+                name: "SubscriptionPayment");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "Payments",
                 schema: "MRPayments");
+
+            migrationBuilder.DropTable(
+                name: "Subscriptions",
+                schema: "MRBasics");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

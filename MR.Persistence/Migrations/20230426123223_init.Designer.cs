@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MR.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230422192344_payment modification")]
-    partial class paymentmodification
+    [Migration("20230426123223_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -243,7 +243,7 @@ namespace MR.Persistence.Migrations
                         {
                             Id = "E97336F4-CF5A-4C72-8C61-997E5C621143",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "2d3a76d4-ba7e-4618-8d13-65db5a5c34a1",
+                            ConcurrencyStamp = "ca8aa5be-cb65-4877-8978-56f123152b29",
                             Email = "superadmin@gmail.com",
                             EmailConfirmed = true,
                             FirstName = "Amit",
@@ -253,7 +253,7 @@ namespace MR.Persistence.Migrations
                             NormalizedUserName = "SUPERADMIN",
                             PasswordHash = "AQAAAAEAACcQAAAAEBLjouNqaeiVWbN0TbXUS3+ChW3d7aQIk/BQEkWBxlrdRRngp14b0BIH0Rp65qD6mA==",
                             PhoneNumberConfirmed = true,
-                            SecurityStamp = "0461c412-fa18-4e61-a8ef-fb8c356a0b76",
+                            SecurityStamp = "532972bb-c278-424d-8dc4-b4aad02c7091",
                             TwoFactorEnabled = false,
                             UserName = "superadmin"
                         },
@@ -261,7 +261,7 @@ namespace MR.Persistence.Migrations
                         {
                             Id = "B2BED4FF-47C0-47A1-9AE0-7AEF44CC14BB",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "00c3669b-6a3d-44e6-925a-08fc8bea75cb",
+                            ConcurrencyStamp = "74a28857-0e9f-488f-bb11-22212ca42468",
                             Email = "basicuser@gmail.com",
                             EmailConfirmed = true,
                             FirstName = "Basic",
@@ -271,7 +271,7 @@ namespace MR.Persistence.Migrations
                             NormalizedUserName = "BASICUSER",
                             PasswordHash = "AQAAAAEAACcQAAAAEBLjouNqaeiVWbN0TbXUS3+ChW3d7aQIk/BQEkWBxlrdRRngp14b0BIH0Rp65qD6mA==",
                             PhoneNumberConfirmed = true,
-                            SecurityStamp = "f36b45e1-2358-4e84-83f5-a51c4484172f",
+                            SecurityStamp = "28a72d0e-7818-4a21-b9d9-c9a7dd3d01ac",
                             TwoFactorEnabled = false,
                             UserName = "basicuser"
                         });
@@ -356,7 +356,6 @@ namespace MR.Persistence.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("PaymentMethod")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("PaymentStatus")
@@ -366,7 +365,6 @@ namespace MR.Persistence.Migrations
                         .HasColumnType("money");
 
                     b.Property<string>("ReferenceNumber")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -375,7 +373,7 @@ namespace MR.Persistence.Migrations
 
                     b.ToTable("Payments", "MRPayments", t =>
                         {
-                            t.HasTrigger("trg_Payment_InsertUpdateDelete");
+                            t.HasTrigger("trg_Payment_Log");
                         });
                 });
 
@@ -433,12 +431,7 @@ namespace MR.Persistence.Migrations
 
             modelBuilder.Entity("MR.Domain.Entities.Subscription", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("ApplicationUserId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime?>("Begin")
@@ -450,16 +443,60 @@ namespace MR.Persistence.Migrations
                     b.Property<DateTime?>("End")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("PaymentId")
-                        .HasColumnType("uniqueidentifier");
+                    b.HasKey("ApplicationUserId");
 
-                    b.HasKey("Id");
+                    b.ToTable("Subscriptions", "MRBasics", t =>
+                        {
+                            t.HasTrigger("trg_Subscription_Log");
+                        });
+                });
 
-                    b.HasIndex("ApplicationUserId");
+            modelBuilder.Entity("MR.Domain.Entities.SubscriptionPayment", b =>
+                {
+                    b.Property<string>("SubscriptionId")
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnOrder(0);
+
+                    b.Property<Guid>("PaymentId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnOrder(1);
+
+                    b.HasKey("SubscriptionId", "PaymentId");
 
                     b.HasIndex("PaymentId");
 
-                    b.ToTable("Subscriptions", "MRBasics");
+                    b.ToTable("SubscriptionPayment");
+                });
+
+            modelBuilder.Entity("MR.Domain.Entities.Subscription_Log", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Action")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("LogDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("NewValues")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OldValues")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SubscriptionId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SubscriptionId");
+
+                    b.ToTable("Subscription_Logs", "MRBasics");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -684,7 +721,7 @@ namespace MR.Persistence.Migrations
             modelBuilder.Entity("MR.Domain.Entities.Payment_Log", b =>
                 {
                     b.HasOne("MR.Domain.Entities.Payment", "Payment")
-                        .WithMany()
+                        .WithMany("Payment_Logs")
                         .HasForeignKey("PaymentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -700,13 +737,37 @@ namespace MR.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MR.Domain.Entities.Payment", "Payment")
-                        .WithMany()
-                        .HasForeignKey("PaymentId");
-
                     b.Navigation("ApplicationUser");
+                });
+
+            modelBuilder.Entity("MR.Domain.Entities.SubscriptionPayment", b =>
+                {
+                    b.HasOne("MR.Domain.Entities.Payment", "Payment")
+                        .WithMany("SubscriptionPayments")
+                        .HasForeignKey("PaymentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MR.Domain.Entities.Subscription", "Subscription")
+                        .WithMany("SubscriptionPayments")
+                        .HasForeignKey("SubscriptionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("Payment");
+
+                    b.Navigation("Subscription");
+                });
+
+            modelBuilder.Entity("MR.Domain.Entities.Subscription_Log", b =>
+                {
+                    b.HasOne("MR.Domain.Entities.Subscription", "Subscription")
+                        .WithMany("Subscription_Logs")
+                        .HasForeignKey("SubscriptionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Subscription");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -770,6 +831,17 @@ namespace MR.Persistence.Migrations
             modelBuilder.Entity("MR.Domain.Entities.Payment", b =>
                 {
                     b.Navigation("PaymentStatusHistories");
+
+                    b.Navigation("Payment_Logs");
+
+                    b.Navigation("SubscriptionPayments");
+                });
+
+            modelBuilder.Entity("MR.Domain.Entities.Subscription", b =>
+                {
+                    b.Navigation("SubscriptionPayments");
+
+                    b.Navigation("Subscription_Logs");
                 });
 #pragma warning restore 612, 618
         }

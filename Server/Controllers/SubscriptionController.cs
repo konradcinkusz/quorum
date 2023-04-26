@@ -40,7 +40,7 @@ public class SubscriptionController : MRBaseController
     {
         var result = await Mediator.Send(new GetSubscriptionsBySearchParamsQuery
         {
-            ApplicationUserId = GetUserId(),
+            ApplicationUserId = query.ApplicationUserId,
             SearchParams = new SearchParams
             {
                 CurrentPage = query.CurrentPage,

@@ -1,14 +1,16 @@
 ﻿namespace MR.Domain.Entities;
 
 [Table(nameof(TableNames.Subscriptions), Schema = SchemasNames.MRBasics)]
-public class Subscription : BaseEntity<Guid>
+public class Subscription
 {
-    [ForeignKey(nameof(ApplicationUser))]
+    [ForeignKey(nameof(ApplicationUser)), Key]
     public string ApplicationUserId { get; set; }
     public ApplicationUser ApplicationUser { get; set; }
 
     public DateTime? Begin { get; set; }
     public DateTime? End { get; set; }
+
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public bool IsActive()
     {
@@ -20,8 +22,11 @@ public class Subscription : BaseEntity<Guid>
         var currentDate = DateTime.UtcNow;
         return currentDate >= Begin && currentDate <= End;
     }
-    [InverseProperty(EntityNames.Subscription)]
+
+    [InverseProperty(nameof(SubscriptionPayment.Subscription))]
     public ICollection<SubscriptionPayment> SubscriptionPayments { get; set; }
+    [InverseProperty(nameof(Subscription_Log.Subscription))]
+    public ICollection<Subscription_Log> Subscription_Logs { get; set; }
 
 }
 
@@ -29,6 +34,6 @@ public class Subscription : BaseEntity<Guid>
 public class Subscription_Log : BaseEntityLog
 {
     [ForeignKey(nameof(Subscription))]
-    public Guid SubscriptionId { get; set; }
+    public string SubscriptionId { get; set; }
     public Subscription Subscription { get; set; }
 }

@@ -86,6 +86,6 @@ app.MapControllers();
 app.MapFallbackToFile("index.html");
 
 app.UseSwaggerUI(c =>
-     c.SwaggerEndpoint("/swagger/v1/swagger.json", "MyBlazor v1"));
+     c.SwaggerEndpoint("/swagger/v1/swagger.json", "MR v1"));
 
 app.Run();

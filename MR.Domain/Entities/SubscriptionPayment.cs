@@ -3,7 +3,7 @@
 public class SubscriptionPayment
 {
     [ForeignKey(nameof(Subscription)), Key, Column(Order = 0)]
-    public Guid SubscriptionId { get; set; }
+    public string SubscriptionId { get; set; }
     public Subscription Subscription { get; set; }
 
     [ForeignKey(nameof(Payment)), Key, Column(Order = 1)]

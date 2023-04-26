@@ -240,37 +240,37 @@ namespace MR.Persistence.Migrations
                         {
                             Id = "E97336F4-CF5A-4C72-8C61-997E5C621143",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "f4092cd3-47d1-4f18-b500-508a0925d1ae",
+                            ConcurrencyStamp = "B87AD966-7EA1-4696-8107-B190AEAB837D",
                             Email = "superadmin@gmail.com",
                             EmailConfirmed = true,
                             FirstName = "Amit",
                             LastName = "Naik",
                             LockoutEnabled = false,
                             NormalizedEmail = "SUPERADMIN@GMAIL.COM",
-                            NormalizedUserName = "SUPERADMIN",
+                            NormalizedUserName = "SUPERADMIN@GMAIL.COM",
                             PasswordHash = "AQAAAAEAACcQAAAAEBLjouNqaeiVWbN0TbXUS3+ChW3d7aQIk/BQEkWBxlrdRRngp14b0BIH0Rp65qD6mA==",
                             PhoneNumberConfirmed = true,
-                            SecurityStamp = "b1f825b6-1f87-404e-b422-46af64f2f9c6",
+                            SecurityStamp = "A94F51C0-E605-43E6-819D-95C43ACE65D3",
                             TwoFactorEnabled = false,
-                            UserName = "superadmin"
+                            UserName = "superadmin@gmail.com"
                         },
                         new
                         {
                             Id = "B2BED4FF-47C0-47A1-9AE0-7AEF44CC14BB",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "f0ca7720-1ebc-418e-ab33-ef3db8edd709",
+                            ConcurrencyStamp = "A63E25A3-1237-4BD0-A5FC-5C8359885E9E",
                             Email = "basicuser@gmail.com",
                             EmailConfirmed = true,
                             FirstName = "Basic",
                             LastName = "User",
                             LockoutEnabled = false,
                             NormalizedEmail = "BASICUSER@GMAIL.COM",
-                            NormalizedUserName = "BASICUSER",
+                            NormalizedUserName = "BASICUSER@GMAIL.COM",
                             PasswordHash = "AQAAAAEAACcQAAAAEBLjouNqaeiVWbN0TbXUS3+ChW3d7aQIk/BQEkWBxlrdRRngp14b0BIH0Rp65qD6mA==",
                             PhoneNumberConfirmed = true,
-                            SecurityStamp = "29781c7b-2061-459c-bbe7-d8c8145e46ab",
+                            SecurityStamp = "33135628-31F0-4995-861D-CE867EBA0FBE",
                             TwoFactorEnabled = false,
-                            UserName = "basicuser"
+                            UserName = "basicuser@gmail.com"
                         });
                 });
 
@@ -370,7 +370,7 @@ namespace MR.Persistence.Migrations
 
                     b.ToTable("Payments", "MRPayments", t =>
                         {
-                            t.HasTrigger("trg_Payment_InsertUpdateDelete");
+                            t.HasTrigger("trg_Payment_Log");
                         });
                 });
 
@@ -428,12 +428,7 @@ namespace MR.Persistence.Migrations
 
             modelBuilder.Entity("MR.Domain.Entities.Subscription", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("ApplicationUserId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime?>("Begin")
@@ -445,9 +440,7 @@ namespace MR.Persistence.Migrations
                     b.Property<DateTime?>("End")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("ApplicationUserId");
+                    b.HasKey("ApplicationUserId");
 
                     b.ToTable("Subscriptions", "MRBasics", t =>
                         {
@@ -457,8 +450,8 @@ namespace MR.Persistence.Migrations
 
             modelBuilder.Entity("MR.Domain.Entities.SubscriptionPayment", b =>
                 {
-                    b.Property<Guid>("SubscriptionId")
-                        .HasColumnType("uniqueidentifier")
+                    b.Property<string>("SubscriptionId")
+                        .HasColumnType("nvarchar(450)")
                         .HasColumnOrder(0);
 
                     b.Property<Guid>("PaymentId")
@@ -492,8 +485,9 @@ namespace MR.Persistence.Migrations
                     b.Property<string>("OldValues")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("SubscriptionId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SubscriptionId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -724,7 +718,7 @@ namespace MR.Persistence.Migrations
             modelBuilder.Entity("MR.Domain.Entities.Payment_Log", b =>
                 {
                     b.HasOne("MR.Domain.Entities.Payment", "Payment")
-                        .WithMany()
+                        .WithMany("Payment_Logs")
                         .HasForeignKey("PaymentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -765,7 +759,7 @@ namespace MR.Persistence.Migrations
             modelBuilder.Entity("MR.Domain.Entities.Subscription_Log", b =>
                 {
                     b.HasOne("MR.Domain.Entities.Subscription", "Subscription")
-                        .WithMany()
+                        .WithMany("Subscription_Logs")
                         .HasForeignKey("SubscriptionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -835,12 +829,16 @@ namespace MR.Persistence.Migrations
                 {
                     b.Navigation("PaymentStatusHistories");
 
+                    b.Navigation("Payment_Logs");
+
                     b.Navigation("SubscriptionPayments");
                 });
 
             modelBuilder.Entity("MR.Domain.Entities.Subscription", b =>
                 {
                     b.Navigation("SubscriptionPayments");
+
+                    b.Navigation("Subscription_Logs");
                 });
 #pragma warning restore 612, 618
         }

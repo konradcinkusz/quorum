@@ -12,15 +12,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MR.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230411130503_init")]
-    partial class init
+    [Migration("20230426123644_usr_fixes")]
+    partial class usr_fixes
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.4")
+                .HasAnnotation("ProductVersion", "7.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -243,37 +243,37 @@ namespace MR.Persistence.Migrations
                         {
                             Id = "E97336F4-CF5A-4C72-8C61-997E5C621143",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "4e33be2c-561d-4570-a1d7-0c698b50035c",
+                            ConcurrencyStamp = "B87AD966-7EA1-4696-8107-B190AEAB837D",
                             Email = "superadmin@gmail.com",
                             EmailConfirmed = true,
                             FirstName = "Amit",
                             LastName = "Naik",
                             LockoutEnabled = false,
                             NormalizedEmail = "SUPERADMIN@GMAIL.COM",
-                            NormalizedUserName = "SUPERADMIN",
+                            NormalizedUserName = "SUPERADMIN@GMAIL.COM",
                             PasswordHash = "AQAAAAEAACcQAAAAEBLjouNqaeiVWbN0TbXUS3+ChW3d7aQIk/BQEkWBxlrdRRngp14b0BIH0Rp65qD6mA==",
                             PhoneNumberConfirmed = true,
-                            SecurityStamp = "bae0bd5b-43f5-4dc7-b722-ee20fd159f8b",
+                            SecurityStamp = "A94F51C0-E605-43E6-819D-95C43ACE65D3",
                             TwoFactorEnabled = false,
-                            UserName = "superadmin"
+                            UserName = "superadmin@gmail.com"
                         },
                         new
                         {
                             Id = "B2BED4FF-47C0-47A1-9AE0-7AEF44CC14BB",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "6064bdb8-180e-4870-a86d-947a755240d1",
+                            ConcurrencyStamp = "A63E25A3-1237-4BD0-A5FC-5C8359885E9E",
                             Email = "basicuser@gmail.com",
                             EmailConfirmed = true,
                             FirstName = "Basic",
                             LastName = "User",
                             LockoutEnabled = false,
                             NormalizedEmail = "BASICUSER@GMAIL.COM",
-                            NormalizedUserName = "BASICUSER",
+                            NormalizedUserName = "BASICUSER@GMAIL.COM",
                             PasswordHash = "AQAAAAEAACcQAAAAEBLjouNqaeiVWbN0TbXUS3+ChW3d7aQIk/BQEkWBxlrdRRngp14b0BIH0Rp65qD6mA==",
                             PhoneNumberConfirmed = true,
-                            SecurityStamp = "5969a396-3930-4ee3-b7dd-8c699798deff",
+                            SecurityStamp = "33135628-31F0-4995-861D-CE867EBA0FBE",
                             TwoFactorEnabled = false,
-                            UserName = "basicuser"
+                            UserName = "basicuser@gmail.com"
                         });
                 });
 
@@ -320,6 +320,28 @@ namespace MR.Persistence.Migrations
                     b.ToTable("RefreshToken");
                 });
 
+            modelBuilder.Entity("MR.Domain.Entities.AdminLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Action")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Values")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Admin_Logs", "MRBasics");
+                });
+
             modelBuilder.Entity("MR.Domain.Entities.Payment", b =>
                 {
                     b.Property<Guid>("Id")
@@ -330,35 +352,29 @@ namespace MR.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("ClientReferenceId")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("PaymentIntentId")
+                    b.Property<string>("PaymentMethod")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PaymentLink")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PaymentStatus")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("PaymentStatus")
+                        .HasColumnType("int");
 
                     b.Property<decimal>("PaymentValuePLN")
                         .HasColumnType("money");
 
-                    b.Property<string>("SessionId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserEmail")
+                    b.Property<string>("ReferenceNumber")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ApplicationUserId");
 
-                    b.ToTable("Payments", "MRPayments");
+                    b.ToTable("Payments", "MRPayments", t =>
+                        {
+                            t.HasTrigger("trg_Payment_Log");
+                        });
                 });
 
             modelBuilder.Entity("MR.Domain.Entities.PaymentStatusHistory", b =>
@@ -381,6 +397,106 @@ namespace MR.Persistence.Migrations
                     b.HasIndex("PaymentId");
 
                     b.ToTable("PaymentStatusHistories", "MRPayments");
+                });
+
+            modelBuilder.Entity("MR.Domain.Entities.Payment_Log", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Action")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("LogDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("NewValues")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OldValues")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("PaymentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PaymentId");
+
+                    b.ToTable("Payment_Logs", "MRPayments");
+                });
+
+            modelBuilder.Entity("MR.Domain.Entities.Subscription", b =>
+                {
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("Begin")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("End")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("ApplicationUserId");
+
+                    b.ToTable("Subscriptions", "MRBasics", t =>
+                        {
+                            t.HasTrigger("trg_Subscription_Log");
+                        });
+                });
+
+            modelBuilder.Entity("MR.Domain.Entities.SubscriptionPayment", b =>
+                {
+                    b.Property<string>("SubscriptionId")
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnOrder(0);
+
+                    b.Property<Guid>("PaymentId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnOrder(1);
+
+                    b.HasKey("SubscriptionId", "PaymentId");
+
+                    b.HasIndex("PaymentId");
+
+                    b.ToTable("SubscriptionPayment");
+                });
+
+            modelBuilder.Entity("MR.Domain.Entities.Subscription_Log", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Action")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("LogDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("NewValues")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OldValues")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SubscriptionId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SubscriptionId");
+
+                    b.ToTable("Subscription_Logs", "MRBasics");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -602,6 +718,58 @@ namespace MR.Persistence.Migrations
                     b.Navigation("Payment");
                 });
 
+            modelBuilder.Entity("MR.Domain.Entities.Payment_Log", b =>
+                {
+                    b.HasOne("MR.Domain.Entities.Payment", "Payment")
+                        .WithMany("Payment_Logs")
+                        .HasForeignKey("PaymentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Payment");
+                });
+
+            modelBuilder.Entity("MR.Domain.Entities.Subscription", b =>
+                {
+                    b.HasOne("MR.Domain.Auth.ApplicationUser", "ApplicationUser")
+                        .WithMany("Subscriptions")
+                        .HasForeignKey("ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+                });
+
+            modelBuilder.Entity("MR.Domain.Entities.SubscriptionPayment", b =>
+                {
+                    b.HasOne("MR.Domain.Entities.Payment", "Payment")
+                        .WithMany("SubscriptionPayments")
+                        .HasForeignKey("PaymentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MR.Domain.Entities.Subscription", "Subscription")
+                        .WithMany("SubscriptionPayments")
+                        .HasForeignKey("SubscriptionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Payment");
+
+                    b.Navigation("Subscription");
+                });
+
+            modelBuilder.Entity("MR.Domain.Entities.Subscription_Log", b =>
+                {
+                    b.HasOne("MR.Domain.Entities.Subscription", "Subscription")
+                        .WithMany("Subscription_Logs")
+                        .HasForeignKey("SubscriptionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Subscription");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -656,11 +824,24 @@ namespace MR.Persistence.Migrations
             modelBuilder.Entity("MR.Domain.Auth.ApplicationUser", b =>
                 {
                     b.Navigation("RefreshTokens");
+
+                    b.Navigation("Subscriptions");
                 });
 
             modelBuilder.Entity("MR.Domain.Entities.Payment", b =>
                 {
                     b.Navigation("PaymentStatusHistories");
+
+                    b.Navigation("Payment_Logs");
+
+                    b.Navigation("SubscriptionPayments");
+                });
+
+            modelBuilder.Entity("MR.Domain.Entities.Subscription", b =>
+                {
+                    b.Navigation("SubscriptionPayments");
+
+                    b.Navigation("Subscription_Logs");
                 });
 #pragma warning restore 612, 618
         }
