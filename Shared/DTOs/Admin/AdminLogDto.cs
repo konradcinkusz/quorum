@@ -7,4 +7,3 @@ public class AdminLogDTO
     public string Action { get; set; }
     public string Values { get; set; }
 }
-

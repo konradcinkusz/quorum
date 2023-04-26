@@ -3,7 +3,7 @@
 public interface IAdminService
 {
     Task<AdminLogPagedListDTO> GetAdminLogs(AdminLogSearchParamsDTO query);
-    Task<bool> SeedPayments();
+    Task<bool> SeedPayments(SeedPaymentRequest seedPaymentRequest);
 }
 
 public class AdminService : DataServiceBase, IAdminService
@@ -41,10 +41,10 @@ public class AdminService : DataServiceBase, IAdminService
         return result ?? throw new Exception("Deserialized response is null.");
     }
 
-    public async Task<bool> SeedPayments()
+    public async Task<bool> SeedPayments(SeedPaymentRequest seedPaymentRequest)
     {
-        var result = await _httpClient.PostAsync($"{_adminControllerPath}/SeedPayments",
-                                                       null);
+        var result = await _httpClient.PostAsJsonAsync($"{_adminControllerPath}/SeedPayments",
+                                                       seedPaymentRequest);
         return result.IsSuccessStatusCode;
     }
 }

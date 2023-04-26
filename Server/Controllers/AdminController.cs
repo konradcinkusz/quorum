@@ -30,11 +30,11 @@ public class AdminController : MRBaseController
     }
 
     [HttpPost(nameof(SeedPayments))]
-    public async Task<IActionResult> SeedPayments()
+    public async Task<IActionResult> SeedPayments([FromBody] SeedPaymentRequest seedPaymentRequest)
     {
         if (!_configuration.GetValue<bool>("SeedData:IsSeeded"))
         {
-            var command = new SeedPaymentCommand(GetUserId());
+            var command = new SeedPaymentCommand(GetUserId()) { Count = seedPaymentRequest.Count };
             await Mediator.Send(command);
             _configuration["SeedData:IsSeeded"] = "true";
 

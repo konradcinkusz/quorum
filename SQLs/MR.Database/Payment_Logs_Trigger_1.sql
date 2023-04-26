@@ -1,7 +1,4 @@
-﻿USE [aspnet-mreferenda.Server-44bd1c16-4782-4de1-8743-3aee3305f17d]
-GO
-/****** Object:  Trigger [MRPayments].[trg_Payment_Log]    Script Date: 26/04/2023 12:49:03 ******/
-SET ANSI_NULLS ON
+﻿SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
