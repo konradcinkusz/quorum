@@ -1,0 +1,40 @@
+﻿@page "/subscription"
+@inject ISubscriptionService subscriptionService
+
+<div class="subscription-container">
+    <h2 class="subscription-header">Sub & payments</h2>
+
+    <div class="subscription-info">
+        <div class="price">
+            <span>Price:</span> <span class="price-value">@subscriptionReadDTO.Price</span>
+        </div>
+        <div class="description">
+            <span>Description:</span> You will buy a subscription for premium portal features.
+        </div>
+
+        @if (subscriptionReadDTO.Begin != null && subscriptionReadDTO.End != null)
+        {
+            <div class="subscription-period">
+                <span>Subscription period:</span> @subscriptionReadDTO.Begin.Value.ToShortDateString() - @subscriptionReadDTO.End.Value.ToShortDateString()
+            </div>
+        }
+
+        @if (subscriptionReadDTO.LastPayment == null)
+        {
+            <button class="buy-subscription-button">Buy subscription</button>
+        }
+        else
+        {
+            <PaymentReadForList Payment="@subscriptionReadDTO.LastPayment" />
+        }
+    </div>
+</div>
+
+@code{
+    private SubscriptionReadDTO subscriptionReadDTO = new SubscriptionReadDTO();
+
+    protected async override Task OnInitializedAsync()
+    {
+        subscriptionReadDTO = await subscriptionService.Get();
+    }
+}

@@ -18,3 +18,4 @@ global using Microsoft.AspNetCore.Components.Authorization;
 global using System.Net;
 global using System.Security.Claims;
 global using Microsoft.AspNetCore.Authorization;
+global using MR.Shared.DTOs.Subscription;

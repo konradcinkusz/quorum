@@ -1,7 +1,6 @@
-﻿@page "/create-subscription"
-@using MR.Client.Services
-@using MR.Shared.DTOs.Subscription;
-@inject ISubscriptionService subscriptionService
+﻿@inherits BaseAdmin
+@page "/create-subscription"
+@inject IAdminService subscriptionService
 
 <div class="card shadow rounded-3">
     <div class="card-header bg-primary text-white py-3 rounded-3">

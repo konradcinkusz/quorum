@@ -21,8 +21,8 @@ public class SubscriptionController : MRBaseController
         return CreatedAtAction(nameof(GetSubscription), new { id = subscriptionDto.ApplicationUserId }, null);
     }
 
-    [HttpGet("{id}")]
-    public async Task<ActionResult<SubscriptionDTO>> GetSubscription()
+    [HttpGet]
+    public async Task<ActionResult<SubscriptionReadDTO>> GetSubscription()
     {
         var Subscription = await Mediator.Send(new GetSubscriptionsBySearchParamsQuery { ApplicationUserId = GetUserId() });
 
@@ -31,7 +31,9 @@ public class SubscriptionController : MRBaseController
             return NotFound();
         }
 
-        var SubscriptionDto = _mapper.Map<SubscriptionDTO>(Subscription.FirstOrDefault());
+        var SubscriptionDto = _mapper.Map<SubscriptionReadDTO>(Subscription.FirstOrDefault());
+
+        SubscriptionDto.Price = 5;
 
         return SubscriptionDto;
     }

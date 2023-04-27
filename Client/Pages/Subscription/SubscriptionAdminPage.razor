@@ -1,6 +1,6 @@
-﻿@attribute [Authorize(Policy = "AdminRoles")]
+﻿@inherits BaseAdmin
 @page "/subscriptionsAdmin"
-@inject ISubscriptionService subscriptionService
+@inject IAdminService subscriptionService
 
 <PageTitle>Subscription admin Page</PageTitle>
 

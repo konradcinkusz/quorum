@@ -1,11 +1,9 @@
-﻿using MR.Shared.DTOs.Subscription;
-
-namespace MR.Client.Services;
+﻿namespace MR.Client.Services;
 
 public interface ISubscriptionService
 {
-    Task<string> CreateSubscription(SubscriptionCreateForUserDTO SubscriptionDto);
-    Task<SubscriptionPagedListDTO> GetSubscriptions(SubscriptionSearchParamsDTO query);
+    Task<SubscriptionReadDTO> Get();
+    Task Buy();
 }
 
 public class SubscriptionService : DataServiceBase, ISubscriptionService
@@ -16,34 +14,22 @@ public class SubscriptionService : DataServiceBase, ISubscriptionService
     {
     }
 
-    public async Task<string> CreateSubscription(SubscriptionCreateForUserDTO SubscriptionDto)
+    public Task Buy()
     {
-        var response = await _httpClient.PostAsJsonAsync($"{_subscriptionControllerPath}/CreateSubscriptionForUser", SubscriptionDto);
-
-        response.EnsureSuccessStatusCode();
-
-        return response.Headers.Location.Segments.Last();
+        throw new NotImplementedException();
     }
 
-    public async Task<SubscriptionPagedListDTO> GetSubscriptions(SubscriptionSearchParamsDTO query)
+    public async Task<SubscriptionReadDTO> Get()
     {
-        var q = BuildQuery(query);
+        var response = await _httpClient.GetAsync(_subscriptionControllerPath);
 
-        if (!string.IsNullOrEmpty(query.ApplicationUserId))
-            q[nameof(query.ApplicationUserId)] = query.ApplicationUserId;
-
-        var response = await _httpClient.GetAsync($"{_subscriptionControllerPath}/GetSubscriptionsByQuery?{q}");
-
-        response.EnsureSuccessStatusCode();
-
-        var content = await response.Content.ReadAsStringAsync();
-
-        var result = JsonSerializer.Deserialize<SubscriptionPagedListDTO>(content, new JsonSerializerOptions
+        if (!response.IsSuccessStatusCode)
         {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        });
+            return null;
+        }
 
-        return result ?? throw new Exception("Deserialized response is null.");
+        var paymentDto = await response.Content.ReadFromJsonAsync<SubscriptionReadDTO>();
+
+        return paymentDto;
     }
-
 }
