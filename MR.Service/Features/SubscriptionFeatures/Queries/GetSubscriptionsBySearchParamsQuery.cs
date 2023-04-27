@@ -1,12 +1,11 @@
 ﻿namespace MR.Service.Features.SubscriptionFeatures.Queries;
 
-public class GetSubscriptionsBySearchParamsQuery : QueryBase, IRequest<PagedList<Subscription>>
+public class GetSubscriptionsBySearchParamsQuery : QueryBase, IRequest<PagedList<Subscription>>, ISubscriptionBaseCommand
 {
-    public Guid SubscriptionId { get; set; }
-    public string ApplicationUserId { get; set; } = string.Empty;
+    public string ApplicationUserId { get; set; }
     public bool OnlyActives { get; set; }
-    public DateTime? BeginDate { get; set; }
-    public DateTime? EndDate { get; set; }
+    public DateTime? Begin { get; set; }
+    public DateTime? End { get; set; }
 
     public class GetSubscriptionsBySearchParamsHandler : CommandHandlerBase<GetSubscriptionsBySearchParamsQuery, PagedList<Subscription>>
     {
@@ -29,14 +28,14 @@ public class GetSubscriptionsBySearchParamsQuery : QueryBase, IRequest<PagedList
                 query = query.Where(x => x.IsActive());
             }
 
-            if (request.BeginDate != null)
+            if (request.Begin != null)
             {
-                query = query.Where(p => p.Begin >= request.BeginDate);
+                query = query.Where(p => p.Begin >= request.Begin);
             }
 
-            if (request.EndDate != null)
+            if (request.End != null)
             {
-                query = query.Where(p => p.End <= request.EndDate);
+                query = query.Where(p => p.End <= request.End);
             }
             return new PagedList<Subscription>(query, request.SearchParams);
         }

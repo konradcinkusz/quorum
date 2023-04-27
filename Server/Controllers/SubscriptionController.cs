@@ -1,11 +1,13 @@
 ﻿namespace MR.Server.Controllers;
 
-[Authorize(Policy = "RequireAdminRole")]
+[Authorize]
 public class SubscriptionController : MRBaseController
 {
     public SubscriptionController(IMapper mapper) : base(mapper)
     {
     }
+
+    [Authorize(Policy = "RequireAdminRole")]
     [HttpPost(nameof(CreateSubscriptionForUser))]
     public async Task<IActionResult> CreateSubscriptionForUser(SubscriptionCreateForUserDTO subscriptionDto)
     {
@@ -16,14 +18,13 @@ public class SubscriptionController : MRBaseController
             End = subscriptionDto.End
         });
 
-        return CreatedAtAction(nameof(GetSubscription), new { id = SubscriptionId }, null);
+        return CreatedAtAction(nameof(GetSubscription), new { id = subscriptionDto.ApplicationUserId }, null);
     }
 
-
     [HttpGet("{id}")]
-    public async Task<ActionResult<SubscriptionDTO>> GetSubscription(Guid id)
+    public async Task<ActionResult<SubscriptionDTO>> GetSubscription()
     {
-        var Subscription = await Mediator.Send(new GetSubscriptionsBySearchParamsQuery { SubscriptionId = id });
+        var Subscription = await Mediator.Send(new GetSubscriptionsBySearchParamsQuery { ApplicationUserId = GetUserId() });
 
         if (Subscription == null || !Subscription.Any())
         {
@@ -35,6 +36,7 @@ public class SubscriptionController : MRBaseController
         return SubscriptionDto;
     }
 
+    [Authorize(Policy = "RequireAdminRole")]
     [HttpGet(nameof(GetSubscriptionsByQuery))]
     public async Task<ActionResult<SubscriptionPagedListDTO>> GetSubscriptionsByQuery([FromQuery] SubscriptionSearchParamsDTO query)
     {

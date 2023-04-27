@@ -6,7 +6,6 @@ public class BuySubscriptionCommand : ISubscriptionBaseCommand, IRequest<bool>
     public string ApplicationUserId { get; set; }
     public DateTime? Begin { get; set; }
     public DateTime? End { get; set; }
-    public decimal Price { get; set; }
 
     public class BuySubscriptionCommandHandler : CommandHandlerBase<BuySubscriptionCommand, bool>
     {

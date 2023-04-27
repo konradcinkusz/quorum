@@ -10,6 +10,8 @@ builder.Services.AddDefaultIdentity<ApplicationUser>
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
+builder.Services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, CustomClaimsPrincipalFactory>();
+
 //https://stackoverflow.com/q/70563303
 //https://github.com/dotnet/AspNetCore.Docs/issues/14944
 builder.Services.AddIdentityServer()
@@ -18,6 +20,8 @@ builder.Services.AddIdentityServer()
         opt.ApiResources.Single().UserClaims.Add("name");
         opt.IdentityResources["openid"].UserClaims.Add("role");
         opt.ApiResources.Single().UserClaims.Add("role");
+        opt.IdentityResources["openid"].UserClaims.Add("isActiveSubscription");
+        opt.ApiResources.Single().UserClaims.Add("isActiveSubscription");
     });
 
 

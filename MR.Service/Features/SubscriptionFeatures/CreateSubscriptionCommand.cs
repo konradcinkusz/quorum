@@ -5,7 +5,6 @@ public class CreateSubscriptionCommand : ISubscriptionBaseCommand, IRequest<bool
     public string ApplicationUserId { get; set; }
     public DateTime? Begin { get; set; }
     public DateTime? End { get; set; }
-    public decimal Price { get; set; } = 0;
 
     public class CreateSubscriptionCommandHandler : CommandHandlerBase<CreateSubscriptionCommand, bool>
     {
@@ -22,27 +21,6 @@ public class CreateSubscriptionCommand : ISubscriptionBaseCommand, IRequest<bool
                 Begin = request.Begin,
                 End = request.End
             };
-
-            if (request.Price > 0)
-            {
-                var payment = new Payment
-                {
-                    ApplicationUserId = request.ApplicationUserId,
-                    PaymentValuePLN = request.Price,
-                    PaymentStatus = PaymentStatus.New
-                };
-
-                subscription.SubscriptionPayments = new List<SubscriptionPayment>
-                {
-                    new SubscriptionPayment
-                    {
-                        Subscription = subscription,
-                        Payment = payment
-                    }
-                };
-
-                await _context.Payments.AddAsync(payment, cancellationToken);
-            }
 
             await _context.Subscriptions.AddAsync(subscription, cancellationToken);
             var result = await _context.SaveChangesAsync(cancellationToken);
