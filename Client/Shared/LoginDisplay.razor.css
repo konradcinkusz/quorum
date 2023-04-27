@@ -1,0 +1,18 @@
+﻿.subscription-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 0.5rem;
+    border-radius: 0.5rem;
+    font-weight: bold;
+}
+
+    .subscription-status.active {
+        background-color: #28a745;
+        color: white;
+    }
+
+    .subscription-status.inactive {
+        background-color: #f44336;
+        color: white;
+    }

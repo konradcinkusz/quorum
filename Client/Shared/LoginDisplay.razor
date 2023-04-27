@@ -1,9 +1,21 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <AuthorizeView>
     <Authorized>
+        <div class="subscription-status@(IsActiveSubscription ? " active" : " inactive")">
+            @if (IsActiveSubscription)
+            {
+                <span>Active</span>
+            }
+            else
+            {
+                <span>Inactive</span>
+            }
+        </div>
+
         <a href="authentication/profile">Hello, @context.User.Identity?.Name!</a>
         <button class="nav-link btn btn-link" @onclick="BeginLogOut">Log out</button>
     </Authorized>
@@ -14,6 +26,18 @@
 </AuthorizeView>
 
 @code{
+    private bool IsActiveSubscription = false;
+
+    protected async override Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        var claim = user.Claims.FirstOrDefault(x => x.Type == "isActiveSubscription");
+        if (claim != null && bool.TryParse(claim.Value, out bool subscriptionF))
+        {
+            IsActiveSubscription = subscriptionF;
+        }
+    }
     private void BeginLogOut()
     {
         Navigation.NavigateToLogout("authentication/logout");
