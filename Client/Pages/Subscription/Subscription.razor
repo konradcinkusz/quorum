@@ -19,22 +19,27 @@
             </div>
         }
 
-        @if (subscriptionReadDTO.LastPayment == null)
+        @if (subscriptionReadDTO.IsActive || subscriptionReadDTO.LastPayment != null)
         {
-            <button class="buy-subscription-button">Buy subscription</button>
+            <PaymentReadForList Payment="@subscriptionReadDTO.LastPayment" />
         }
         else
         {
-            <PaymentReadForList Payment="@subscriptionReadDTO.LastPayment" />
+            <button class="buy-subscription-button" @onclick="Buy">Buy subscription</button>
         }
     </div>
 </div>
 
-@code{
+@code {
     private SubscriptionReadDTO subscriptionReadDTO = new SubscriptionReadDTO();
 
     protected async override Task OnInitializedAsync()
     {
         subscriptionReadDTO = await subscriptionService.Get();
+    }
+
+    private async Task Buy()
+    {
+        var appuserresult = await subscriptionService.Buy();
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace MR.Server.Controllers;
+﻿using MR.Shared.DTOs.Subscription;
+
+namespace MR.Server.Controllers;
 
 [Authorize]
 public class SubscriptionController : MRBaseController
@@ -34,9 +36,26 @@ public class SubscriptionController : MRBaseController
         var SubscriptionDto = _mapper.Map<SubscriptionReadDTO>(Subscription.FirstOrDefault());
 
         SubscriptionDto.Price = 5;
-
+        var payment = await Mediator.Send(new GetSubscriptionPayment { ApplicationUserId = GetUserId() });
+        var paymentDTO = _mapper.Map<PaymentDTO>(payment);
+        SubscriptionDto.LastPayment = paymentDTO;
         return SubscriptionDto;
     }
+
+    [HttpPost]
+    public async Task<ActionResult<bool>> BuySubscription()
+    {
+        var uId = GetUserId();
+        var Subscription = await Mediator.Send(new BuySubscriptionCommand { ApplicationUserId = uId });
+
+        if (Subscription == null || !Subscription)
+        {
+            return NotFound();
+        }
+
+        return CreatedAtAction(nameof(GetSubscription), new { id = uId }, null);
+    }
+
 
     [Authorize(Policy = "RequireAdminRole")]
     [HttpGet(nameof(GetSubscriptionsByQuery))]

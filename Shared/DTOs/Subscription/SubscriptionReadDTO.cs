@@ -8,4 +8,5 @@ public class SubscriptionReadDTO
     public DateTime? Begin { get; set; }
     public DateTime? End { get; set; }
     public PaymentDTO? LastPayment { get; set; }
+    public bool IsActive { get; set; }
 }

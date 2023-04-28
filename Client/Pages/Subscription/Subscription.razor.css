@@ -1,13 +1,4 @@
-﻿.subscription-container {
-    text-align: center;
-}
-
-.subscription-header {
-    font-size: 2rem;
-    margin-bottom: 2rem;
-}
-
-.subscription-info {
+﻿.subscription-info {
     display: flex;
     flex-direction: column;
     margin: 1rem;
@@ -20,6 +11,7 @@
         display: flex;
         align-items: center;
         margin: 0.5rem 0;
+        font-size: 1rem;
     }
 
         .subscription-info > div > span {
@@ -29,20 +21,16 @@
 
 .price {
     color: #28a745;
-    font-size: 1.2rem;
-}
-
-.price-value {
-    font-size: 1.5rem;
-    margin-left: 0.5rem;
+    font-size: 1rem;
 }
 
 .description {
     font-style: italic;
+    font-size: 1rem;
 }
 
 .subscription-period {
-    font-size: 0.8rem;
+    font-size: 1rem;
 }
 
 .buy-subscription-button {

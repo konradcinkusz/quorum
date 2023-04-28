@@ -1,11 +1,8 @@
 ﻿namespace MR.Service.Features.SubscriptionFeatures;
 
-public class BuySubscriptionCommand : ISubscriptionBaseCommand, IRequest<bool>
+public class BuySubscriptionCommand : IRequest<bool>
 {
-    public Guid? PaymentId { get; set; }
     public string ApplicationUserId { get; set; }
-    public DateTime? Begin { get; set; }
-    public DateTime? End { get; set; }
 
     public class BuySubscriptionCommandHandler : CommandHandlerBase<BuySubscriptionCommand, bool>
     {
@@ -16,23 +13,37 @@ public class BuySubscriptionCommand : ISubscriptionBaseCommand, IRequest<bool>
 
         public override async Task<bool> Handle(BuySubscriptionCommand request, CancellationToken cancellationToken)
         {
-            var activeSubscriptionExists = _context.Subscriptions
-                .Where(s => s.ApplicationUserId == request.ApplicationUserId);
+            var activeSubscriptionExists = await _context.Subscriptions.Include(x=>x.SubscriptionPayments).ThenInclude(x=>x.Payment)
+                .FirstAsync(s => s.ApplicationUserId == request.ApplicationUserId);
 
-            if (await activeSubscriptionExists.AnyAsync(x => x.IsActive()))
+            if (activeSubscriptionExists.IsActive())
             {
                 throw new ApplicationException("User already has an active subscription");
             }
 
-            var subscription = new Subscription
+            if (activeSubscriptionExists.SubscriptionPayments.Any(x=> x.Payment != null && x.Payment.PaymentStatus == PaymentStatus.Pending))
+            {
+                throw new ApplicationException("User has pending payment for that subscription");
+            }
+
+            Payment payment = new Payment
             {
                 ApplicationUserId = request.ApplicationUserId,
-                Begin = request.Begin,
-                End = request.End
+                PaymentMethod = "Bank",
+                PaymentStatus = PaymentStatus.Pending,
+                PaymentValuePLN = 5
             };
 
-            await _context.Subscriptions.AddAsync(subscription, cancellationToken);
-            var result = await _context.SaveChangesAsync(cancellationToken);
+            SubscriptionPayment subscriptionPayment = new SubscriptionPayment
+            {
+                SubscriptionId = request.ApplicationUserId
+            };
+
+            payment.SubscriptionPayments = new List<SubscriptionPayment>() { subscriptionPayment };
+
+            await _context.Payments.AddAsync(payment, cancellationToken);
+
+            int result = await _context.SaveChangesAsync(cancellationToken);
 
             return result > 0;
         }

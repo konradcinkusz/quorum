@@ -24,6 +24,7 @@ public class PaymentService : DataServiceBase, IPaymentService
 
         return response.Headers.Location.Segments.Last();
     }
+
     public async Task<PaymentDTO> GetPayment(Guid id)
     {
         var response = await _httpClient.GetAsync($"{_paymentControllerPath}/{id}");

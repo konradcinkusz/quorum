@@ -3,7 +3,7 @@
 public interface ISubscriptionService
 {
     Task<SubscriptionReadDTO> Get();
-    Task Buy();
+    Task<string> Buy();
 }
 
 public class SubscriptionService : DataServiceBase, ISubscriptionService
@@ -14,9 +14,13 @@ public class SubscriptionService : DataServiceBase, ISubscriptionService
     {
     }
 
-    public Task Buy()
+    public async Task<string> Buy()
     {
-        throw new NotImplementedException();
+        var response = await _httpClient.PostAsync($"{_subscriptionControllerPath}", null);
+
+        response.EnsureSuccessStatusCode();
+
+        return response.Headers.Location.Segments.Last();
     }
 
     public async Task<SubscriptionReadDTO> Get()
