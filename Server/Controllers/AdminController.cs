@@ -42,4 +42,12 @@ public class AdminController : MRBaseController
         }
         return BadRequest("Data has already been seeded");
     }
+
+
+    [HttpPost(nameof(ActivateSubscription))]
+    public async Task<IActionResult> ActivateSubscription()
+    {
+        var result = await Mediator.Send(new ActivateSubscriptionCommand());
+        return Ok(result);
+    }
 }

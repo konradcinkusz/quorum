@@ -4,6 +4,7 @@ public interface ISubscriptionService
 {
     Task<SubscriptionReadDTO> Get();
     Task<string> Buy();
+    Task<PaymentPagedListDTO> GetMyPayments(PaymentSearchParamsDTO query);
 }
 
 public class SubscriptionService : DataServiceBase, ISubscriptionService
@@ -35,5 +36,23 @@ public class SubscriptionService : DataServiceBase, ISubscriptionService
         var paymentDto = await response.Content.ReadFromJsonAsync<SubscriptionReadDTO>();
 
         return paymentDto;
+    }
+
+    public async Task<PaymentPagedListDTO> GetMyPayments(PaymentSearchParamsDTO query)
+    {
+        var q = BuildQuery(query);
+
+        var response = await _httpClient.GetAsync($"{_subscriptionControllerPath}/GetMyPayments?{q}");
+
+        response.EnsureSuccessStatusCode();
+
+        var content = await response.Content.ReadAsStringAsync();
+
+        var result = JsonSerializer.Deserialize<PaymentPagedListDTO>(content, new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        });
+
+        return result ?? throw new Exception("Deserialized response is null.");
     }
 }

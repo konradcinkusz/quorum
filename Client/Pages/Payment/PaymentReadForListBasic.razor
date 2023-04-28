@@ -1,0 +1,100 @@
+﻿@if (Payment != null)
+{
+    <div class="card m-1 p-1">
+        <div class="card-header">
+            <h4 class="card-title">Payment Details</h4>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-sm-4">
+                    <p class="form-control-plaintext" id="payment-value">You have to make a wire from you bank account, and then admin accept payment and activate your subscription</p>
+                </div>
+                <div class="col-sm-4">
+                    <label for="payment-value" class="form-label">Payment Value:</label>
+                    <p class="form-control-plaintext" id="payment-value">@Payment.PaymentValuePLN.ToString("C", CultureInfo.GetCultureInfo("pl-PL"))</p>
+                </div>
+            </div>
+            <hr />
+            <div class="btn-group my-2" role="group">
+                <button class="btn btn-primary btn-sm" type="button" @onclick="ToggleDetails">@ShowDetailsButtonText</button>
+            </div>
+
+            <div class="@DetailsCssClass">
+                <hr />
+                <h5>Payment Details</h5>
+                <dl class="row mb-3">
+                    <dt class="col-sm-3">Payment Link:</dt>
+                    <dd class="col-sm-9">@Payment.PaymentMethod</dd>
+
+                    <dt class="col-sm-3">Reference ID:</dt>
+                    <dd class="col-sm-9">@Payment.ReferenceNumber</dd>
+
+                    <dt class="col-sm-3">Created At:</dt>
+                    <dd class="col-sm-9">@Payment.CreatedAt.ToString("g", CultureInfo.InvariantCulture)</dd>
+
+                    <dt class="col-sm-3">Payment Status History:</dt>
+                    <dd class="col-sm-9">
+                        @if (Payment.PaymentStatusHistories != null && Payment.PaymentStatusHistories.Any())
+                        {
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Payment Status</th>
+                                        <th>Status Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var history in Payment.PaymentStatusHistories)
+                                    {
+                                        <tr>
+                                            <td>@history.PaymentStatus</td>
+                                            <td>@history.CreatedAt.ToString("g", CultureInfo.InvariantCulture)</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                        else
+                        {
+                            <p>No payment status history available.</p>
+                        }
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <p>No payment to display.</p>
+}
+
+@code {
+    [Parameter]
+    public PaymentDTO Payment { get; set; }
+
+    public string ShowDetailsButtonText { get; set; } = "Show Details";
+
+    public string GetDetailsButtonText { get; set; } = "Get Details";
+
+    private string DetailsCssClass => showDetails ? "d-block" : "d-none";
+
+    private bool showDetails = false;
+
+    private void ToggleDetails()
+    {
+        showDetails = !showDetails;
+
+        if (showDetails)
+        {
+            GetDetailsButtonText = "Hide Details";
+            ShowDetailsButtonText = GetDetailsButtonText;
+        }
+        else
+        {
+            GetDetailsButtonText = "Get Details";
+            ShowDetailsButtonText = GetDetailsButtonText;
+        }
+    }
+
+}

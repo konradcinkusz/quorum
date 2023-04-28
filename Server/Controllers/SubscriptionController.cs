@@ -75,4 +75,23 @@ public class SubscriptionController : MRBaseController
 
         return Ok(new SubscriptionPagedListDTO { Items = subscriptionDTOs, CurrentPage = result.CurrentPage, PageSize = result.PageSize, TotalItems = result.TotalItems, TotalPages = result.TotalPages });
     }
+
+    [HttpGet(nameof(GetMyPayments))]
+    public async Task<ActionResult<PaymentPagedListDTO>> GetMyPayments([FromQuery] PaymentSearchParamsDTO query)
+    {
+        var result = await Mediator.Send(new GetPaymentsBySearchParamsQuery
+        {
+            ApplicationUserId = GetUserId(),
+            SearchParams = new SearchParams
+            {
+                CurrentPage = query.CurrentPage,
+                PageSize = query.PageSize,
+                Question = query.Description
+            }
+        });
+
+        var paymentDTOs = _mapper.Map<List<PaymentDTO>>(result);
+
+        return Ok(new PaymentPagedListDTO { Items = paymentDTOs, CurrentPage = result.CurrentPage, PageSize = result.PageSize, TotalItems = result.TotalItems, TotalPages = result.TotalPages });
+    }
 }

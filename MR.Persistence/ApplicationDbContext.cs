@@ -6,6 +6,7 @@ public interface IApplicationDbContext
     DbSet<AdminLog> Admin_Logs { get; set; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     DbSet<Subscription> Subscriptions { get; set; }
+    DbSet<SubscriptionPayment> SubscriptionPayment { get; set; }
 }
 
 public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>, IApplicationDbContext
@@ -21,6 +22,7 @@ public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>, 
     public DbSet<AdminLog> Admin_Logs { get; set; }
     public DbSet<Subscription> Subscriptions { get; set; }
     public DbSet<Subscription_Log> Subscription_Logs { get; set; }
+    public DbSet<SubscriptionPayment> SubscriptionPayment { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

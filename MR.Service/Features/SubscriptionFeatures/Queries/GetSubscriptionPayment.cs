@@ -15,6 +15,7 @@ public class GetSubscriptionPayment : IRequest<Payment?>
             var query = await _context.Subscriptions
                 .Where(s => s.ApplicationUserId == request.ApplicationUserId)
                 .SelectMany(s => s.SubscriptionPayments)
+                .Include(sp => sp.Payment.PaymentStatusHistories)
                 .Select(sp => sp.Payment)
                 .OrderByDescending(p => p.CreatedAt)
                 .FirstOrDefaultAsync();

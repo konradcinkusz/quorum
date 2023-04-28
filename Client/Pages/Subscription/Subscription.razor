@@ -21,7 +21,7 @@
 
         @if (subscriptionReadDTO.IsActive || subscriptionReadDTO.LastPayment != null)
         {
-            <PaymentReadForList Payment="@subscriptionReadDTO.LastPayment" />
+            <PaymentReadForListBasic Payment="subscriptionReadDTO.LastPayment"></PaymentReadForListBasic>
         }
         else
         {
@@ -29,6 +29,8 @@
         }
     </div>
 </div>
+
+<PaymentListForBasicUserPage></PaymentListForBasicUserPage>
 
 @code {
     private SubscriptionReadDTO subscriptionReadDTO = new SubscriptionReadDTO();
@@ -41,5 +43,29 @@
     private async Task Buy()
     {
         var appuserresult = await subscriptionService.Buy();
+    }
+
+
+    public string ShowDetailsButtonText { get; set; } = "Show Details";
+    public string GetDetailsButtonText { get; set; } = "Get Details";
+
+    private string DetailsCssClass => showDetails ? "d-block" : "d-none";
+
+    private bool showDetails = false;
+
+    private void ToggleDetails()
+    {
+        showDetails = !showDetails;
+
+        if (showDetails)
+        {
+            GetDetailsButtonText = "Hide Details";
+            ShowDetailsButtonText = GetDetailsButtonText;
+        }
+        else
+        {
+            GetDetailsButtonText = "Get Details";
+            ShowDetailsButtonText = GetDetailsButtonText;
+        }
     }
 }

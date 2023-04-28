@@ -6,6 +6,8 @@ public enum PaymentStatus
     New,
     Pending,
     Rejected,
+    //sub to activated
+    Accepted,
     Completed,
     Unknown,
     Refunded

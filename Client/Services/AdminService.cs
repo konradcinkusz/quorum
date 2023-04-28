@@ -1,9 +1,12 @@
-﻿namespace MR.Client.Services;
+﻿using MR.Shared.DTOs.Admin;
+
+namespace MR.Client.Services;
 
 public interface IAdminService
 {
     Task<AdminLogPagedListDTO> GetAdminLogs(AdminLogSearchParamsDTO query);
     Task<bool> SeedPayments(SeedPaymentRequest seedPaymentRequest);
+    Task<int> ActivateSubscription();
     Task<string> CreateSubscription(SubscriptionCreateForUserDTO SubscriptionDto);
     Task<SubscriptionPagedListDTO> GetSubscriptions(SubscriptionSearchParamsDTO query);
 }
@@ -79,5 +82,14 @@ public class AdminService : DataServiceBase, IAdminService
         });
 
         return result ?? throw new Exception("Deserialized response is null.");
+    }
+
+    public async Task<int> ActivateSubscription()
+    {
+        var response = await _httpClient.PostAsync($"{_adminControllerPath}/ActivateSubscription",
+                                                       null);
+        response.EnsureSuccessStatusCode();
+        var result = await response.Content.ReadFromJsonAsync<int>();
+        return result;
     }
 }
