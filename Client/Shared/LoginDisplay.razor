@@ -1,7 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @inject NavigationManager Navigation
-@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <AuthorizeView>
     <Authorized>
@@ -25,12 +24,18 @@
     </NotAuthorized>
 </AuthorizeView>
 
-@code{
+@code {
+    [CascadingParameter] public Task<AuthenticationState> AuthTask { get; set; }
+
+    private System.Security.Claims.ClaimsPrincipal user;
+
     private bool IsActiveSubscription = false;
 
-    protected async override Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        await base.OnParametersSetAsync();
+
+        var authState = await AuthTask;
         var user = authState.User;
         var claim = user.Claims.FirstOrDefault(x => x.Type == "isActiveSubscription");
         if (claim != null && bool.TryParse(claim.Value, out bool subscriptionF))
@@ -38,6 +43,7 @@
             IsActiveSubscription = subscriptionF;
         }
     }
+
     private void BeginLogOut()
     {
         Navigation.NavigateToLogout("authentication/logout");

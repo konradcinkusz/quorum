@@ -18,3 +18,4 @@ global using System.Reflection;
 global using Microsoft.AspNetCore.Identity;
 global using Microsoft.Extensions.Options;
 global using MR.Domain.Auth;
+global using System.Security.Claims;

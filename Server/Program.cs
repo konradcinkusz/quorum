@@ -8,7 +8,8 @@ builder.Services.AddDefaultIdentity<ApplicationUser>
     (options => options.SignIn.RequireConfirmedAccount = true)
     .AddUserManager<MRUserManager>()
     .AddRoles<IdentityRole>()
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddClaimsPrincipalFactory<CustomClaimsPrincipalFactory>();
 
 builder.Services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, CustomClaimsPrincipalFactory>();
 

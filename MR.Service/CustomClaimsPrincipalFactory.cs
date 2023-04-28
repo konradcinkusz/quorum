@@ -1,6 +1,4 @@
-﻿using System.Security.Claims;
-
-namespace MR.Service;
+﻿namespace MR.Service;
 
 public class CustomClaimsPrincipalFactory : UserClaimsPrincipalFactory<ApplicationUser, IdentityRole>
 {
