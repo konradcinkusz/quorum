@@ -1,4 +1,7 @@
-﻿namespace MR.Server.Controllers;
+﻿using MR.Service.Features.QuarterFeatures;
+using MR.Shared.DTOs.Quarter;
+
+namespace MR.Server.Controllers;
 
 [Authorize(Policy = "RequireAdminRole")]
 public class AdminController : MRBaseController
@@ -48,6 +51,18 @@ public class AdminController : MRBaseController
     public async Task<IActionResult> ActivateSubscription()
     {
         var result = await Mediator.Send(new ActivateSubscriptionCommand());
+        return Ok(result);
+    }
+
+    [HttpPost(nameof(InitQuarter))]
+    public async Task<IActionResult> InitQuarter([FromBody] InitQuarterDTO initQuarterDTO)
+    {
+        var result = await Mediator.Send(new InitQuarterCommand
+        {
+            Month = initQuarterDTO.Month,
+            Year = initQuarterDTO.Year,
+            SignaturesCount = initQuarterDTO.SignaturesCount
+        });
         return Ok(result);
     }
 }

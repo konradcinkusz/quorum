@@ -1,6 +1,4 @@
-﻿using MR.Shared.DTOs.Admin;
-
-namespace MR.Client.Services;
+﻿namespace MR.Client.Services;
 
 public interface IAdminService
 {
@@ -9,6 +7,7 @@ public interface IAdminService
     Task<int> ActivateSubscription();
     Task<string> CreateSubscription(SubscriptionCreateForUserDTO SubscriptionDto);
     Task<SubscriptionPagedListDTO> GetSubscriptions(SubscriptionSearchParamsDTO query);
+    Task<int> InitQuarter(InitQuarterDTO quarter);
 }
 
 public class AdminService : DataServiceBase, IAdminService
@@ -87,6 +86,15 @@ public class AdminService : DataServiceBase, IAdminService
     public async Task<int> ActivateSubscription()
     {
         var response = await _httpClient.PostAsync($"{_adminControllerPath}/ActivateSubscription",
+                                                       null);
+        response.EnsureSuccessStatusCode();
+        var result = await response.Content.ReadFromJsonAsync<int>();
+        return result;
+    }
+
+    public async Task<int> InitQuarter(InitQuarterDTO quarter)
+    {
+        var response = await _httpClient.PostAsync($"{_adminControllerPath}/InitQuarter",
                                                        null);
         response.EnsureSuccessStatusCode();
         var result = await response.Content.ReadFromJsonAsync<int>();

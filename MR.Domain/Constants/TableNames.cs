@@ -10,7 +10,7 @@ public class TableNames
     public const string SignaturePools = "SignaturePools";
     public const string SignatureHistories = "SignatureHistories";
     public const string Signatures = "Signatures";
-    public const string QuarterToIssues = "QuarterToIssues";
+    public const string QuarterIssues = "QuarterIssues";
     public const string Quarters = "Quarters";
     public const string Mails = "Mails";
     public const string PaymentToIssues = "PaymentToIssues";

@@ -7,6 +7,10 @@ public interface IApplicationDbContext
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     DbSet<Subscription> Subscriptions { get; set; }
     DbSet<SubscriptionPayment> SubscriptionPayment { get; set; }
+    DbSet<Issue> Issues { get; set; }
+    DbSet<Quarter> Quarters { get; set; }
+    DbSet<SignaturePool> SignaturePools { get; set; }
+    DbSet<Signature> Signatures { get; set; }
 }
 
 public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>, IApplicationDbContext
@@ -23,7 +27,10 @@ public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>, 
     public DbSet<Subscription> Subscriptions { get; set; }
     public DbSet<Subscription_Log> Subscription_Logs { get; set; }
     public DbSet<SubscriptionPayment> SubscriptionPayment { get; set; }
-
+    public DbSet<Issue> Issues { get; set; }
+    public DbSet<Quarter> Quarters { get; set; }
+    public DbSet<SignaturePool> SignaturePools { get; set; }
+    public DbSet<Signature> Signatures { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Seed();
@@ -31,6 +38,7 @@ public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>, 
         Logs_config(modelBuilder);
         Logs_triggers_config(modelBuilder);
         SubscriptionPaymentConfig(modelBuilder);
+        QuarterIssueConfig(modelBuilder);
         base.OnModelCreating(modelBuilder);
     }
 
@@ -73,6 +81,24 @@ public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>, 
             .HasOne(sp => sp.Payment)
             .WithMany(p => p.SubscriptionPayments)
             .HasForeignKey(sp => sp.PaymentId)
+            .OnDelete(DeleteBehavior.Cascade);
+    }
+
+    private void QuarterIssueConfig(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<QuarterIssue>()
+                    .HasKey(sp => new { sp.IssueId, sp.QuarterId });
+
+        modelBuilder.Entity<QuarterIssue>()
+            .HasOne(sp => sp.Issue)
+            .WithMany(s => s.QuarterIssues)
+            .HasForeignKey(sp => sp.IssueId)
+            .OnDelete(DeleteBehavior.Restrict);// remove cascading delete behavior on SubscriptionPayment -> Subscription relationship
+
+        modelBuilder.Entity<QuarterIssue>()
+            .HasOne(sp => sp.Quarter)
+            .WithMany(p => p.QuarterIssues)
+            .HasForeignKey(sp => sp.QuarterId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

@@ -1,0 +1,55 @@
+﻿@inherits BaseAdmin
+
+<div class="card shadow rounded-3">
+    <div class="card-header bg-primary text-white py-3 rounded-3">
+        <h5 class="card-title mb-0">Admin Init Quarter</h5>
+    </div>
+
+    <div class="card-body">
+        <EditForm Model="@dto" OnValidSubmit="@Create">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="row">
+                <div class="col-md-12 mb-4">
+                    <label for="year-value" class="form-label">Year</label>
+                    <InputNumber id="year-value" class="form-control rounded-pill" @bind-Value="@dto.Year" required />
+                    <ValidationMessage For="@(() => dto.Year)" />
+                </div>
+
+                <div class="col-md-12 mb-4">
+                    <label for="month-value" class="form-label">Month</label>
+                    <InputNumber id="month-value" class="form-control rounded-pill" @bind-Value="@dto.Month" required />
+                    <ValidationMessage For="@(() => dto.Month)" />
+                </div>
+
+                <div class="col-md-12 mb-4">
+                    <label for="count-value" class="form-label">Signatures count</label>
+                    <InputNumber id="count-value" class="form-control rounded-pill" @bind-Value="@dto.SignaturesCount" required />
+                    <ValidationMessage For="@(() => dto.SignaturesCount)" />
+                </div>
+
+                <div class="col-md-12 d-grid">
+                    <button type="submit" class="btn btn-primary rounded-pill">Init quarter</button>
+                </div>
+            </div>
+        </EditForm>
+    </div>
+</div>
+@if (created)
+{
+    <div class="alert alert-success" role="alert">
+        Quarter initialized!
+    </div>
+}
+
+@code {
+    private InitQuarterDTO dto = new InitQuarterDTO();
+    private bool created = false;
+    [Parameter]
+    public EventCallback<InitQuarterDTO> InitQuarter { get; set; }
+    private async Task Create()
+    {
+        await InitQuarter.InvokeAsync(dto);
+    }
+}
