@@ -31,7 +31,12 @@
 </div>
 
 <PaymentListForBasicUserPage></PaymentListForBasicUserPage>
-
+@if (!string.IsNullOrEmpty(appUserResult))
+{
+    <div class="alert alert-success" role="alert">
+        <span>@appUserResult</span>
+    </div>
+}
 @code {
     private SubscriptionReadDTO subscriptionReadDTO = new SubscriptionReadDTO();
 
@@ -39,10 +44,10 @@
     {
         subscriptionReadDTO = await subscriptionService.Get();
     }
-
+    private string appUserResult { get; set; } = string.Empty;
     private async Task Buy()
     {
-        var appuserresult = await subscriptionService.Buy();
+        appUserResult = await subscriptionService.Buy();
     }
 
 

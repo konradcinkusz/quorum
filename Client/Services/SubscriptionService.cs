@@ -18,10 +18,9 @@ public class SubscriptionService : DataServiceBase, ISubscriptionService
     public async Task<string> Buy()
     {
         var response = await _httpClient.PostAsync($"{_subscriptionControllerPath}", null);
+        var apiResponse = await response.Content.ReadFromJsonAsync<ApiResponse<bool>>();
 
-        response.EnsureSuccessStatusCode();
-
-        return response.Headers.Location.Segments.Last();
+        return apiResponse.Message.ToString();
     }
 
     public async Task<SubscriptionReadDTO> Get()

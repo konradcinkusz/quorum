@@ -1,0 +1,17 @@
+﻿.card {
+    background-color: #f8f9fa;
+    border: none;
+    padding: 10px;
+    font-weight: bold;
+}
+
+.row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.col-sm-4 {
+    flex-basis: 33.33%;
+    text-align: center;
+}

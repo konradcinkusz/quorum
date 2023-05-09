@@ -1,6 +1,4 @@
-﻿using MR.Shared.DTOs.Subscription;
-
-namespace MR.Server.Controllers;
+﻿namespace MR.Server.Controllers;
 
 [Authorize]
 public class SubscriptionController : MRBaseController
@@ -43,18 +41,26 @@ public class SubscriptionController : MRBaseController
     }
 
     [HttpPost]
-    public async Task<ActionResult<bool>> BuySubscription()
+    public async Task<ActionResult<ApiResponse<bool>>> BuySubscription()
     {
-        var uId = GetUserId();
-        var Subscription = await Mediator.Send(new BuySubscriptionCommand { ApplicationUserId = uId });
-
-        if (Subscription == null || !Subscription)
+        try
         {
-            return NotFound();
-        }
+            var uId = GetUserId();
+            var subscription = await Mediator.Send(new BuySubscriptionCommand { ApplicationUserId = uId });
 
-        return CreatedAtAction(nameof(GetSubscription), new { id = uId }, null);
+            if (subscription == null || !subscription)
+            {
+                return new ApiResponse<bool> { StatusCode = (int)HttpStatusCode.NotFound, Success = false, Message = "Subscription not found" };
+            }
+
+            return new ApiResponse<bool> { StatusCode = (int)HttpStatusCode.Created, Success = true, Message = "Subscription purchased successfully" };
+        }
+        catch (Exception ex)
+        {
+            return new ApiResponse<bool> { StatusCode = (int)HttpStatusCode.BadRequest, Success = false, Message = ex.Message };
+        }
     }
+
 
 
     [Authorize(Policy = "RequireAdminRole")]

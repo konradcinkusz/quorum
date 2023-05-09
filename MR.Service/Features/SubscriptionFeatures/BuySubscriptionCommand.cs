@@ -21,7 +21,8 @@ public class BuySubscriptionCommand : IRequest<bool>
                 throw new ApplicationException("User already has an active subscription");
             }
 
-            if (activeSubscriptionExists.SubscriptionPayments.Any(x=> x.Payment != null && x.Payment.PaymentStatus == PaymentStatus.Pending))
+            if (activeSubscriptionExists.SubscriptionPayments.Any(x=> x.Payment != null 
+                && x.Payment.PaymentStatus == PaymentStatus.Pending))
             {
                 throw new ApplicationException("User has pending payment for that subscription");
             }

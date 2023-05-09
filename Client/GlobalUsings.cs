@@ -20,3 +20,4 @@ global using System.Security.Claims;
 global using Microsoft.AspNetCore.Authorization;
 global using MR.Shared.DTOs.Subscription;
 global using MR.Shared.DTOs.Quarter;
+global using MR.Service;
