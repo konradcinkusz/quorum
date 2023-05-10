@@ -27,7 +27,7 @@ public class ActivateSubscriptionCommand : IRequest<int>
                     item.Payment.PaymentStatusHistories = new List<PaymentStatusHistory>() 
                     { 
                         new PaymentStatusHistory {
-                            PaymentStatus = PaymentStatus.Accepted
+                            PaymentStatus = PaymentStatus.Completed
                         } 
                     };
                 }

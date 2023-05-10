@@ -25,7 +25,8 @@ public class GetSubscriptionsBySearchParamsQuery : QueryBase, IRequest<PagedList
             
             if (request.OnlyActives)
             {
-                query = query.Where(x => x.IsActive());
+                var currentDate = DateTime.UtcNow;
+                query = query.Where(x => currentDate >= x.Begin && currentDate <= x.End);
             }
 
             if (request.Begin != null)

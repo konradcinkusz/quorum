@@ -46,9 +46,6 @@ public class PaymentService : DataServiceBase, IPaymentService
         if (!string.IsNullOrEmpty(query.ApplicationUserId))
             q[nameof(query.ApplicationUserId)] = query.ApplicationUserId;
 
-        if (!string.IsNullOrEmpty(query.SortColumn))
-            q[nameof(query.SortColumn)] = query.SortColumn;
-
         var response = await _httpClient.GetAsync($"{_paymentControllerPath}/GetPaymentsByQuery?{q}");
 
         response.EnsureSuccessStatusCode();

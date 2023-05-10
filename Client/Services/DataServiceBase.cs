@@ -14,6 +14,7 @@ public abstract class DataServiceBase
         q[nameof(query.CurrentPage)] = query.CurrentPage.ToString();
         q[nameof(query.PageSize)] = query.PageSize.ToString();
         q[nameof(query.SortOrder)] = query.SortOrder.ToString();
+        q[nameof(query.SortColumn)] = query.SortColumn.ToString();
         return q;
     }
 }

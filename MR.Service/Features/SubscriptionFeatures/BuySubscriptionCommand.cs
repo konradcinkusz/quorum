@@ -32,7 +32,16 @@ public class BuySubscriptionCommand : IRequest<bool>
                 ApplicationUserId = request.ApplicationUserId,
                 PaymentMethod = "Bank",
                 PaymentStatus = PaymentStatus.Pending,
-                PaymentValuePLN = 5
+                PaymentValuePLN = 5,
+                PaymentStatusHistories = new List<PaymentStatusHistory>()
+                    {
+                        new PaymentStatusHistory {
+                            PaymentStatus = PaymentStatus.New,
+                        },
+                        new PaymentStatusHistory {
+                            PaymentStatus = PaymentStatus.Pending,
+                        }
+                    }
             };
 
             SubscriptionPayment subscriptionPayment = new SubscriptionPayment

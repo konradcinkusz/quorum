@@ -1,6 +1,6 @@
 ﻿<div class="card">
     <div class="row mb-3">
-        <div class="col-sm-3">
+        <div class="col-sm-2">
             <button class="btn btn-link" @onclick="@(() => SortData("Id"))">
                 Payment ID
                 @if (QuerySearch.SortColumn == "Id")
@@ -12,7 +12,7 @@
 
         <div class="col-sm-3">
             <button class="btn btn-link" @onclick="@(() => SortData("ApplicationUserId"))">
-                Application User
+                User
                 @if (QuerySearch.SortColumn == "ApplicationUserId")
                 {
                     <i class="@GetSortIconClass(QuerySearch.SortOrder)"></i>
@@ -20,10 +20,20 @@
             </button>
         </div>
 
-        <div class="col-sm-3">
+        <div class="col-sm-2">
             <button class="btn btn-link" @onclick="@(() => SortData("PaymentValuePLN"))">
-                Payment Value
+                Value
                 @if (QuerySearch.SortColumn == "PaymentValuePLN")
+                {
+                    <i class="@GetSortIconClass(QuerySearch.SortOrder)"></i>
+                }
+            </button>
+        </div>
+
+        <div class="col-sm-2">
+            <button class="btn btn-link" @onclick="@(() => SortData("CreatedAt"))">
+                CreatedAt
+                @if (QuerySearch.SortColumn == "CreatedAt")
                 {
                     <i class="@GetSortIconClass(QuerySearch.SortOrder)"></i>
                 }
