@@ -1,13 +1,65 @@
 ﻿<div class="card">
     <div class="row mb-3">
-        <div class="col-sm-4">
-            Payment ID:
+        <div class="col-sm-3">
+            <button class="btn btn-link" @onclick="@(() => SortData("Id"))">
+                Payment ID
+                @if (QuerySearch.SortColumn == "Id")
+                {
+                    <i class="@GetSortIconClass(QuerySearch.SortOrder)"></i>
+                }
+            </button>
         </div>
-        <div class="col-sm-4">
-            ApplicationUserId:
+
+        <div class="col-sm-3">
+            <button class="btn btn-link" @onclick="@(() => SortData("ApplicationUserId"))">
+                Application User
+                @if (QuerySearch.SortColumn == "ApplicationUserId")
+                {
+                    <i class="@GetSortIconClass(QuerySearch.SortOrder)"></i>
+                }
+            </button>
         </div>
-        <div class="col-sm-4">
-            Payment Value:
+
+        <div class="col-sm-3">
+            <button class="btn btn-link" @onclick="@(() => SortData("PaymentValuePLN"))">
+                Payment Value
+                @if (QuerySearch.SortColumn == "PaymentValuePLN")
+                {
+                    <i class="@GetSortIconClass(QuerySearch.SortOrder)"></i>
+                }
+            </button>
+        </div>
+
+        <div class="col-sm-3">
+            Actions:
         </div>
     </div>
 </div>
+
+@code {
+    [Parameter]
+    public PaymentSearchParamsDTO QuerySearch { get; set; }
+    [Parameter]
+    public EventCallback Refresh { get; set; }
+
+    private async Task SortData(string column)
+    {
+        if (QuerySearch.SortColumn == column)
+        {
+            QuerySearch.SortOrder = QuerySearch.SortOrder == SortOrder.Ascending ? SortOrder.Descending : SortOrder.Ascending;
+        }
+        else
+        {
+            QuerySearch.SortColumn = column;
+            QuerySearch.SortOrder = SortOrder.Ascending;
+        }
+
+        // implement sorting logic based on the selected column and sort order
+        await Refresh.InvokeAsync();
+    }
+
+    private string GetSortIconClass(SortOrder order)
+    {
+        return order == SortOrder.Ascending ? "bi bi-caret-up" : "bi bi-caret-down";
+    }
+}

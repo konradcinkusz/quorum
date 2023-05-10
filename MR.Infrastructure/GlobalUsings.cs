@@ -16,5 +16,4 @@ global using Microsoft.Extensions.Logging;
 global using MR.Service.Middleware;
 global using Serilog;
 global using Microsoft.AspNetCore.Mvc;
-global using Microsoft.OpenApi.Models;
-global using MR.Domain.Enums;
+global using System.Linq.Expressions;

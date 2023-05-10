@@ -15,7 +15,7 @@ public class PaymentController : MRBaseController
         {
             PaymentStatus = PaymentStatus.New,
             PaymentMethod = paymentDto.PaymentMethod,
-            ReferenceNumber = paymentDto.ReferenceNumber,            
+            ReferenceNumber = paymentDto.ReferenceNumber,
             ApplicationUserId = uId,
             PaymentValuePLN = paymentDto.PaymentValuePLN
         });
@@ -51,7 +51,9 @@ public class PaymentController : MRBaseController
                 CurrentPage = query.CurrentPage,
                 PageSize = query.PageSize,
                 Question = query.Description
-            }
+            },
+            SortColumn = query.SortColumn,
+            SortOrder = (Microsoft.Data.SqlClient.SortOrder)query.SortOrder
         });
 
         var paymentDTOs = _mapper.Map<List<PaymentDTO>>(result);

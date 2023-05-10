@@ -19,3 +19,6 @@ global using Microsoft.AspNetCore.Identity;
 global using Microsoft.Extensions.Options;
 global using MR.Domain.Auth;
 global using System.Security.Claims;
+global using System.Linq.Expressions;
+global using Microsoft.Data.SqlClient;
+global using MR.Service.Extension;

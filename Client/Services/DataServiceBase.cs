@@ -13,6 +13,7 @@ public abstract class DataServiceBase
         var q = HttpUtility.ParseQueryString(string.Empty);
         q[nameof(query.CurrentPage)] = query.CurrentPage.ToString();
         q[nameof(query.PageSize)] = query.PageSize.ToString();
+        q[nameof(query.SortOrder)] = query.SortOrder.ToString();
         return q;
     }
 }

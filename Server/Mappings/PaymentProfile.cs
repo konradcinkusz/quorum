@@ -5,7 +5,8 @@ public class PaymentProfile : Profile
     public PaymentProfile()
     {
         CreateMap<PaymentStatusHistory, PaymentStatusHistoryDTO>();
-        CreateMap<Payment, PaymentDTO>();
+        CreateMap<Payment, PaymentDTO>()
+            .ForMember(dest => dest.ApplicationUserEmail, opt => opt.MapFrom(src => src.ApplicationUser.Email));
 
         CreateMap<PaymentStatusHistoryDTO, PaymentStatusHistory>();
         CreateMap<PaymentDTO, Payment>()
