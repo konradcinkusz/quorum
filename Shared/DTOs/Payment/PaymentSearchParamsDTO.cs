@@ -1,6 +1,6 @@
 ﻿namespace MR.Shared.DTOs.Payment;
 
-public class PaymentSearchParamsDTO : SearchParams
+public class PaymentSearchParamsDTO : SearchParamsDTO
 {
     public string ApplicationUserId { get; set; } = string.Empty;
     public decimal? MinPaymentValuePLN { get; set; }

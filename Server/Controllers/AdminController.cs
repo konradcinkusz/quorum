@@ -1,9 +1,6 @@
-﻿using MR.Service.Features.QuarterFeatures;
-using MR.Shared.DTOs.Quarter;
+﻿namespace MR.Server.Controllers;
 
-namespace MR.Server.Controllers;
-
-[Authorize(Policy = "RequireAdminRole")]
+[Authorize(Policy = Policies.RequireAdminRole)]
 public class AdminController : MRBaseController
 {
     private readonly IConfiguration _configuration;
@@ -55,14 +52,21 @@ public class AdminController : MRBaseController
     }
 
     [HttpPost(nameof(InitQuarter))]
-    public async Task<IActionResult> InitQuarter([FromBody] InitQuarterDTO initQuarterDTO)
+    public async Task<ActionResult<ApiResponse<Guid>>> InitQuarter([FromBody] InitQuarterDTO initQuarterDTO)
     {
-        var result = await Mediator.Send(new InitQuarterCommand
+        try
         {
-            Month = initQuarterDTO.Month,
-            Year = initQuarterDTO.Year,
-            SignaturesCount = initQuarterDTO.SignaturesCount
-        });
-        return Ok(result);
+            var result = await Mediator.Send(new InitQuarterCommand
+            {
+                Month = initQuarterDTO.Month,
+                Year = initQuarterDTO.Year,
+                SignaturesCount = initQuarterDTO.SignaturesCount
+            });
+            return new ApiResponse<Guid>(result);
+        }
+        catch (ApplicationException ex)
+        {
+            return new ApiResponse<Guid>() { Message = ex.Message };
+        }
     }
 }

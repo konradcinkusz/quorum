@@ -1,6 +1,6 @@
 ﻿namespace MR.Shared;
 
-public abstract class SearchParams
+public abstract class SearchParamsDTO
 {
     public int CurrentPage { get; set; } = 1;
     public int PageSize { get; set; } = 10;

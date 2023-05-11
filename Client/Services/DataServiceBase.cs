@@ -8,7 +8,7 @@ public abstract class DataServiceBase
 
     public string GetBaseUrl() => _httpClient.BaseAddress.ToString();
 
-    protected NameValueCollection BuildQuery(SearchParams query)
+    protected NameValueCollection BuildQuery(SearchParamsDTO query)
     {
         var q = HttpUtility.ParseQueryString(string.Empty);
         q[nameof(query.CurrentPage)] = query.CurrentPage.ToString();

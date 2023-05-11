@@ -1,3 +1,5 @@
+using MR.Server;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContextService(builder.Configuration);
@@ -33,7 +35,7 @@ builder.Services.AddAuthentication()
 //https://stackoverflow.com/a/73930254/4510954
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("RequireAdminRole", policy =>
+    options.AddPolicy(Policies.RequireAdminRole, policy =>
     {
         policy.RequireClaim(ClaimTypes.Role, new[] { "Admin", "SuperAdmin" });
     });

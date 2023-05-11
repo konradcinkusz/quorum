@@ -1,6 +1,6 @@
 ﻿namespace MR.Server.Controllers;
 
-[Authorize(Policy = "RequireAdminRole")]
+[Authorize(Policy = Policies.RequireAdminRole)]
 public class PaymentController : MRBaseController
 {
     public PaymentController(IMapper mapper) : base(mapper)

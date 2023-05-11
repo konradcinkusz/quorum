@@ -7,7 +7,7 @@ public class SubscriptionController : MRBaseController
     {
     }
 
-    [Authorize(Policy = "RequireAdminRole")]
+    [Authorize(Policy = Policies.RequireAdminRole)]
     [HttpPost(nameof(CreateSubscriptionForUser))]
     public async Task<IActionResult> CreateSubscriptionForUser(SubscriptionCreateForUserDTO subscriptionDto)
     {
@@ -63,7 +63,7 @@ public class SubscriptionController : MRBaseController
 
 
 
-    [Authorize(Policy = "RequireAdminRole")]
+    [Authorize(Policy = Policies.RequireAdminRole)]
     [HttpGet(nameof(GetSubscriptionsByQuery))]
     public async Task<ActionResult<SubscriptionPagedListDTO>> GetSubscriptionsByQuery([FromQuery] SubscriptionSearchParamsDTO query)
     {

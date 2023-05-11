@@ -9,8 +9,6 @@ public class GetPaymentsBySearchParamsQuery : QueryBase, IPaymentBaseFeature, IR
     public string ReferenceNumber { get; set; }// a reference number associated with the payment (e.g. transaction ID)
     public decimal? MinPaymentValuePLN { get; set; }
     public decimal? MaxPaymentValuePLN { get; set; }
-    public string SortColumn { get; set; }
-    public SortOrder SortOrder { get; set; }
 
     public class GetPaymentsByQueryHandler : CommandHandlerBase<GetPaymentsBySearchParamsQuery, PagedList<Payment>>
     {
@@ -52,17 +50,8 @@ public class GetPaymentsBySearchParamsQuery : QueryBase, IPaymentBaseFeature, IR
                 query = query.Where(p => p.PaymentValuePLN <= request.MaxPaymentValuePLN.Value);
             }
 
-            if (!string.IsNullOrEmpty(request.SortColumn))
-            {
-                if (request.SortOrder == SortOrder.Ascending)
-                {
-                    query = query.OrderBy(request.SortColumn);
-                }
-                else
-                {
-                    query = query.OrderByDescending(request.SortColumn);
-                }
-            }
+            query = ApplySorting(query, request.SortColumn, request.SortOrder);
+
             return new PagedList<Payment>(query, request.SearchParams);
         }
     }
