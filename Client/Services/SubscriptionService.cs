@@ -7,10 +7,8 @@ public interface ISubscriptionService
     Task<PaymentPagedListDTO> GetMyPayments(PaymentSearchParamsDTO query);
 }
 
-public class SubscriptionService : DataServiceBase, ISubscriptionService
+internal class SubscriptionService : DataServiceBase, ISubscriptionService
 {
-    private const string _subscriptionControllerPath = @"/api/v1.0/Subscription";
-
     public SubscriptionService(HttpClient httpclient) : base(httpclient)
     {
     }

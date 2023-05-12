@@ -50,23 +50,4 @@ public class AdminController : MRBaseController
         var result = await Mediator.Send(new ActivateSubscriptionCommand());
         return Ok(result);
     }
-
-    [HttpPost(nameof(InitQuarter))]
-    public async Task<ActionResult<ApiResponse<Guid>>> InitQuarter([FromBody] InitQuarterDTO initQuarterDTO)
-    {
-        try
-        {
-            var result = await Mediator.Send(new InitQuarterCommand
-            {
-                Month = initQuarterDTO.Month,
-                Year = initQuarterDTO.Year,
-                SignaturesCount = initQuarterDTO.SignaturesCount
-            });
-            return new ApiResponse<Guid>(result);
-        }
-        catch (ApplicationException ex)
-        {
-            return new ApiResponse<Guid>() { Message = ex.Message };
-        }
-    }
 }

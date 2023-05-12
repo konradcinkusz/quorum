@@ -101,16 +101,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Quarters details -->
-    <div class="row">
-        <div class="col-md-12">
-            <AdminInitQuarter InitQuarter="_initQuarter"></AdminInitQuarter>
-            <br />
-            <div>inited: @inited</div>
-        </div>
-    </div>
-
 </div>
 
 @code {
@@ -121,12 +111,6 @@
     {
         AdminLogQuerySearchDTO = new AdminLogSearchParamsDTO();
         await _refresh();
-    }
-
-    private int inited = 0;
-    private async Task _initQuarter(InitQuarterDTO initQuarterDTO)
-    {
-        inited = await adminService.InitQuarter(initQuarterDTO);
     }
 
     private async Task _refresh()

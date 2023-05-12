@@ -1,4 +1,8 @@
 ﻿@inherits BaseAdmin
+@page "/admin/quarter"
+@inject IAdminService adminService
+
+<PageTitle>Admin quarter</PageTitle>
 
 <div class="card shadow rounded-3">
     <div class="card-header bg-primary text-white py-3 rounded-3">
@@ -36,20 +40,19 @@
         </EditForm>
     </div>
 </div>
-@if (created)
+
+@if (result != null)
 {
-    <div class="alert alert-success" role="alert">
-        Quarter initialized!
-    </div>
+    <_ApiResponse T="Guid" result="result" />
 }
+
 
 @code {
     private InitQuarterDTO dto = new InitQuarterDTO();
-    private bool created = false;
-    [Parameter]
-    public EventCallback<InitQuarterDTO> InitQuarter { get; set; }
+
+    private ApiResponse<Guid> result = null;
     private async Task Create()
     {
-        await InitQuarter.InvokeAsync(dto);
+        result = await adminService.InitQuarter(dto);
     }
 }

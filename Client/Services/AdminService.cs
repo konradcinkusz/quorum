@@ -1,4 +1,6 @@
-﻿namespace MR.Client.Services;
+﻿using System.Text;
+
+namespace MR.Client.Services;
 
 public interface IAdminService
 {
@@ -7,15 +9,11 @@ public interface IAdminService
     Task<int> ActivateSubscription();
     Task<string> CreateSubscription(SubscriptionCreateForUserDTO SubscriptionDto);
     Task<SubscriptionPagedListDTO> GetSubscriptions(SubscriptionSearchParamsDTO query);
-    Task<int> InitQuarter(InitQuarterDTO quarter);
+    Task<ApiResponse<Guid>> InitQuarter(InitQuarterDTO quarter);
 }
 
-public class AdminService : DataServiceBase, IAdminService
+internal class AdminService : DataServiceBase, IAdminService
 {
-    private const string _adminControllerPath = @"/api/v1.0/Admin";
-
-    private const string _subscriptionControllerPath = @"/api/v1.0/Subscription";
-
     public AdminService(HttpClient httpclient) : base(httpclient)
     {
     }
@@ -92,12 +90,30 @@ public class AdminService : DataServiceBase, IAdminService
         return result;
     }
 
-    public async Task<int> InitQuarter(InitQuarterDTO quarter)
+    public async Task<ApiResponse<Guid>> InitQuarter(InitQuarterDTO quarter)
     {
-        var response = await _httpClient.PostAsync($"{_adminControllerPath}/InitQuarter",
-                                                       null);
-        response.EnsureSuccessStatusCode();
-        var result = await response.Content.ReadFromJsonAsync<int>();
-        return result;
+        var endpoint = $"{_QuarterControllerPath}/InitQuarter";
+        var jsonString = JsonSerializer.Serialize(quarter);
+        var payload = new StringContent(jsonString, Encoding.UTF8, "application/json");
+
+        var response = await _httpClient.PostAsync(endpoint, payload);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            // Handle error response
+        }
+        
+        //var jsonString = await response.Content.ReadAsStringAsync();
+        //var apiResponse = JsonSerializer.Deserialize<ApiResponse<Guid>>(jsonString);
+
+        var apiResponse = await response.Content.ReadFromJsonAsync<ApiResponse<Guid>>();
+
+        if (apiResponse == null)
+        {
+            apiResponse = new ApiResponse<Guid> { Data = Guid.Empty, Message = "The response is empty" };
+        }
+
+        return apiResponse;
     }
+
 }

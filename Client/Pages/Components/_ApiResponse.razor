@@ -1,0 +1,35 @@
+﻿@typeparam T
+
+@if (result != null)
+{
+    @if (result.Success)
+    {
+        <div class="alert alert-success" role="alert">
+            <span>@result.Data</span>
+            <span>@result.Message</span>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-danger" role="alert">
+            @if (!string.IsNullOrEmpty(result.Message))
+            {
+                <span>@result.Message</span>
+            }
+            @if (result.Errors != null && result.Errors.Any())
+            {
+                <ul>
+                    @foreach (var error in result.Errors)
+                    {
+                        <li>@error</li>
+                    }
+                </ul>
+            }
+        </div>
+    }
+}
+
+@code {
+    [Parameter]
+    public ApiResponse<T> result { get; set; }
+}

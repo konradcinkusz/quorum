@@ -8,10 +8,8 @@ public interface IPaymentService
     Task<PaymentPagedListDTO> GetPayments(PaymentSearchParamsDTO query);
 }
 
-public class PaymentService : DataServiceBase, IPaymentService
+internal class PaymentService : DataServiceBase, IPaymentService
 {
-    private const string _paymentControllerPath = @"/api/v1.0/Payment";
-
     public PaymentService(HttpClient httpclient) : base(httpclient)
     {
     }
