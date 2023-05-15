@@ -8,30 +8,37 @@ public class QuarterController : MRBaseController
     }
 
     [HttpGet(nameof(GetQuartersBySearchParams))]
-    public async Task<ActionResult<ApiResponse<QuarterPagedListDto>>> 
+    public async Task<ActionResult<ApiResponse<QuarterPagedListDTO>>>
         GetQuartersBySearchParams([FromQuery] SearchParamsDTO query)
     {
-        var result = await Mediator.Send(new GetQuartersBySearchParamsQuery
+        try
         {
-            SearchParams = new SearchParams
+            var result = await Mediator.Send(new GetQuartersBySearchParamsQuery
             {
-                CurrentPage = query.CurrentPage,
-                PageSize = query.PageSize
-            },
-            SortColumn = query.SortColumn,
-            SortOrder = (Microsoft.Data.SqlClient.SortOrder)query.SortOrder
-        });
+                SearchParams = new SearchParams
+                {
+                    CurrentPage = query.CurrentPage,
+                    PageSize = query.PageSize
+                },
+                SortColumn = query.SortColumn,
+                SortOrder = (Microsoft.Data.SqlClient.SortOrder)query.SortOrder
+            });
 
-        var quarterPagedListDto = new QuarterPagedListDto
+            var quarterPagedListDto = new QuarterPagedListDTO
+            {
+                Items = _mapper.Map<List<QuarterDTO>>(result),
+                CurrentPage = result.CurrentPage,
+                PageSize = result.PageSize,
+                TotalItems = result.TotalItems,
+                TotalPages = result.TotalPages
+            };
+
+            return new ApiResponse<QuarterPagedListDTO>(quarterPagedListDto);
+        }
+        catch (Exception ex)
         {
-            Items = _mapper.Map<List<QuarterDTO>>(result),
-            CurrentPage = result.CurrentPage,
-            PageSize = result.PageSize,
-            TotalItems = result.TotalItems,
-            TotalPages = result.TotalPages
-        };
-
-        return new ApiResponse<QuarterPagedListDto>(quarterPagedListDto);
+            return new ApiResponse<QuarterPagedListDTO>(new QuarterPagedListDTO()) { Message = ex.Message, StatusCode = (int)HttpStatusCode.BadRequest };
+        }
     }
 
     [HttpPost(nameof(InitQuarter))]

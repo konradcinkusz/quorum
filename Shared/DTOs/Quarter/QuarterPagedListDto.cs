@@ -1,5 +1,5 @@
 ﻿namespace MR.Shared.DTOs.Quarter;
 
-public class QuarterPagedListDto : PagedListDto<QuarterDTO>
+public class QuarterPagedListDTO : PagedListDto<QuarterDTO>
 {
 }

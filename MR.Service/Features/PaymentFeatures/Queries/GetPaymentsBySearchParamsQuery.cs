@@ -52,7 +52,7 @@ public class GetPaymentsBySearchParamsQuery : QueryBase, IPaymentBaseFeature, IR
 
             query = ApplySorting(query, request.SortColumn, request.SortOrder);
 
-            return new PagedList<Payment>(query, request.SearchParams);
+            return await PagedList<Payment>.CreateAsync(query, request.SearchParams, cancellationToken);
         }
     }
 }

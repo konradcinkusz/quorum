@@ -38,7 +38,8 @@ public class GetSubscriptionsBySearchParamsQuery : QueryBase, IRequest<PagedList
             {
                 query = query.Where(p => p.End <= request.End);
             }
-            return new PagedList<Subscription>(query, request.SearchParams);
+
+            return await PagedList<Subscription>.CreateAsync(query, request.SearchParams, cancellationToken);
         }
     }
 }

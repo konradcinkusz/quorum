@@ -40,7 +40,7 @@ public class GetAdminLogsBySearchParamsQuery : QueryBase, IRequest<PagedList<Adm
                 query = query.Where(log => log.CreatedAt >= lastHour);
             }
 
-            return new PagedList<AdminLog>(query, request.SearchParams);
+            return await PagedList<AdminLog>.CreateAsync(query, request.SearchParams, cancellationToken);
         }
     }
 }

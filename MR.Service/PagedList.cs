@@ -7,20 +7,28 @@ public class PagedList<T> : List<T>
     public int TotalPages { get; set; }
     public int TotalItems { get; set; }
 
-    public PagedList(IQueryable<T> query, SearchParams options)
-    {
-        CurrentPage = options.CurrentPage;
-        PageSize = options.PageSize;
+    private PagedList() { } // Private constructor to prevent direct instantiation
 
-        TotalItems = query.Count();
-        TotalPages = (int)Math.Ceiling(TotalItems / (double)PageSize);
+    public static async Task<PagedList<T>> CreateAsync(IQueryable<T> query, SearchParams options, CancellationToken cancellationToken = default)
+    {
+        var pagedList = new PagedList<T>
+        {
+            CurrentPage = options.CurrentPage,
+            PageSize = options.PageSize
+        };
+
+        pagedList.TotalItems = await query.CountAsync(cancellationToken);
+        pagedList.TotalPages = (int)Math.Ceiling(pagedList.TotalItems / (double)pagedList.PageSize);
 
         // Check if the new PageSize would result in a page number greater than the total number of pages
-        if (CurrentPage > TotalPages && TotalPages > 0)
+        if (pagedList.CurrentPage > pagedList.TotalPages && pagedList.TotalPages > 0)
         {
-            CurrentPage = TotalPages;
+            pagedList.CurrentPage = pagedList.TotalPages;
         }
 
-        AddRange(query.Skip((CurrentPage - 1) * PageSize).Take(PageSize));
+        var items = await query.Skip((pagedList.CurrentPage - 1) * pagedList.PageSize).Take(pagedList.PageSize).ToListAsync(cancellationToken);
+        pagedList.AddRange(items);
+
+        return pagedList;
     }
 }

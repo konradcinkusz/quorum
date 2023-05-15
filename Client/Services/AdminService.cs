@@ -1,6 +1,4 @@
-﻿using System.Text;
-
-namespace MR.Client.Services;
+﻿namespace MR.Client.Services;
 
 public interface IAdminService
 {
@@ -10,6 +8,7 @@ public interface IAdminService
     Task<string> CreateSubscription(SubscriptionCreateForUserDTO SubscriptionDto);
     Task<SubscriptionPagedListDTO> GetSubscriptions(SubscriptionSearchParamsDTO query);
     Task<ApiResponse<Guid>> InitQuarter(InitQuarterDTO quarter);
+    Task<ApiResponse<QuarterPagedListDTO>> GetQuarters(QuarterSearchParamsDTO searchParams);
 }
 
 internal class AdminService : DataServiceBase, IAdminService
@@ -53,7 +52,8 @@ internal class AdminService : DataServiceBase, IAdminService
     }
     public async Task<string> CreateSubscription(SubscriptionCreateForUserDTO SubscriptionDto)
     {
-        var response = await _httpClient.PostAsJsonAsync($"{_subscriptionControllerPath}/CreateSubscriptionForUser", SubscriptionDto);
+        var response = await _httpClient.PostAsJsonAsync(
+            $"{_subscriptionControllerPath}/CreateSubscriptionForUser", SubscriptionDto);
 
         response.EnsureSuccessStatusCode();
 
@@ -93,18 +93,13 @@ internal class AdminService : DataServiceBase, IAdminService
     public async Task<ApiResponse<Guid>> InitQuarter(InitQuarterDTO quarter)
     {
         var endpoint = $"{_QuarterControllerPath}/InitQuarter";
-        var jsonString = JsonSerializer.Serialize(quarter);
-        var payload = new StringContent(jsonString, Encoding.UTF8, "application/json");
 
-        var response = await _httpClient.PostAsync(endpoint, payload);
+        var response = await _httpClient.PostAsJsonAsync(endpoint, quarter);
 
         if (!response.IsSuccessStatusCode)
         {
             // Handle error response
         }
-        
-        //var jsonString = await response.Content.ReadAsStringAsync();
-        //var apiResponse = JsonSerializer.Deserialize<ApiResponse<Guid>>(jsonString);
 
         var apiResponse = await response.Content.ReadFromJsonAsync<ApiResponse<Guid>>();
 
@@ -116,4 +111,30 @@ internal class AdminService : DataServiceBase, IAdminService
         return apiResponse;
     }
 
+    public async Task<ApiResponse<QuarterPagedListDTO>> GetQuarters(QuarterSearchParamsDTO searchParams)
+    {
+        var q = BuildQuery(searchParams);
+
+        if (searchParams.Begin.HasValue)
+            q[nameof(searchParams.Begin)] = searchParams.Begin.Value.ToString();
+        if (searchParams.End.HasValue)
+            q[nameof(searchParams.End)] = searchParams.End.Value.ToString();
+        if (searchParams.Year.HasValue)
+            q[nameof(searchParams.Year)] = searchParams.Year.Value.ToString();
+        if (searchParams.Quarter.HasValue)
+            q[nameof(searchParams.Quarter)] = searchParams.Quarter.Value.ToString();
+
+        var response = await _httpClient.GetAsync($"{_QuarterControllerPath}/GetQuartersBySearchParams?{q}");
+
+        response.EnsureSuccessStatusCode();
+
+        var content = await response.Content.ReadAsStringAsync();
+
+        var result = JsonSerializer.Deserialize<ApiResponse<QuarterPagedListDTO>>(content, new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        });
+
+        return result ?? throw new Exception("Deserialized response is null.");
+    }
 }
