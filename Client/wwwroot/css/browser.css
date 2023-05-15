@@ -1,6 +1,6 @@
 ﻿.domain-search {
     margin: 0;
-    padding: 40px 0 20px 0;
+    padding: 20px 0;
 }
 
 .bg-green {
@@ -13,28 +13,28 @@
     color: #fff;
     font-family: "Poppins", sans-serif;
     font-weight: 100;
-    font-size: 24px;
+    font-size: 18px;
 }
 
 .domain-search p {
     color: white;
     margin: 0;
-    font-size: 18px;
+    font-size: 16px;
 }
 
 .domain-search .form-title strong {
-    display: block
+    display: block;
 }
 
 .domain-search .form-control {
-    height: 40px;
-    border-radius: 20px;
+    height: 30px;
+    border-radius: 15px;
     border: none;
     background-color: #fff;
     color: #8B0000;
-    font-size: 18px;
-    padding-left: 20px;
-    padding-right: 20px;
+    font-size: 14px;
+    padding-left: 15px;
+    padding-right: 15px;
 }
 
     .domain-search .form-control:focus {
@@ -43,17 +43,47 @@
     }
 
 .domain-search .btn {
-    height: 40px;
-    padding: 0 30px;
-    line-height: 40px;
-    border-radius: 20px;
+    height: 30px;
+    padding: 0 20px;
+    line-height: 30px;
+    border-radius: 15px;
     border: none;
     background-color: #fff;
     color: #8B0000;
-    font-size: 18px;
+    font-size: 14px;
 }
 
     .domain-search .btn:hover {
         background-color: #8B0000;
         color: #fff;
     }
+
+@media (max-width: 767px) {
+    .domain-search {
+        padding: 10px 0;
+    }
+
+        .domain-search .form-title {
+            font-size: 16px;
+        }
+
+        .domain-search p {
+            font-size: 14px;
+        }
+
+        .domain-search .form-control {
+            height: 25px;
+            border-radius: 12.5px;
+            font-size: 12px;
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+
+        .domain-search .btn {
+            height: 25px;
+            padding: 0 15px;
+            line-height: 25px;
+            border-radius: 12.5px;
+            font-size: 12px;
+        }
+}
