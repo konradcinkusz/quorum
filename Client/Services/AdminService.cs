@@ -9,6 +9,7 @@ public interface IAdminService
     Task<SubscriptionPagedListDTO> GetSubscriptions(SubscriptionSearchParamsDTO query);
     Task<ApiResponse<Guid>> InitQuarter(InitQuarterDTO quarter);
     Task<ApiResponse<QuarterPagedListDTO>> GetQuarters(QuarterSearchParamsDTO searchParams);
+    Task<ApiResponse<SignaturePoolsPagedListDTO>> GetSignaturePools(SignaturePoolsSearchParamsDTO searchParams);
 }
 
 internal class AdminService : DataServiceBase, IAdminService
@@ -131,6 +132,33 @@ internal class AdminService : DataServiceBase, IAdminService
         var content = await response.Content.ReadAsStringAsync();
 
         var result = JsonSerializer.Deserialize<ApiResponse<QuarterPagedListDTO>>(content, new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        });
+
+        return result ?? throw new Exception("Deserialized response is null.");
+    }
+
+    public async Task<ApiResponse<SignaturePoolsPagedListDTO>> GetSignaturePools(SignaturePoolsSearchParamsDTO searchParams)
+    {
+        var q = BuildQuery(searchParams);
+
+        if (searchParams.Begin.HasValue)
+            q[nameof(searchParams.Begin)] = searchParams.Begin.Value.ToString();
+        if (searchParams.End.HasValue)
+            q[nameof(searchParams.End)] = searchParams.End.Value.ToString();
+        if (searchParams.Year.HasValue)
+            q[nameof(searchParams.Year)] = searchParams.Year.Value.ToString();
+        if (searchParams.Quarter.HasValue)
+            q[nameof(searchParams.Quarter)] = searchParams.Quarter.Value.ToString();
+
+        var response = await _httpClient.GetAsync($"{_SignaturePoolControllerPath}/GetSignaturePoolsBySearchParams?{q}");
+
+        response.EnsureSuccessStatusCode();
+
+        var content = await response.Content.ReadAsStringAsync();
+
+        var result = JsonSerializer.Deserialize<ApiResponse<SignaturePoolsPagedListDTO>>(content, new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase
         });

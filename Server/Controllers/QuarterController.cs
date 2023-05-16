@@ -9,19 +9,23 @@ public class QuarterController : MRBaseController
 
     [HttpGet(nameof(GetQuartersBySearchParams))]
     public async Task<ActionResult<ApiResponse<QuarterPagedListDTO>>>
-        GetQuartersBySearchParams([FromQuery] SearchParamsDTO query)
+        GetQuartersBySearchParams([FromQuery] QuarterSearchParamsDTO searchParams)
     {
         try
         {
             var result = await Mediator.Send(new GetQuartersBySearchParamsQuery
             {
+                Quarter = searchParams.Quarter,
+                Year =  searchParams.Year,
+                Begin = searchParams.Begin,
+                End = searchParams.End,
                 SearchParams = new SearchParams
                 {
-                    CurrentPage = query.CurrentPage,
-                    PageSize = query.PageSize
+                    CurrentPage = searchParams.CurrentPage,
+                    PageSize = searchParams.PageSize
                 },
-                SortColumn = query.SortColumn,
-                SortOrder = (Microsoft.Data.SqlClient.SortOrder)query.SortOrder
+                SortColumn = searchParams.SortColumn,
+                SortOrder = (Microsoft.Data.SqlClient.SortOrder)searchParams.SortOrder
             });
 
             var quarterPagedListDto = new QuarterPagedListDTO

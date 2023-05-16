@@ -3,7 +3,10 @@
 public class GetQuartersBySearchParamsQuery : QueryBase, IRequest<PagedList<Quarter>>
 {
     public int? Year { get; set; }
-    public int? Month { get; set; }
+    public int? Quarter { get; set; }
+    public DateTime? Begin { get; set; }
+    public DateTime? End { get; set; }
+
     public class GetQuartersByQueryHandler : CommandHandlerBase<GetQuartersBySearchParamsQuery, PagedList<Quarter>>
     {
         public GetQuartersByQueryHandler(IApplicationDbContext context, ILogger<GetQuartersBySearchParamsQuery> logger) : 
@@ -21,9 +24,23 @@ public class GetQuartersBySearchParamsQuery : QueryBase, IRequest<PagedList<Quar
                 query = query.Where(p => p.Year == request.Year.Value);
             }
 
-            if (request.Month.HasValue)
+            if (request.Quarter.HasValue)
             {
-                query = query.Where(p => p.Month == request.Month.Value);
+                query = query.Where(p => p.Month == request.Quarter.Value);
+            }
+
+            if (request.Begin.HasValue)
+            {
+                var beginYear = request.Begin.Value.Year;
+                var beginMonth = request.Begin.Value.Month;
+                query = query.Where(p => (p.Year > beginYear) || (p.Year == beginYear && p.Month >= beginMonth));
+            }
+
+            if (request.End.HasValue)
+            {
+                var endYear = request.End.Value.Year;
+                var endMonth = request.End.Value.Month;
+                query = query.Where(p => (p.Year < endYear) || (p.Year == endYear && p.Month <= endMonth));
             }
 
             query = ApplySorting(query, request.SortColumn, request.SortOrder);

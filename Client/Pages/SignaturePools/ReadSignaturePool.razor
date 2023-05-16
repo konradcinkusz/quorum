@@ -1,20 +1,14 @@
-﻿@if (Quarter != null)
+﻿@if (SignaturePool != null)
 {
     <div class="card m-1 p-1">
         <div class="row mb-3">
-            <div class="col-sm-2">
-                <p class="form-control-plaintext" id="Quarter-id">@Quarter.Id</p>
+            <div class="col-sm-4">
+                <p class="form-control-plaintext" id="Quarter-id">@SignaturePool.Id</p>
             </div>
-            <div class="col-sm-3">
-                <p class="form-control-plaintext" id="user-email">@Quarter.Month</p>
+            <div class="col-sm-4">
+                <p class="form-control-plaintext" id="Quarter-createdat">@SignaturePool.CreatedAt</p>
             </div>
-            <div class="col-sm-2">
-                <p class="form-control-plaintext" id="Quarter-value">@Quarter.Year</p>
-            </div>
-            <div class="col-sm-2">
-                <p class="form-control-plaintext" id="Quarter-createdat">@Quarter.CreatedAt</p>
-            </div>
-            <div class="col-sm-3">
+            <div class="col-sm-4">
                 <div class="btn-group my-2" role="group">
                     <button class="btn btn-primary btn-sm" type="button" @onclick="ToggleDetails">@ShowDetailsButtonText</button>
                 </div>
@@ -25,8 +19,8 @@
             <hr />
             <h5>Quarter Details</h5>
             <dl class="row mb-3">
-                <dt class="col-sm-3">Issues count:</dt>
-                <dd class="col-sm-9">@Quarter.Issues.Count</dd>
+                <dt class="col-sm-3">Detail prop:</dt>
+                <dd class="col-sm-9">-</dd>
             </dl>
         </div>
     </div>
@@ -38,7 +32,7 @@ else
 
 @code {
     [Parameter]
-    public QuarterDTO Quarter { get; set; }
+    public SignaturePoolDTO SignaturePool { get; set; }
 
     [Parameter]
     public string ShowDetailsButtonText { get; set; } = "Show Details";

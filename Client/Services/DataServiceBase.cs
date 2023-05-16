@@ -6,6 +6,7 @@ internal abstract class DataServiceBase
     protected const string _adminControllerPath = $"{_apiVersion}Admin";
     protected const string _subscriptionControllerPath = $"{_apiVersion}Subscription";
     protected const string _QuarterControllerPath = $"{_apiVersion}Quarter";
+    protected const string _SignaturePoolControllerPath = $"{_apiVersion}SignaturePool";
     protected const string _paymentControllerPath = $"{_apiVersion}Payment";
 
     protected readonly HttpClient _httpClient;

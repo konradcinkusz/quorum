@@ -28,4 +28,7 @@ global using MR.Shared.DTOs.Subscription;
 global using MR.Service.Features.QuarterFeatures;
 global using MR.Shared.DTOs.Quarter;
 global using MR.Service.Features.QuarterFeatures.Queries;
-global using MR.Shared;
+global using MR.Service.Features.SignaturePoolsFeatures.Queries;
+global using MR.Shared.DTOs.SignaturePools;
+global using MR.Shared.DTOs.Issue;
+global using MR.Shared.DTOs.Signature;

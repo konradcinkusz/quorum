@@ -1,6 +1,4 @@
-﻿using MR.Shared.DTOs.Issue;
-
-namespace MR.Server.Mappings;
+﻿namespace MR.Server.Mappings;
 
 public class IssueProfile : Profile
 {

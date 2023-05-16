@@ -1,10 +1,10 @@
-﻿@inherits BasePayment
+﻿@inherits BaseAdmin
 
 <div class="row domain-search bg-green rounded">
     <div class="container">
         <div class="row">
             <div class="col-md-3">
-                <h2 class="form-title">Search payments</h2>
+                <h2 class="form-title">Search quarters</h2>
             </div>
             <div class="col-md-9">
                 <div class="row g-3">
@@ -26,7 +26,7 @@
 
 @code {
     [Parameter]
-    public PaymentSearchParamsDTO QuerySearch { get; set; }
+    public SignaturePoolsSearchParamsDTO SearchParams { get; set; }
     [Parameter]
     public EventCallback Refresh { get; set; }
 
@@ -36,13 +36,6 @@
 
     async Task RefreshInternal()
     {
-        if (isDescription)
-        {
-            QuerySearch.Description = phrase;
-        }
-
-        QuerySearch.ApplicationUserId = phrase;
-        
         await Refresh.InvokeAsync();
     }
 }

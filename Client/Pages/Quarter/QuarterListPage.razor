@@ -14,7 +14,7 @@
         {
             <QuarterBrowser Refresh="_refresh"
                         QuerySearch="QuarterSearchParamsDTO"></QuarterBrowser>
-            @if (result != null)
+            @if (result != null && !result.Success)
             {
                 <_ApiResponse T="QuarterPagedListDTO" result="result" />
             }
