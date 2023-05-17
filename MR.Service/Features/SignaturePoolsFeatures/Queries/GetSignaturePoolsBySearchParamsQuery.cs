@@ -58,10 +58,52 @@ public class GetSignaturePoolsBySearchParamsQuery : QueryBase, IRequest<PagedLis
 
             query = ApplySorting(query, request.SortColumn, request.SortOrder);
 
-
             var pagedList = await PagedList<SignaturePool>.CreateAsync(query, request.SearchParams, cancellationToken);
 
             return pagedList;
+        }
+        protected override IQueryable<T> ApplySorting<T>(IQueryable<T> query, string sortColumn, SortOrder sortOrder) 
+        {
+            if (!string.IsNullOrEmpty(sortColumn) && sortOrder != SortOrder.Unspecified)
+            {
+                switch (sortColumn)
+                {
+                    case "ApplicationUserEmail":
+                        if (sortOrder == SortOrder.Ascending)
+                        {
+                            query = query.OrderBy(p => (p as SignaturePool).ApplicationUser.Email);
+                        }
+                        else if (sortOrder == SortOrder.Descending)
+                        {
+                            query = query.OrderByDescending(p => (p as SignaturePool).ApplicationUser.Email);
+                        }
+                        break;
+                    case "Year":
+                        if (sortOrder == SortOrder.Ascending)
+                        {
+                            query = query.OrderBy(p => (p as SignaturePool).Quarter.Year);
+                        }
+                        else if (sortOrder == SortOrder.Descending)
+                        {
+                            query = query.OrderByDescending(p => (p as SignaturePool).Quarter.Year);
+                        }
+                        break;
+                    case "Month":
+                        if (sortOrder == SortOrder.Ascending)
+                        {
+                            query = query.OrderBy(p => (p as SignaturePool).Quarter.Month);
+                        }
+                        else if (sortOrder == SortOrder.Descending)
+                        {
+                            query = query.OrderByDescending(p => (p as SignaturePool).Quarter.Month);
+                        }
+                        break;
+                    default:
+                        query = base.ApplySorting(query, sortColumn, sortOrder);
+                        break;
+                }
+            }
+            return query;
         }
     }
 }

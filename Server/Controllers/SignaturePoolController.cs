@@ -54,18 +54,18 @@ public class SignaturePoolController : MRBaseController
     [HttpPost("AddSignatureToSignaturePool")]
     public async Task<ActionResult<ApiResponse<bool>>> AddSignatureToSignaturePool([FromBody] Guid signaturePoolDTO)
     {
-        return await HandleErrors(async () => await Mediator.Send(new AddSignatureToSignaturePoolCommand { SignaturePoolId = signaturePoolDTO }));
+        return await HandleErrors(async () => await Mediator.Send(new AddSignatureToSignaturePoolCommand { SignaturePoolId = signaturePoolDTO }), "Adding new signature to the pool");
     }
 
     [HttpPost("RemoveSignature")]
     public async Task<ActionResult<ApiResponse<bool>>> RemoveSignature([FromBody] Guid signatureId)
     {
-        return await HandleErrors(async () => await Mediator.Send(new RemoveSignatureCommand { SignatureId = signatureId }));
+        return await HandleErrors(async () => await Mediator.Send(new RemoveSignatureCommand { SignatureId = signatureId }), "Removing signature");
     }
 
     [HttpPost("UnpinSignatureFromIssue")]
     public async Task<ActionResult<ApiResponse<bool>>> UnpinSignatureFromIssue([FromBody] Guid signatureId)
     {
-        return await HandleErrors(async () => await Mediator.Send(new UnpinSignatureFromIssueCommand { SignatureId = signatureId }));
+        return await HandleErrors(async () => await Mediator.Send(new UnpinSignatureFromIssueCommand { SignatureId = signatureId }), "Unpinning issue from signature");
     }
 }

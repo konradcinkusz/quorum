@@ -37,10 +37,7 @@
                         <div class="row align-content-center justify-content-center">
                             @foreach (var p in SignaturePoolPagedListDto.Items)
                             {
-                                <ReadSignaturePool SignaturePool="p"
-                                       AddSignature="async () => await adminService.AddSignatureToSignaturePool(p.Id)"
-                                       RemoveSignature="async (Guid signatureId) => await adminService.RemoveSignature(signatureId)"
-                                       UnpinSignature="async (Guid signatureId) => await adminService.UnpinSignatureFromIssue(signatureId)" />
+                                <ReadSignaturePool SignaturePool="p"  Refresh="_refresh"/>
                             }
                         </div>
                     </div>

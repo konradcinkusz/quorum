@@ -14,7 +14,7 @@ public abstract class CommandHandlerBase<TCommand, TResult> : IRequestHandler<TC
 
     public abstract Task<TResult> Handle(TCommand request, CancellationToken cancellationToken);
 
-    protected IQueryable<T> ApplySorting<T>(IQueryable<T> query, string sortColumn, SortOrder sortOrder)
+    protected virtual IQueryable<T> ApplySorting<T>(IQueryable<T> query, string sortColumn, SortOrder sortOrder)
     {
         if (!string.IsNullOrEmpty(sortColumn))
         {

@@ -1,4 +1,7 @@
-﻿<div class="card m-1 p-1">
+﻿@inherits BaseAdmin
+@inject IAdminService adminService
+
+<div class="card m-1 p-1">
     <div class="row mb-3">
         <div class="col-sm-2">
             <p class="form-control-plaintext" id="Quarter-id">@SignaturePool.QuarterDTO.Year</p>
@@ -44,24 +47,32 @@
                 <dd class="col-sm-9 separator-line">
                     <div class="row">
                         <div class="col-sm-3">
-                            <button class="btn btn-danger btn-sm" @onclick="async () => await RemoveSignature.InvokeAsync(signature.Id)">Remove</button>
+                            <button class="btn btn-danger btn-sm" @onclick="async () => await RemoveSignature(signature.Id)">Remove</button>
                         </div>
                         <div class="col-sm-3">
-                            <button class="btn btn-secondary btn-sm" @onclick="async () => await UnpinSignature.InvokeAsync(signature.Id)">Unpin</button>
+                            <button class="btn btn-secondary btn-sm" @onclick="async () => await UnpinSignatureFromIssue(signature.Id)">Unpin</button>
                         </div>
                     </div>
                 </dd>
             }
         </dl>
         <div class="col-sm-12">
-            <button class="btn btn-primary btn-sm" @onclick="async () => await AddSignature.InvokeAsync()">Add another Signature</button>
+            <button class="btn btn-primary btn-sm" @onclick="AddSignature">Add another Signature</button>
         </div>
+        @if (result != null)
+        {
+            <hr />
+            <_ApiResponse T="bool" result="result" />
+        }
     </div>
 </div>
 
 @code {
     [Parameter]
     public SignaturePoolDTO SignaturePool { get; set; }
+
+    [Parameter]
+    public EventCallback Refresh { get; set; }
 
     [Parameter]
     public string ShowDetailsButtonText { get; set; } = "Show Details";
@@ -88,11 +99,21 @@
             ShowDetailsButtonText = GetDetailsButtonText;
         }
     }
-    private ApiResponse<bool> boolResult = null;
-    [Parameter]
-    public EventCallback<Guid> RemoveSignature { get; set; }
-    [Parameter]
-    public EventCallback<Guid> UnpinSignature { get; set; }
-    [Parameter]
-    public EventCallback<bool> AddSignature { get; set; }
+    private ApiResponse<bool> result = null;
+
+    private async Task RemoveSignature(Guid signatureId)
+    {
+        result = await adminService.RemoveSignature(signatureId);
+        await Refresh.InvokeAsync();
+    }
+    private async Task UnpinSignatureFromIssue(Guid signatureId)
+    {
+        result = await adminService.UnpinSignatureFromIssue(signatureId);
+        await Refresh.InvokeAsync();
+    }
+    private async Task AddSignature()
+    {
+        result = await adminService.AddSignatureToSignaturePool(SignaturePool.Id);
+        await Refresh.InvokeAsync();
+    }
 }
