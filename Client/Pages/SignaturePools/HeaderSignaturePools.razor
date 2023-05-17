@@ -1,16 +1,36 @@
 ﻿<div class="card">
     <div class="row mb-3">
-        <div class="col-sm-4">
-            <button class="btn btn-link" @onclick="@(() => SortData("Id"))">
-                Quarter ID
-                @if (SearchParams.SortColumn == "Id")
+        <div class="col-sm-2">
+            <button class="btn btn-link" @onclick="@(() => SortData("Year"))">
+                Year
+                @if (SearchParams.SortColumn == "Year")
                 {
                     <i class="@GetSortIconClass(SearchParams.SortOrder)"></i>
                 }
             </button>
         </div>
 
-        <div class="col-sm-4">
+        <div class="col-sm-2">
+            <button class="btn btn-link" @onclick="@(() => SortData("Month"))">
+                Month
+                @if (SearchParams.SortColumn == "Month")
+                {
+                    <i class="@GetSortIconClass(SearchParams.SortOrder)"></i>
+                }
+            </button>
+        </div>
+
+        <div class="col-sm-2">
+            <button class="btn btn-link" @onclick="@(() => SortData("ApplicationUserEmail"))">
+                ApplicationUserEmail
+                @if (SearchParams.SortColumn == "ApplicationUserEmail")
+                {
+                    <i class="@GetSortIconClass(SearchParams.SortOrder)"></i>
+                }
+            </button>
+        </div>
+
+        <div class="col-sm-3">
             <button class="btn btn-link" @onclick="@(() => SortData("CreatedAt"))">
                 CreatedAt
                 @if (SearchParams.SortColumn == "CreatedAt")
@@ -20,7 +40,7 @@
             </button>
         </div>
 
-        <div class="col-sm-4">
+        <div class="col-sm-3">
             Actions:
         </div>
     </div>

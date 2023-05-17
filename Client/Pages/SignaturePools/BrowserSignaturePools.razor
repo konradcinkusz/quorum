@@ -3,23 +3,55 @@
 <div class="row domain-search bg-green rounded">
     <div class="container">
         <div class="row">
-            <div class="col-md-3">
-                <h2 class="form-title">Search quarters</h2>
-            </div>
-            <div class="col-md-9">
-                <div class="row g-3">
+            <div class="col-md-12">
+                <div class="row g-3 mt-2">
                     <div class="col-md-9 col-sm-12">
-                        <input type="search" class="form-control rounded-pill" placeholder="User name" @bind-value="phrase" @bind-value:event="oninput" required>
+                        <input type="search" class="form-control rounded-pill" placeholder="User name" @bind-value="SearchParams.ApplicationUserEmail" @bind-value:event="oninput">
+                    </div>
+                    <div class="col-md-3 col-sm-12 text-end">
+                        <button type="submit" class="btn btn-outline-light btn-block rounded-pill" @onclick="ClearQuery"><span class="flex-center search">Clear</span></button>
+                        <button type="submit" class="btn btn-outline-light btn-block rounded-pill" @onclick="async () => await Refresh.InvokeAsync()"><span class="flex-center search">Search</span></button>
+                    </div>
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-3 col-sm-12">
+                        <label for="year" class="text-white">Year</label>
+                        <select id="year" class="form-control rounded-pill" @bind="SearchParams.Year" @bind:event="onchange">
+                            <option value="">-- Select Year --</option>
+                            <option value="2021">2021</option>
+                            <option value="2022">2022</option>
+                            <option value="2023">2023</option>
+                            <!-- Add more options for other years -->
+                        </select>
                     </div>
                     <div class="col-md-3 col-sm-12">
-                        <button type="submit" class="btn btn-outline-light btn-block rounded-pill" @onclick="RefreshInternal"><span class="flex-center search">Search</span></button>
+                        <label for="quarter" class="text-white">Quarter</label>
+                        <select id="quarter" class="form-control rounded-pill" @bind="SearchParams.Quarter" @bind:event="onchange">
+                            <option value="">-- Select Quarter --</option>
+                            <option value="1">Q1</option>
+                            <option value="2">Q2</option>
+                            <option value="3">Q3</option>
+                            <option value="4">Q4</option>
+                            <!-- Add more options for other quarters if needed -->
+                        </select>
+                    </div>
+                    <div class="col-md-3 col-sm-12">
+                        <label for="beginDate" class="text-white">Begin Date</label>
+                        <input type="date" id="beginDate" class="form-control rounded-pill" @bind="SearchParams.Begin" @bind:event="oninput">
+                    </div>
+                    <div class="col-md-3 col-sm-12">
+                        <label for="endDate" class="text-white">End Date</label>
+                        <input type="date" id="endDate" class="form-control rounded-pill" @bind="SearchParams.End" @bind:event="oninput">
                     </div>
                 </div>
-
-                <div class="centered mt-2">
-                    <div> <input type="checkbox" name="rr" id="r2" @bind-value="isDescription" @bind-value:event="onchange"> <label for="r2" class="text-white font-weight-bold">Search in description</label> </div>
-                </div>
             </div>
+        </div>
+        <br />
+        <div class="row">
+            <_Paging QueryBase="SearchParams"
+                     RefreshList="async () => await Refresh.InvokeAsync()"
+                     TotalPages="TotalPages"
+                     TotalItems="TotalItems"></_Paging>
         </div>
     </div>
 </div>
@@ -29,13 +61,18 @@
     public SignaturePoolsSearchParamsDTO SearchParams { get; set; }
     [Parameter]
     public EventCallback Refresh { get; set; }
+    [Parameter]
+    public int TotalPages { get; set; }
+    [Parameter]
+    public int TotalItems { get; set; } = 0;
 
-    string phrase = string.Empty;
-
-    bool isDescription = false;
-
-    async Task RefreshInternal()
+    async Task ClearQuery()
     {
+        SearchParams.Year = null;
+        SearchParams.Quarter = null;
+        SearchParams.Begin = null;
+        SearchParams.End = null;
+        SearchParams.ApplicationUserEmail = string.Empty;
         await Refresh.InvokeAsync();
     }
 }

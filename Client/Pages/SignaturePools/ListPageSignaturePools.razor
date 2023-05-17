@@ -13,40 +13,38 @@
         else
         {
             <BrowserSignaturePools Refresh="_refresh"
-                               SearchParams="SignaturePoolsearchParamsDTO"></BrowserSignaturePools>
+                               SearchParams="SignaturePoolsearchParamsDTO"
+                               TotalPages="SignaturePoolPagedListDto.TotalPages"
+                               TotalItems="SignaturePoolPagedListDto.TotalItems" />
             @if (result != null && !result.Success)
             {
+                <hr />
                 <_ApiResponse T="SignaturePoolsPagedListDTO" result="result" />
             }
             @if (SignaturePoolPagedListDto.Items.Count == 0)
             {
-                <p><em>Brak kwestii spełniających kryteria wyszukiwania...</em></p>
+                <hr />
+                <div class="alert alert-danger" role="alert">
+                    <p><em>Brak kwestii spełniających kryteria wyszukiwania...</em></p>
+                </div>
             }
             else
             {
-                <br />
-                <br />
-                <_Paging QueryBase="SignaturePoolsearchParamsDTO"
-                 RefreshList="_refresh"
-                 TotalPages="SignaturePoolPagedListDto.TotalPages"
-                 TotalItems="SignaturePoolPagedListDto.TotalItems"></_Paging>
                 <HeaderSignaturePools Refresh="_refresh"
-                              SearchParams="SignaturePoolsearchParamsDTO"></HeaderSignaturePools>
+                              SearchParams="SignaturePoolsearchParamsDTO" />
                 <div class="content">
                     <div class="container">
                         <div class="row align-content-center justify-content-center">
                             @foreach (var p in SignaturePoolPagedListDto.Items)
                             {
-                                <ReadSignaturePool SignaturePool="p"></ReadSignaturePool>
+                                <ReadSignaturePool SignaturePool="p"
+                                       AddSignature="async () => await adminService.AddSignatureToSignaturePool(p.Id)"
+                                       RemoveSignature="async (Guid signatureId) => await adminService.RemoveSignature(signatureId)"
+                                       UnpinSignature="async (Guid signatureId) => await adminService.UnpinSignatureFromIssue(signatureId)" />
                             }
                         </div>
                     </div>
                 </div>
-
-                <_Paging QueryBase="SignaturePoolsearchParamsDTO"
-                 RefreshList="_refresh"
-                 TotalPages="SignaturePoolPagedListDto.TotalPages"
-                 TotalItems="SignaturePoolPagedListDto.TotalItems"></_Paging>
             }
         }
     </Authorized>
@@ -58,8 +56,8 @@
 </AuthorizeView>
 
 @code {
-    SignaturePoolsSearchParamsDTO SignaturePoolsearchParamsDTO;
-    SignaturePoolsPagedListDTO? SignaturePoolPagedListDto;
+    private SignaturePoolsSearchParamsDTO SignaturePoolsearchParamsDTO;
+    private SignaturePoolsPagedListDTO? SignaturePoolPagedListDto;
 
     private ApiResponse<SignaturePoolsPagedListDTO> result = null;
 

@@ -26,9 +26,10 @@ public class GetSignaturePoolsBySearchParamsQuery : QueryBase, IRequest<PagedLis
                 query = query.Where(x => x.ApplicationUserId == request.ApplicationUserId);
             }
 
-            if(!string.IsNullOrEmpty(request.ApplicationUserEmail))
+            if (!string.IsNullOrEmpty(request.ApplicationUserEmail))
             {
-                query = query.Where(x => x.ApplicationUser.Email == request.ApplicationUserEmail);
+                query = query.Where(x => !string.IsNullOrEmpty(x.ApplicationUser.Email) &&
+                            x.ApplicationUser.Email.Contains(request.ApplicationUserEmail));
             }
 
             if (request.Year.HasValue)

@@ -1,6 +1,6 @@
 ﻿.domain-search {
-    margin: 0;
-    padding: 20px 0;
+    margin: 20px;
+    padding: 0 0 20px;
 }
 
 .bg-green {
@@ -86,4 +86,10 @@
             border-radius: 12.5px;
             font-size: 12px;
         }
+}
+
+dd.separator-line {
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
 }

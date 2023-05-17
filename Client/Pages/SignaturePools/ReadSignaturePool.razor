@@ -1,34 +1,63 @@
-﻿@if (SignaturePool != null)
-{
-    <div class="card m-1 p-1">
-        <div class="row mb-3">
-            <div class="col-sm-4">
-                <p class="form-control-plaintext" id="Quarter-id">@SignaturePool.Id</p>
-            </div>
-            <div class="col-sm-4">
-                <p class="form-control-plaintext" id="Quarter-createdat">@SignaturePool.CreatedAt</p>
-            </div>
-            <div class="col-sm-4">
-                <div class="btn-group my-2" role="group">
-                    <button class="btn btn-primary btn-sm" type="button" @onclick="ToggleDetails">@ShowDetailsButtonText</button>
-                </div>
-            </div>
+﻿<div class="card m-1 p-1">
+    <div class="row mb-3">
+        <div class="col-sm-2">
+            <p class="form-control-plaintext" id="Quarter-id">@SignaturePool.QuarterDTO.Year</p>
         </div>
-
-        <div class="@DetailsCssClass">
-            <hr />
-            <h5>Quarter Details</h5>
-            <dl class="row mb-3">
-                <dt class="col-sm-3">Detail prop:</dt>
-                <dd class="col-sm-9">-</dd>
-            </dl>
+        <div class="col-sm-2">
+            <p class="form-control-plaintext" id="Quarter-id">@SignaturePool.QuarterDTO.Month</p>
+        </div>
+        <div class="col-sm-2">
+            <p class="form-control-plaintext" id="Quarter-id">@SignaturePool.ApplicationUserEmail</p>
+        </div>
+        <div class="col-sm-3">
+            <p class="form-control-plaintext" id="Quarter-createdat">@SignaturePool.CreatedAt</p>
+        </div>
+        <div class="col-sm-3">
+            <div class="btn-group my-2" role="group">
+                <button class="btn btn-primary btn-sm" type="button" @onclick="ToggleDetails">@ShowDetailsButtonText</button>
+            </div>
         </div>
     </div>
-}
-else
-{
-    <p>No Quarter to display.</p>
-}
+
+    <div class="@DetailsCssClass">
+        <hr />
+        <h5>Signature Pools Details</h5>
+        <dl class="row mb-3">
+            <dt class="col-sm-3">Id</dt>
+            <dd class="col-sm-9">@SignaturePool.Id</dd>
+
+            <dt class="col-sm-3">ApplicationUserId</dt>
+            <dd class="col-sm-9">@SignaturePool.ApplicationUserId</dd>
+
+            <dt class="col-sm-3">Signatures count</dt>
+            <dd class="col-sm-9">@SignaturePool.SignatureDTOs.Count</dd>
+
+            <dt class="col-sm-3">Signed</dt>
+            <dd class="col-sm-9 separator-line">@SignaturePool.SignatureDTOs.Where(x=>x.IssueDTO != null).Count()</dd>
+
+            @foreach (var signature in SignaturePool.SignatureDTOs)
+            {
+                <dt class="col-sm-3">Issue</dt>
+                <dd class="col-sm-9">@(signature.IssueDTO != null ? "singed" : "null")</dd>
+
+                <dt class="col-sm-3">Actions:</dt>
+                <dd class="col-sm-9 separator-line">
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <button class="btn btn-danger btn-sm" @onclick="async () => await RemoveSignature.InvokeAsync(signature.Id)">Remove</button>
+                        </div>
+                        <div class="col-sm-3">
+                            <button class="btn btn-secondary btn-sm" @onclick="async () => await UnpinSignature.InvokeAsync(signature.Id)">Unpin</button>
+                        </div>
+                    </div>
+                </dd>
+            }
+        </dl>
+        <div class="col-sm-12">
+            <button class="btn btn-primary btn-sm" @onclick="async () => await AddSignature.InvokeAsync()">Add another Signature</button>
+        </div>
+    </div>
+</div>
 
 @code {
     [Parameter]
@@ -59,5 +88,11 @@ else
             ShowDetailsButtonText = GetDetailsButtonText;
         }
     }
-
+    private ApiResponse<bool> boolResult = null;
+    [Parameter]
+    public EventCallback<Guid> RemoveSignature { get; set; }
+    [Parameter]
+    public EventCallback<Guid> UnpinSignature { get; set; }
+    [Parameter]
+    public EventCallback<bool> AddSignature { get; set; }
 }

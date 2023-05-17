@@ -24,4 +24,38 @@ internal abstract class DataServiceBase
         q[nameof(query.SortColumn)] = query.SortColumn.ToString();
         return q;
     }
+
+    protected async Task<ApiResponse<T>> HandleResponse<T>(Func<Task<HttpResponseMessage>> action)
+    {
+        var response = await action.Invoke();
+
+        if (!response.IsSuccessStatusCode)
+        {
+            if (response.StatusCode == HttpStatusCode.BadRequest)
+            {
+                // Handle 400 Bad Request error
+                var errorMessage = await response.Content.ReadAsStringAsync();
+                return new ApiResponse<T>(errorMessage, (int)response.StatusCode);
+            }
+            else if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+                // Handle 404 Not Found error
+                return new ApiResponse<T>("Resource not found", (int)response.StatusCode);
+            }
+            else
+            {
+                // Handle other error status codes
+                return new ApiResponse<T>("An error occurred", (int)response.StatusCode);
+            }
+        }
+
+        var apiResponse = await response.Content.ReadFromJsonAsync<ApiResponse<T>>();
+
+        if (apiResponse == null)
+        {
+            apiResponse = new ApiResponse<T> { Message = "The response is empty" };
+        }
+
+        return apiResponse;
+    }
 }

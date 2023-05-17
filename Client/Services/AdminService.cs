@@ -1,4 +1,8 @@
-﻿namespace MR.Client.Services;
+﻿using System.Net;
+using System.Net.Http;
+using System.Text;
+
+namespace MR.Client.Services;
 
 public interface IAdminService
 {
@@ -10,6 +14,9 @@ public interface IAdminService
     Task<ApiResponse<Guid>> InitQuarter(InitQuarterDTO quarter);
     Task<ApiResponse<QuarterPagedListDTO>> GetQuarters(QuarterSearchParamsDTO searchParams);
     Task<ApiResponse<SignaturePoolsPagedListDTO>> GetSignaturePools(SignaturePoolsSearchParamsDTO searchParams);
+    Task<ApiResponse<bool>> UnpinSignatureFromIssue(Guid signatureId);
+    Task<ApiResponse<bool>> RemoveSignature(Guid signatureId);
+    Task<ApiResponse<bool>> AddSignatureToSignaturePool(Guid signaturePoolId);
 }
 
 internal class AdminService : DataServiceBase, IAdminService
@@ -144,13 +151,17 @@ internal class AdminService : DataServiceBase, IAdminService
         var q = BuildQuery(searchParams);
 
         if (searchParams.Begin.HasValue)
-            q[nameof(searchParams.Begin)] = searchParams.Begin.Value.ToString();
+            q[nameof(searchParams.Begin)] = searchParams.Begin.Value.ToString("yyyy-MM-dd");
         if (searchParams.End.HasValue)
-            q[nameof(searchParams.End)] = searchParams.End.Value.ToString();
+            q[nameof(searchParams.End)] = searchParams.End.Value.ToString("yyyy-MM-dd");
         if (searchParams.Year.HasValue)
             q[nameof(searchParams.Year)] = searchParams.Year.Value.ToString();
         if (searchParams.Quarter.HasValue)
             q[nameof(searchParams.Quarter)] = searchParams.Quarter.Value.ToString();
+        if (!string.IsNullOrEmpty(searchParams.ApplicationUserId))
+            q[nameof(searchParams.ApplicationUserId)] = searchParams.ApplicationUserId;
+        if (!string.IsNullOrEmpty(searchParams.ApplicationUserEmail))
+            q[nameof(searchParams.ApplicationUserEmail)] = searchParams.ApplicationUserEmail;
 
         var response = await _httpClient.GetAsync($"{_SignaturePoolControllerPath}/GetSignaturePoolsBySearchParams?{q}");
 
@@ -164,5 +175,23 @@ internal class AdminService : DataServiceBase, IAdminService
         });
 
         return result ?? throw new Exception("Deserialized response is null.");
+    }
+
+    public async Task<ApiResponse<bool>> UnpinSignatureFromIssue(Guid signatureId)
+    {
+        var endpoint = $"{_SignaturePoolControllerPath}/UnpinSignatureFromIssue";
+        return await HandleResponse<bool>(async () => await _httpClient.PostAsJsonAsync(endpoint, signatureId));
+    }
+
+    public async Task<ApiResponse<bool>> RemoveSignature(Guid signatureId)
+    {
+        var endpoint = $"{_SignaturePoolControllerPath}/RemoveSignature";
+        return await HandleResponse<bool>(async () => await _httpClient.PostAsJsonAsync(endpoint, signatureId));
+    }
+
+    public async Task<ApiResponse<bool>> AddSignatureToSignaturePool(Guid signaturePoolId)
+    {
+        var endpoint = $"{_SignaturePoolControllerPath}/AddSignatureToSignaturePool";
+        return await HandleResponse<bool>(async () => await _httpClient.PostAsJsonAsync(endpoint, signaturePoolId));
     }
 }

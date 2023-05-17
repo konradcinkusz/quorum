@@ -1,4 +1,8 @@
-﻿namespace MR.Server.Controllers;
+﻿using MR.Service;
+using MR.Service.Features.SignatureFeautres;
+using MR.Service.Features.SignaturePoolsFeatures;
+
+namespace MR.Server.Controllers;
 
 [Authorize(Policy = Policies.RequireAdminRole)]
 public class SignaturePoolController : MRBaseController
@@ -45,5 +49,23 @@ public class SignaturePoolController : MRBaseController
         {
             return new ApiResponse<SignaturePoolsPagedListDTO>(new SignaturePoolsPagedListDTO()) { Message = ex.Message, StatusCode = (int)HttpStatusCode.BadRequest };
         }
+    }
+
+    [HttpPost("AddSignatureToSignaturePool")]
+    public async Task<ActionResult<ApiResponse<bool>>> AddSignatureToSignaturePool([FromBody] Guid signaturePoolDTO)
+    {
+        return await HandleErrors(async () => await Mediator.Send(new AddSignatureToSignaturePoolCommand { SignaturePoolId = signaturePoolDTO }));
+    }
+
+    [HttpPost("RemoveSignature")]
+    public async Task<ActionResult<ApiResponse<bool>>> RemoveSignature([FromBody] Guid signatureId)
+    {
+        return await HandleErrors(async () => await Mediator.Send(new RemoveSignatureCommand { SignatureId = signatureId }));
+    }
+
+    [HttpPost("UnpinSignatureFromIssue")]
+    public async Task<ActionResult<ApiResponse<bool>>> UnpinSignatureFromIssue([FromBody] Guid signatureId)
+    {
+        return await HandleErrors(async () => await Mediator.Send(new UnpinSignatureFromIssueCommand { SignatureId = signatureId }));
     }
 }
