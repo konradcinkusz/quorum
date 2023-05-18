@@ -1,4 +1,7 @@
-﻿namespace MR.Persistence;
+﻿using Microsoft.EntityFrameworkCore.Metadata;
+using System.Diagnostics.CodeAnalysis;
+
+namespace MR.Persistence;
 
 public interface IApplicationDbContext
 {
@@ -11,6 +14,7 @@ public interface IApplicationDbContext
     DbSet<Quarter> Quarters { get; set; }
     DbSet<SignaturePool> SignaturePools { get; set; }
     DbSet<Signature> Signatures { get; set; }
+    DbSet<TEntity> Set<TEntity>() where TEntity : class;
 }
 
 public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>, IApplicationDbContext

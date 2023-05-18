@@ -1,4 +1,6 @@
-﻿namespace MR.Server.Controllers;
+﻿using MR.Service.Features.Issues;
+
+namespace MR.Server.Controllers;
 
 public class IssueController : MRBaseController
 {
@@ -41,4 +43,20 @@ public class IssueController : MRBaseController
         }
     }
 
+    [Authorize(Policy = Policies.RequireAdminRole)]
+    [HttpPost("CreateIssue")]
+    public async Task<ActionResult<ApiResponse<Guid>>> CreateIssue(IssueDTO issueDTO)
+    {
+        string uId = GetUserId();
+        var paymentId = await Mediator.Send(new CreateIssueCommand
+        {
+            ApplicationUserId = uId,
+            IssueStatus = (IssueStatus)issueDTO.IssueStatus,
+            IsVerifyByAdmin = false,
+            Question = issueDTO.Question,
+            Title = issueDTO.Title,
+        });
+
+        return new ApiResponse<Guid> { Data = paymentId };
+    }
 }

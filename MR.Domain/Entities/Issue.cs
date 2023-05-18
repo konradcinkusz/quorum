@@ -4,6 +4,8 @@
 public class Issue : BaseEntity<Guid>
 {
     //nullable
+    [ForeignKey(nameof(Issue.CreatedBy))]
+    public string? CreatedById { get; set; }
     public ApplicationUser? CreatedBy { get; set; }
 
     //not null
