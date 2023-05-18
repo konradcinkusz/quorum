@@ -1,0 +1,103 @@
+﻿<div class="card m-1 p-1">
+    <div class="row mb-3">
+        <div class="col-sm-1">
+            <p class="form-control-plaintext" id="Quarter-id">@IssueDTO.RatingValue</p>
+        </div>
+        <div class="col-sm-2">
+            <p class="form-control-plaintext" id="Quarter-id">@IssueDTO.ApplicationUserEmail</p>
+        </div>
+        <div class="col-sm-1">
+            <p class="form-control-plaintext" id="Quarter-id">@IssueDTO.Title.Truncate(5)</p>
+        </div>
+        <div class="col-sm-2">
+            <p class="form-control-plaintext" id="Quarter-id">@IssueDTO.Question.Truncate(10)</p>
+        </div>
+        <div class="col-sm-2">
+            <p class="form-control-plaintext" id="Quarter-IssueStatus">@IssueDTO.IssueStatus</p>
+        </div>
+        <div class="col-sm-2">
+            <p class="form-control-plaintext" id="Quarter-createdat">@IssueDTO.CreatedAt</p>
+        </div>
+        <div class="col-sm-2">
+            <div class="btn-group my-2" role="group">
+                <button class="btn btn-primary btn-sm" type="button" @onclick="ToggleDetails">@ShowDetailsButtonText</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="@DetailsCssClass">
+        <hr />
+        <h5>Signature Pools Details</h5>
+        <dl class="row mb-3">
+            <dt class="col-sm-3">Id</dt>
+            <dd class="col-sm-9">@IssueDTO.Id</dd>
+
+            <dt class="col-sm-3">Full title</dt>
+            <dd class="col-sm-9">@IssueDTO.Title</dd>
+
+            <dt class="col-sm-3">Full question</dt>
+            <dd class="col-sm-9">@IssueDTO.Question</dd>
+
+            @if (IssueDTO.InitialPayment != null)
+            {
+                <dt class="col-sm-3">InitialPayment</dt>
+                <dd class="col-sm-9">@IssueDTO.InitialPayment.PaymentValuePLN</dd>
+
+                <dt class="col-sm-3">InitialPayment user</dt>
+                <dd class="col-sm-9">@IssueDTO.InitialPayment.ApplicationUserEmail</dd>
+            }
+
+            <dt class="col-sm-3">Quarters</dt>
+            <dd class="col-sm-9 separator-line">@IssueDTO.QuarterDTOs.Count()</dd>
+
+            @foreach (var quarter in IssueDTO.QuarterDTOs)
+            {
+                <dt class="col-sm-3">Quarter Y-M</dt>
+                <dd class="col-sm-9">@quarter.Year - @quarter.Month</dd>
+            }
+
+            <dt class="col-sm-3">Signatures</dt>
+            <dd class="col-sm-9 separator-line">@IssueDTO.SignatureDTOs.Count()</dd>
+
+            @foreach (var signature in IssueDTO.SignatureDTOs)
+            {
+                <dt class="col-sm-3">Signature ID</dt>
+                <dd class="col-sm-9">@signature.Id</dd>
+            }
+        </dl>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public IssueDTO IssueDTO { get; set; }
+
+    [Parameter]
+    public EventCallback Refresh { get; set; }
+
+    [Parameter]
+    public string ShowDetailsButtonText { get; set; } = "Show Details";
+
+    [Parameter]
+    public string GetDetailsButtonText { get; set; } = "Get Details";
+
+    private string DetailsCssClass => showDetails ? "d-block" : "d-none";
+
+    private bool showDetails = false;
+
+    private void ToggleDetails()
+    {
+        showDetails = !showDetails;
+
+        if (showDetails)
+        {
+            GetDetailsButtonText = "Hide Details";
+            ShowDetailsButtonText = GetDetailsButtonText;
+        }
+        else
+        {
+            GetDetailsButtonText = "Get Details";
+            ShowDetailsButtonText = GetDetailsButtonText;
+        }
+    }
+}

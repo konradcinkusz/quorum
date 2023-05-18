@@ -19,7 +19,8 @@ public class GetSignaturePoolsBySearchParamsQuery : QueryBase, IRequest<PagedLis
         public override async Task<PagedList<SignaturePool>> Handle(GetSignaturePoolsBySearchParamsQuery request,
             CancellationToken cancellationToken)
         {
-            var query = _context.SignaturePools.Include(x=>x.Signatures).Include(x=>x.Quarter).Include(x=>x.ApplicationUser).AsQueryable();
+            var query = _context.SignaturePools
+                .Include(x=>x.Signatures).Include(x=>x.Quarter).Include(x=>x.ApplicationUser).AsQueryable();
 
             if (!string.IsNullOrEmpty(request.ApplicationUserId))
             {
@@ -62,6 +63,7 @@ public class GetSignaturePoolsBySearchParamsQuery : QueryBase, IRequest<PagedLis
 
             return pagedList;
         }
+
         protected override IQueryable<T> ApplySorting<T>(IQueryable<T> query, string sortColumn, SortOrder sortOrder) 
         {
             if (!string.IsNullOrEmpty(sortColumn) && sortOrder != SortOrder.Unspecified)

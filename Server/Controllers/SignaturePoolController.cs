@@ -1,8 +1,4 @@
-﻿using MR.Service;
-using MR.Service.Features.SignatureFeautres;
-using MR.Service.Features.SignaturePoolsFeatures;
-
-namespace MR.Server.Controllers;
+﻿namespace MR.Server.Controllers;
 
 [Authorize(Policy = Policies.RequireAdminRole)]
 public class SignaturePoolController : MRBaseController

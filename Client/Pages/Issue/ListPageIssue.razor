@@ -1,0 +1,74 @@
+﻿@inherits BaseAdmin
+@page "/admin/Issues"
+@inject IAdminService adminService
+
+<PageTitle>Issues list</PageTitle>
+
+<AuthorizeView>
+    <Authorized>
+        @if (SignaturePoolPagedListDto == null)
+        {
+            <_Loading LoadingText="Ładowanie listy płatności" />
+        }
+        else
+        {
+            <BrowserIssues Refresh="_refresh"
+                               SearchParams="IssuesearchParamsDTO"
+                               TotalPages="SignaturePoolPagedListDto.TotalPages"
+                               TotalItems="SignaturePoolPagedListDto.TotalItems" />
+            @if (result != null && !result.Success)
+            {
+                <hr />
+                <_ApiResponse T="IssuePagedListDTO" result="result" />
+            }
+            @if (SignaturePoolPagedListDto.Items.Count == 0)
+            {
+                <hr />
+                <div class="alert alert-danger" role="alert">
+                    <p><em>Brak kwestii spełniających kryteria wyszukiwania...</em></p>
+                </div>
+            }
+            else
+            {
+                <HeaderIssues Refresh="_refresh"
+                              SearchParams="IssuesearchParamsDTO" />
+                <div class="content">
+                    <div class="container">
+                        <div class="row align-content-center justify-content-center">
+                            @foreach (var p in SignaturePoolPagedListDto.Items)
+                            {
+                                <ReadIssue IssueDTO="p"  Refresh="_refresh"/>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </Authorized>
+    <NotAuthorized>
+        <div class="m-2 p-2 font-weight-bold" style="background-color:grey">
+            You must be logged as a super admin user at least to see these page
+        </div>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private IssueSearchParamsDTO IssuesearchParamsDTO;
+    private IssuePagedListDTO? SignaturePoolPagedListDto;
+
+    private ApiResponse<IssuePagedListDTO> result = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        IssuesearchParamsDTO = new IssueSearchParamsDTO();
+        await _refresh();
+    }
+
+    async Task _refresh()
+    {
+        result = await adminService.GetIssues(IssuesearchParamsDTO);
+        SignaturePoolPagedListDto = result.Data;
+        IssuesearchParamsDTO.CurrentPage = SignaturePoolPagedListDto.CurrentPage;
+        IssuesearchParamsDTO.PageSize = SignaturePoolPagedListDto.PageSize;
+    }
+}

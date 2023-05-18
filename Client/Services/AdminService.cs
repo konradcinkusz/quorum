@@ -1,8 +1,4 @@
-﻿using System.Net;
-using System.Net.Http;
-using System.Text;
-
-namespace MR.Client.Services;
+﻿namespace MR.Client.Services;
 
 public interface IAdminService
 {
@@ -17,6 +13,7 @@ public interface IAdminService
     Task<ApiResponse<bool>> UnpinSignatureFromIssue(Guid signatureId);
     Task<ApiResponse<bool>> RemoveSignature(Guid signatureId);
     Task<ApiResponse<bool>> AddSignatureToSignaturePool(Guid signaturePoolId);
+    Task<ApiResponse<IssuePagedListDTO>> GetIssues(IssueSearchParamsDTO searchParams);
 }
 
 internal class AdminService : DataServiceBase, IAdminService
@@ -100,7 +97,7 @@ internal class AdminService : DataServiceBase, IAdminService
 
     public async Task<ApiResponse<Guid>> InitQuarter(InitQuarterDTO quarter)
     {
-        var endpoint = $"{_QuarterControllerPath}/InitQuarter";
+        var endpoint = $"{_quarterControllerPath}/InitQuarter";
 
         var response = await _httpClient.PostAsJsonAsync(endpoint, quarter);
 
@@ -132,7 +129,7 @@ internal class AdminService : DataServiceBase, IAdminService
         if (searchParams.Quarter.HasValue)
             q[nameof(searchParams.Quarter)] = searchParams.Quarter.Value.ToString();
 
-        var response = await _httpClient.GetAsync($"{_QuarterControllerPath}/GetQuartersBySearchParams?{q}");
+        var response = await _httpClient.GetAsync($"{_quarterControllerPath}/GetQuartersBySearchParams?{q}");
 
         response.EnsureSuccessStatusCode();
 
@@ -163,7 +160,7 @@ internal class AdminService : DataServiceBase, IAdminService
         if (!string.IsNullOrEmpty(searchParams.ApplicationUserEmail))
             q[nameof(searchParams.ApplicationUserEmail)] = searchParams.ApplicationUserEmail;
 
-        var response = await _httpClient.GetAsync($"{_SignaturePoolControllerPath}/GetSignaturePoolsBySearchParams?{q}");
+        var response = await _httpClient.GetAsync($"{_signaturePoolControllerPath}/GetSignaturePoolsBySearchParams?{q}");
 
         response.EnsureSuccessStatusCode();
 
@@ -179,19 +176,37 @@ internal class AdminService : DataServiceBase, IAdminService
 
     public async Task<ApiResponse<bool>> UnpinSignatureFromIssue(Guid signatureId)
     {
-        var endpoint = $"{_SignaturePoolControllerPath}/UnpinSignatureFromIssue";
+        var endpoint = $"{_signaturePoolControllerPath}/UnpinSignatureFromIssue";
         return await HandleResponse<bool>(async () => await _httpClient.PostAsJsonAsync(endpoint, signatureId));
     }
 
     public async Task<ApiResponse<bool>> RemoveSignature(Guid signatureId)
     {
-        var endpoint = $"{_SignaturePoolControllerPath}/RemoveSignature";
+        var endpoint = $"{_signaturePoolControllerPath}/RemoveSignature";
         return await HandleResponse<bool>(async () => await _httpClient.PostAsJsonAsync(endpoint, signatureId));
     }
 
     public async Task<ApiResponse<bool>> AddSignatureToSignaturePool(Guid signaturePoolId)
     {
-        var endpoint = $"{_SignaturePoolControllerPath}/AddSignatureToSignaturePool";
+        var endpoint = $"{_signaturePoolControllerPath}/AddSignatureToSignaturePool";
         return await HandleResponse<bool>(async () => await _httpClient.PostAsJsonAsync(endpoint, signaturePoolId));
+    }
+
+    public async Task<ApiResponse<IssuePagedListDTO>> GetIssues(IssueSearchParamsDTO searchParams)
+    {
+        var q = BuildQuery(searchParams);
+
+        var response = await _httpClient.GetAsync($"{_issueControllerPath}/GetIssuesBySearchParams?{q}");
+
+        response.EnsureSuccessStatusCode();
+
+        var content = await response.Content.ReadAsStringAsync();
+
+        var result = JsonSerializer.Deserialize<ApiResponse<IssuePagedListDTO>>(content, new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        });
+
+        return result ?? throw new Exception("Deserialized response is null.");
     }
 }

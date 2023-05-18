@@ -32,3 +32,6 @@ global using MR.Service.Features.SignaturePoolsFeatures.Queries;
 global using MR.Shared.DTOs.SignaturePools;
 global using MR.Shared.DTOs.Issue;
 global using MR.Shared.DTOs.Signature;
+global using MR.Service.Features.SignatureFeautres;
+global using MR.Service.Features.SignaturePoolsFeatures;
+global using MR.Service.Features.Issues.Queries;
