@@ -14,6 +14,7 @@ public interface IAdminService
     Task<ApiResponse<bool>> RemoveSignature(Guid signatureId);
     Task<ApiResponse<bool>> AddSignatureToSignaturePool(Guid signaturePoolId);
     Task<ApiResponse<IssuePagedListDTO>> GetIssues(IssueSearchParamsDTO searchParams);
+    Task<ApiResponse<Guid>> CreateIssue(IssueDTO issueDTO);
 }
 
 internal class AdminService : DataServiceBase, IAdminService
@@ -208,5 +209,26 @@ internal class AdminService : DataServiceBase, IAdminService
         });
 
         return result ?? throw new Exception("Deserialized response is null.");
+    }
+
+    public async Task<ApiResponse<Guid>> CreateIssue(IssueDTO issueDTO)
+    {
+        var endpoint = $"{_issueControllerPath}/CreateIssue";
+
+        var response = await _httpClient.PostAsJsonAsync(endpoint, issueDTO);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            // Handle error response
+        }
+
+        var apiResponse = await response.Content.ReadFromJsonAsync<ApiResponse<Guid>>();
+
+        if (apiResponse == null)
+        {
+            apiResponse = new ApiResponse<Guid> { Data = Guid.Empty, Message = "The response is empty" };
+        }
+
+        return apiResponse;
     }
 }

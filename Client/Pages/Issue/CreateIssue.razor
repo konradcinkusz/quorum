@@ -1,0 +1,86 @@
+﻿@inherits BaseAdmin
+@page "/admin/issue"
+@inject IAdminService adminService
+
+<PageTitle>Admin Issue Edit</PageTitle>
+
+<div class="card shadow rounded-3">
+    <div class="card-header bg-primary text-white py-3 rounded-3">
+        <h5 class="card-title mb-0">Edit Issue</h5>
+    </div>
+
+    <div class="card-body">
+        <EditForm Model="@dto" OnValidSubmit="@Create">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="row">
+                <div class="col-md-12 mb-4">
+                    <label for="email-value" class="form-label">Application User Email</label>
+                    <InputText id="email-value" class="form-control rounded-pill" @bind-Value="@dto.ApplicationUserEmail" required />
+                    <ValidationMessage For="@(() => dto.ApplicationUserEmail)" />
+                </div>
+
+                <div class="col-md-12 mb-4">
+                    <label for="title-value" class="form-label">Title</label>
+                    <InputText id="title-value" class="form-control rounded-pill" @bind-Value="@dto.Title" required />
+                    <ValidationMessage For="@(() => dto.Title)" />
+                </div>
+
+                <div class="col-md-12 mb-4">
+                    <label for="question-value" class="form-label">Question</label>
+                    <InputText id="question-value" class="form-control rounded-pill" @bind-Value="@dto.Question" required />
+                    <ValidationMessage For="@(() => dto.Question)" />
+                </div>
+
+                <div class="col-md-12 mb-4">
+                    <label for="verify-value" class="form-label">Is Verified by Admin</label>
+                    <InputCheckbox id="verify-value" class="form-check-input" @bind-Value="@dto.IsVerifyByAdmin" />
+                    <ValidationMessage For="@(() => dto.IsVerifyByAdmin)" />
+                </div>
+
+                <div class="col-md-12 mb-4">
+                    <label for="status-value" class="form-label">Issue Status</label>
+                    <select id="status-value" class="form-select rounded-pill" @bind="@dto.IssueStatus" required>
+                        @foreach (var status in Enum.GetValues(typeof(IssueStatusEnum)))
+                        {
+                            <option value="@status">@status</option>
+                        }
+                    </select>
+                    <ValidationMessage For="@(() => dto.IssueStatus)" />
+                </div>
+
+                <div class="col-md-12 mb-4">
+                    <label for="rating-value" class="form-label">Rating Value</label>
+                    <InputNumber id="rating-value" class="form-control rounded-pill" @bind-Value="@dto.RatingValue" required />
+                    <ValidationMessage For="@(() => dto.RatingValue)" />
+                </div>
+
+                @*<div class="col-md-12 mb-4">
+                    <label for="initial-payment-value" class="form-label">Initial Payment</label>
+                    <InputNumber id="initial-payment-value" class="form-control rounded-pill" @bind-Value="@dto.InitialPayment" />
+                    <ValidationMessage For="@(() => dto.InitialPayment)" />
+                </div>*@
+
+                <div class="col-md-12 d-grid">
+                    <button type="submit" class="btn btn-primary rounded-pill">Save Changes</button>
+                </div>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@if (result != null)
+{
+    <_ApiResponse T="Guid" result="result" />
+}
+
+@code {
+    private IssueDTO dto = new IssueDTO();
+
+    private ApiResponse<Guid> result = null;
+    private async Task Create()
+    {
+        result = await adminService.CreateIssue(dto);
+    }
+}

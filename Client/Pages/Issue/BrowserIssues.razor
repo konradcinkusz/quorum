@@ -1,0 +1,39 @@
+﻿@inherits BaseAdmin
+
+<div class="row domain-search bg-green rounded">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="row g-3 mt-2">
+                    
+                </div>
+                <div class="row g-3">
+
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <_Paging QueryBase="SearchParams"
+                     RefreshList="async () => await Refresh.InvokeAsync()"
+                     TotalPages="TotalPages"
+                     TotalItems="TotalItems"></_Paging>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public IssueSearchParamsDTO SearchParams { get; set; }
+    [Parameter]
+    public EventCallback Refresh { get; set; }
+    [Parameter]
+    public int TotalPages { get; set; }
+    [Parameter]
+    public int TotalItems { get; set; } = 0;
+
+    async Task ClearQuery()
+    {
+        await Refresh.InvokeAsync();
+    }
+}

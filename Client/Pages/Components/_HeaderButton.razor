@@ -1,0 +1,41 @@
+﻿<div class="col-sm-@Width">
+    <button class="btn btn-link" @onclick="@(() => SortData(Name))">
+        RatingValue
+        @if (SearchParams.SortColumn == Name)
+        {
+            <i class="@GetSortIconClass(SearchParams.SortOrder)"></i>
+        }
+    </button>
+</div>
+
+@code {
+    [Parameter]
+    public SearchParamsDTO SearchParams { get; set; }
+    [Parameter]
+    public EventCallback Refresh { get; set; }
+    [Parameter]
+    public string Width { get; set; }
+    [Parameter]
+    public string Name { get; set; }
+
+    private async Task SortData(string column)
+    {
+        if (SearchParams.SortColumn == column)
+        {
+            SearchParams.SortOrder = SearchParams.SortOrder == SortOrder.Ascending ? SortOrder.Descending : SortOrder.Ascending;
+        }
+        else
+        {
+            SearchParams.SortColumn = column;
+            SearchParams.SortOrder = SortOrder.Ascending;
+        }
+
+        // implement sorting logic based on the selected column and sort order
+        await Refresh.InvokeAsync();
+    }
+
+    private string GetSortIconClass(SortOrder order)
+    {
+        return order == SortOrder.Ascending ? "bi bi-caret-up" : "bi bi-caret-down";
+    }
+}

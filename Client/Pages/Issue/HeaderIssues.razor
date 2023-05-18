@@ -1,0 +1,22 @@
+﻿<div class="card">
+    <div class="row mb-3">
+        <_HeaderButton Name="RatingValue" Width="1" SearchParams="SearchParams" Refresh="async () => await Refresh.InvokeAsync()" />
+        <_HeaderButton Name="ApplicationUserEmail" Width="2" SearchParams="SearchParams" Refresh="async () => await Refresh.InvokeAsync()" />
+        <_HeaderButton Name="Title" Width="1" SearchParams="SearchParams" Refresh="async () => await Refresh.InvokeAsync()" />
+        <_HeaderButton Name="Question" Width="2" SearchParams="SearchParams" Refresh="async () => await Refresh.InvokeAsync()" />
+        <_HeaderButton Name="IssueStatus" Width="2" SearchParams="SearchParams" Refresh="async () => await Refresh.InvokeAsync()" />
+        <_HeaderButton Name="CreatedAt" Width="2" SearchParams="SearchParams" Refresh="async () => await Refresh.InvokeAsync()" />
+
+        <div class="col-sm-2">
+            Actions:
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public IssueSearchParamsDTO SearchParams { get; set; }
+
+    [Parameter]
+    public EventCallback Refresh { get; set; }
+}
