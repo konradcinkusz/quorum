@@ -27,7 +27,7 @@
 
     <div class="@DetailsCssClass">
         <hr />
-        <h5>Issue Details</h5>
+        <h5>Details</h5>
         <dl class="row mb-3">
             <dt class="col-sm-3">Id</dt>
             <dd class="col-sm-9">@IssueDTO.Id</dd>
@@ -65,6 +65,9 @@
                 <dd class="col-sm-9">@signature.Id</dd>
             }*@
         </dl>
+        <h5>Preview</h5>
+        <_CustomCard BackgroundColor="@IssueDTO.BackgroundColor" Title="@IssueDTO.Title" Icon="@IssueDTO.Icon" Text="@IssueDTO.Question" />
+        <hr />
     </div>
 </div>
 
