@@ -1,90 +1,111 @@
 ﻿@page "/"
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Home</PageTitle>
 
-<div class="container">
-    <div class="row">
-        <_CustomCard BackgroundColor="#eaf5e5" Title="About MR" Icon="oi-info" Text="MR is a system for referendums. Our unique monetization model includes payment for publication and signature collection." />
-        <_CustomCard BackgroundColor="#d6edeb" Title="How big a problem does MR solve?" Icon="oi-people" Text="In Poland, 500,000 signatures from real people are required to submit a referendum. MR solves the problem of collecting signatures online from confirmed users." />
-        <_CustomCard BackgroundColor="#c3e0c8" Title="The MR Business Model" Icon="oi-puzzle-piece" Text="Our business model includes a unique monetization strategy that hasn't been applied anywhere else. Join us in revolutionizing democracy!" />
-    </div>
-    <div class="row">
-        <div class="col-12">
-            <ul class="nav justify-content-center">
-                <li class="nav-item">
-                    <NavLink href="" Match="NavLinkMatch.All" class="nav-link">
-                        <div class="nav-link-container">
-                            <span class="oi oi-home mr-2"></span>
-                            Home
-                        </div>
-                    </NavLink>
-                </li>
-                <AuthorizeView Policy="AdminRoles">
-                    <Authorized>
+<AuthorizeView Policy="AdminRoles">
+    <Authorized>
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <ul class="nav justify-content-center">
                         <li class="nav-item">
-                            <NavLink href="create-payment" class="nav-link">
+                            <NavLink href="" Match="NavLinkMatch.All" class="nav-link">
                                 <div class="nav-link-container">
-                                    <span class="oi oi-plus mr-2"></span>
-                                    Add Payment
+                                    <span class="oi oi-home mr-2"></span>
+                                    Home
                                 </div>
                             </NavLink>
                         </li>
-                        <li class="nav-item">
-                            <NavLink href="payments" class="nav-link">
-                                <div class="nav-link-container">
-                                    <span class="oi oi-list mr-2"></span>
-                                    Payments
-                                </div>
+                        <li class="nav-item px-3">
+                            <NavLink class="nav-link" href="subscription">
+                                <span class="oi oi-cart"></span> Sub &amp; payments
                             </NavLink>
                         </li>
-                        <li class="nav-item">
-                            <NavLink href="/admin/dashboard" class="nav-link">
-                                <div class="nav-link-container">
-                                    <span class="oi oi-wrench mr-2"></span>
-                                    Admin Seed Payments
-                                </div>
+                        <li class="nav-item px-3">
+                            <NavLink class="nav-link" href="create-payment">
+                                <span class="oi oi-plus"></span> Add payment
                             </NavLink>
                         </li>
-                    </Authorized>
-                </AuthorizeView>
-            </ul>
+                        <li class="nav-item px-3">
+                            <NavLink class="nav-link" href="payments">
+                                <span class="oi oi-dollar"></span> Payments
+                            </NavLink>
+                        </li>
+                        <li class="nav-item px-3">
+                            <NavLink class="nav-link" href="/admin/dashboard">
+                                <span class="oi oi-cog"></span> Admin dashboard
+                            </NavLink>
+                        </li>
+                        <li class="nav-item px-3">
+                            <NavLink class="nav-link" href="/admin/quarter">
+                                <span class="oi oi-calendar"></span> Create quarter
+                            </NavLink>
+                        </li>
+                        <li class="nav-item px-3">
+                            <NavLink class="nav-link" href="/admin/quarters">
+                                <span class="oi oi-bar-chart"></span> Quarters
+                            </NavLink>
+                        </li>
+                        <li class="nav-item px-3">
+                            <NavLink class="nav-link" href="/admin/SignaturePools">
+                                <span class="oi oi-pencil"></span> Signature pools
+                            </NavLink>
+                        </li>
+                        <li class="nav-item px-3">
+                            <NavLink class="nav-link" href="/admin/issue">
+                                <span class="oi oi-badge"></span> Create issue
+                            </NavLink>
+                        </li>
+                        <li class="nav-item px-3">
+                            <NavLink class="nav-link" href="/admin/Issues">
+                                <span class="oi oi-document"></span> Issues
+                            </NavLink>
+                        </li>
+                        <li class="nav-item px-3">
+                            <NavLink class="nav-link" href="onepager">
+                                <span class="oi oi-lightbulb" aria-hidden="true"></span> One pager
+                            </NavLink>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
-    </div>
-</div>
 
-@if (user is not null)
-{
-    <h3>@user.Identity.Name</h3>
-    <div class="m-2 p-2">
-        Is Authenticated: @user.Identity.IsAuthenticated
-    </div>
-    <div class="m-2 p-2">
-        Authentication Type: @user.Identity.AuthenticationType
-    </div>
-    <div class="m-2 p-2">
-        Admin Role: @user.IsInRole("Admin")
-    </div>
-    <div class="m-2 p-2">
-        <h5>Claims</h5>
-        @foreach (var claim in user.Claims)
+        @if (user is not null)
         {
-            <span>
-                @claim.Type
-            </span>
-            <span>:</span>
-            <span>
-                @claim.Value
-            </span>
-            <br />
+            <h3>@user.Identity.Name</h3>
+            <div class="m-2 p-2">
+                Is Authenticated: @user.Identity.IsAuthenticated
+            </div>
+            <div class="m-2 p-2">
+                Authentication Type: @user.Identity.AuthenticationType
+            </div>
+            <div class="m-2 p-2">
+                Admin Role: @user.IsInRole("Admin")
+            </div>
+            <div class="m-2 p-2">
+                <h5>Claims</h5>
+                @foreach (var claim in user.Claims)
+                {
+                    <span>
+                        @claim.Type
+                    </span>
+                    <span>:</span>
+                    <span>
+                        @claim.Value
+                    </span>
+                    <br />
+                }
+            </div>
         }
-    </div>
-}
-else
-{
-    <div class="m-2 p-2">
-        No User Exists
-    </div>
-}
+        else
+        {
+            <div class="m-2 p-2">
+                No User Exists
+            </div>
+        }
+    </Authorized>
+</AuthorizeView>
 
 @code {
     [CascadingParameter] public Task<AuthenticationState> AuthTask { get; set; }
