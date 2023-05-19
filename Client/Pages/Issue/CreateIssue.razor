@@ -42,6 +42,7 @@
                 <div class="col-md-6 mb-4">
                     <label for="status-value" class="form-label">Issue Status</label>
                     <select id="status-value" class="form-select rounded-pill" @bind="@dto.IssueStatus" required>
+                        <option value="">-- Select Issue Status --</option>
                         @foreach (var status in Enum.GetValues(typeof(IssueStatusEnum)))
                         {
                             <option value="@status">@status</option>

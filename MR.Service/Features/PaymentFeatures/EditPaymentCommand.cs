@@ -1,6 +1,6 @@
 ﻿namespace MR.Service.Features.PaymentFeatures;
 
-public class EditPaymentCommand : IPaymentBaseFeature, IRequest<Guid>
+public class EditPaymentCommand : IRequest<Guid>
 {
     public Guid PaymentId { get; set; }
     public PaymentStatus PaymentStatus { get; set; }

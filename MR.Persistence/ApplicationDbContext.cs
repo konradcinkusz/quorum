@@ -1,13 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata;
-using System.Diagnostics.CodeAnalysis;
-
-namespace MR.Persistence;
+﻿namespace MR.Persistence;
 
 public interface IApplicationDbContext
 {
     DbSet<Payment> Payments { get; set; }
     DbSet<AdminLog> Admin_Logs { get; set; }
-    Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     DbSet<Subscription> Subscriptions { get; set; }
     DbSet<SubscriptionPayment> SubscriptionPayment { get; set; }
     DbSet<Issue> Issues { get; set; }
@@ -15,6 +11,7 @@ public interface IApplicationDbContext
     DbSet<SignaturePool> SignaturePools { get; set; }
     DbSet<Signature> Signatures { get; set; }
     DbSet<TEntity> Set<TEntity>() where TEntity : class;
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }
 
 public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>, IApplicationDbContext

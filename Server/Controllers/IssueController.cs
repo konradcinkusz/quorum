@@ -17,6 +17,7 @@ public class IssueController : MRBaseController
         {
             var result = await Mediator.Send(new GetIssuesBySearchParamsQuery
             {
+                CreatedByEmail = searchParams.CreatedByEmail,
                 SearchParams = new SearchParams
                 {
                     CurrentPage = searchParams.CurrentPage,

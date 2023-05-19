@@ -27,15 +27,6 @@ internal class AdminService : DataServiceBase, IAdminService
     {
         var q = BuildQuery(query);
 
-        if (!string.IsNullOrEmpty(query.ValuesText))
-            q[nameof(query.ValuesText)] = query.ValuesText;
-
-        if (!string.IsNullOrEmpty(query.Action))
-            q[nameof(query.Action)] = query.Action;
-
-        q[nameof(query.LastHour)] = query.LastHour.ToString();
-        q[nameof(query.LastMonth)] = query.LastMonth.ToString();
-
         var response = await _httpClient.GetAsync($"{_adminControllerPath}/GetAdminLogsByQuery?{q}");
 
         response.EnsureSuccessStatusCode();
@@ -69,9 +60,6 @@ internal class AdminService : DataServiceBase, IAdminService
     public async Task<SubscriptionPagedListDTO> GetSubscriptions(SubscriptionSearchParamsDTO query)
     {
         var q = BuildQuery(query);
-
-        if (!string.IsNullOrEmpty(query.ApplicationUserId))
-            q[nameof(query.ApplicationUserId)] = query.ApplicationUserId;
 
         var response = await _httpClient.GetAsync($"{_subscriptionControllerPath}/GetSubscriptionsByQuery?{q}");
 
@@ -121,15 +109,6 @@ internal class AdminService : DataServiceBase, IAdminService
     {
         var q = BuildQuery(searchParams);
 
-        if (searchParams.Begin.HasValue)
-            q[nameof(searchParams.Begin)] = searchParams.Begin.Value.ToString();
-        if (searchParams.End.HasValue)
-            q[nameof(searchParams.End)] = searchParams.End.Value.ToString();
-        if (searchParams.Year.HasValue)
-            q[nameof(searchParams.Year)] = searchParams.Year.Value.ToString();
-        if (searchParams.Quarter.HasValue)
-            q[nameof(searchParams.Quarter)] = searchParams.Quarter.Value.ToString();
-
         var response = await _httpClient.GetAsync($"{_quarterControllerPath}/GetQuartersBySearchParams?{q}");
 
         response.EnsureSuccessStatusCode();
@@ -147,19 +126,6 @@ internal class AdminService : DataServiceBase, IAdminService
     public async Task<ApiResponse<SignaturePoolsPagedListDTO>> GetSignaturePools(SignaturePoolsSearchParamsDTO searchParams)
     {
         var q = BuildQuery(searchParams);
-
-        if (searchParams.Begin.HasValue)
-            q[nameof(searchParams.Begin)] = searchParams.Begin.Value.ToString("yyyy-MM-dd");
-        if (searchParams.End.HasValue)
-            q[nameof(searchParams.End)] = searchParams.End.Value.ToString("yyyy-MM-dd");
-        if (searchParams.Year.HasValue)
-            q[nameof(searchParams.Year)] = searchParams.Year.Value.ToString();
-        if (searchParams.Quarter.HasValue)
-            q[nameof(searchParams.Quarter)] = searchParams.Quarter.Value.ToString();
-        if (!string.IsNullOrEmpty(searchParams.ApplicationUserId))
-            q[nameof(searchParams.ApplicationUserId)] = searchParams.ApplicationUserId;
-        if (!string.IsNullOrEmpty(searchParams.ApplicationUserEmail))
-            q[nameof(searchParams.ApplicationUserEmail)] = searchParams.ApplicationUserEmail;
 
         var response = await _httpClient.GetAsync($"{_signaturePoolControllerPath}/GetSignaturePoolsBySearchParams?{q}");
 

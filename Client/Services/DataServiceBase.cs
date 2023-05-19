@@ -16,13 +16,29 @@ internal abstract class DataServiceBase
 
     public string GetBaseUrl() => _httpClient.BaseAddress.ToString();
 
-    protected NameValueCollection BuildQuery(SearchParamsDTO query)
+    protected NameValueCollection BuildQuery<T>(T query) where T : SearchParamsDTO
     {
         var q = HttpUtility.ParseQueryString(string.Empty);
-        q[nameof(query.CurrentPage)] = query.CurrentPage.ToString();
-        q[nameof(query.PageSize)] = query.PageSize.ToString();
-        q[nameof(query.SortOrder)] = query.SortOrder.ToString();
-        q[nameof(query.SortColumn)] = query.SortColumn.ToString();
+
+        var properties = typeof(T).GetProperties();
+        foreach (var property in properties)
+        {
+            var value = property.GetValue(query);
+            if (value != null)
+            {
+                if (property.PropertyType == typeof(DateTime) || property.PropertyType == typeof(DateTime?))
+                {
+                    var dateTimeValue = value as DateTime?;
+                    var formattedValue = dateTimeValue?.ToString("yyyy-MM-dd");
+                    q[property.Name] = formattedValue;
+                }
+                else
+                {
+                    q[property.Name] = value.ToString();
+                }
+            }
+        }
+
         return q;
     }
 

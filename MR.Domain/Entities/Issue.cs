@@ -9,7 +9,7 @@ public class Issue : BaseEntity<Guid>
     public ApplicationUser? CreatedBy { get; set; }
 
     //not null
-    public string Name { get; set; }
+    public string Title { get; set; }
     public string Question { get; set; }
     public bool IsVerifyByAdmin { get; set; } = false;
     //bazujac na tym statusie ustawiamy widocznosc

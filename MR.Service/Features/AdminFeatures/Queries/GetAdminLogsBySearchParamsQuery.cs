@@ -2,10 +2,10 @@
 
 public class GetAdminLogsBySearchParamsQuery : QueryBase, IRequest<PagedList<AdminLog>>
 {
-    public string Action { get; set; } = string.Empty;
-    public string ValuesText { get; set; } = string.Empty;
-    public bool LastMonth { get; set; } = false;
-    public bool LastHour { get; set; } = false;
+    public string? Action { get; set; }
+    public string? ValuesText { get; set; }
+    public bool? LastMonth { get; set; }
+    public bool? LastHour { get; set; }
 
     public class GetAdminLogsByQueryHandler : CommandHandlerBase<GetAdminLogsBySearchParamsQuery, PagedList<AdminLog>>
     {
@@ -20,21 +20,21 @@ public class GetAdminLogsBySearchParamsQuery : QueryBase, IRequest<PagedList<Adm
             // apply context search
             if (!string.IsNullOrEmpty(request.ValuesText))
             {
-                query = query.Where(log => log.Values.Contains(request.ValuesText));
+                query = query.Where(log => log.Values != null && log.Values.Contains(request.ValuesText));
             }
 
             if (!string.IsNullOrEmpty(request.Action))
             {
-                query = query.Where(log => log.Action.Contains(request.ValuesText));
+                query = query.Where(log => log.Action != null && log.Action.Contains(request.Action));
             }
 
-            if (request.LastMonth)
+            if (request.LastMonth.HasValue && request.LastMonth.Value)
             {
                 var lastMonth = DateTime.UtcNow.AddDays(-30);
                 query = query.Where(log => log.CreatedAt >= lastMonth);
             }
 
-            if (request.LastHour)
+            if (request.LastHour.HasValue && request.LastHour.Value)
             {
                 var lastHour = DateTime.UtcNow.AddHours(-1);
                 query = query.Where(log => log.CreatedAt >= lastHour);

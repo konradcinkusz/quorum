@@ -2,8 +2,8 @@
 
 public class GetSignaturePoolsBySearchParamsQuery : QueryBase, IRequest<PagedList<SignaturePool>>
 {
-    public string ApplicationUserId { get; set; } = string.Empty;
-    public string ApplicationUserEmail { get; set; } = string.Empty;
+    public string? ApplicationUserId { get; set; }
+    public string? ApplicationUserEmail { get; set; }
     public int? Year { get; set; }
     public int? Quarter { get; set; }
     public DateTime? Begin { get; set; }

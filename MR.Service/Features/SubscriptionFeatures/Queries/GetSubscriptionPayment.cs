@@ -2,7 +2,7 @@
 
 public class GetSubscriptionPayment : IRequest<Payment?>
 {
-    public string ApplicationUserId { get; set; }
+    public string? ApplicationUserId { get; set; }
 
     public class GetSubscriptionPaymentHandler : CommandHandlerBase<GetSubscriptionPayment, Payment?>
     {

@@ -26,14 +26,14 @@ public class PaymentController : MRBaseController
     [HttpGet("{id}")]
     public async Task<ActionResult<PaymentDTO>> GetPayment(Guid id)
     {
-        var payment = await Mediator.Send(new GetPaymentQuery { PaymentId = id });
+        var payment = await Mediator.Send(new GetPaymentsBySearchParamsQuery { PaymentId = id });
 
-        if (payment == null)
+        if (payment.FirstOrDefault() == null)
         {
             return NotFound();
         }
 
-        var paymentDto = _mapper.Map<PaymentDTO>(payment);
+        var paymentDto = _mapper.Map<PaymentDTO>(payment.FirstOrDefault());
 
         return paymentDto;
     }

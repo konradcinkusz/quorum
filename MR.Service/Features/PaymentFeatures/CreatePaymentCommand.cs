@@ -1,43 +1,43 @@
 ﻿namespace MR.Service.Features.PaymentFeatures;
-public class CreatePaymentCommand : IPaymentBaseFeature, IRequest<Guid>
+
+public class CreatePaymentCommand : IRequest<Guid>
 {
-    public PaymentStatus PaymentStatus { get; set; }
-    public string ApplicationUserId { get; set; }
-    public decimal PaymentValuePLN { get; set; }
-    public string PaymentMethod { get; set; } // the payment method used (e.g. credit card, PayPal, etc.)
-    public string ReferenceNumber { get; set; }// a reference number associated with the payment (e.g. transaction ID)
-    public class CreatePaymentCommandHandler : CommandHandlerBase<CreatePaymentCommand, Guid>
+    public PaymentStatus? PaymentStatus { get; set; }
+    public string? ApplicationUserId { get; set; }
+    public decimal? PaymentValuePLN { get; set; }
+    public string? PaymentMethod { get; set; }
+    public string? ReferenceNumber { get; set; }
+    public class CreatePaymentCommandHandler : CreateCommandHandlerBase<CreatePaymentCommand, Guid, Payment>
     {
-        public CreatePaymentCommandHandler(IApplicationDbContext context, ILogger<CreatePaymentCommand> logger)
-            : base(context, logger)
+        public CreatePaymentCommandHandler(IApplicationDbContext context, ILogger<CreatePaymentCommand> logger) : base(context, logger)
         {
         }
 
-        public override async Task<Guid> Handle(CreatePaymentCommand request, CancellationToken cancellationToken)
+        protected override Task<Payment> MakeAsync(CreatePaymentCommand command, CancellationToken cancellationToken)
         {
-            var payment = MakePayment(request);
-
-            await _context.Payments.AddAsync(payment, cancellationToken);
-            await _context.SaveChangesAsync(cancellationToken);
-
-            return payment.Id;
-        }
-
-        private Payment MakePayment(CreatePaymentCommand request)
-        {
-            return new Payment
+            var payment = new Payment
             {
-                PaymentMethod = request.PaymentMethod,
-                ReferenceNumber = request.ReferenceNumber,
-                PaymentStatus = request.PaymentStatus,
-                ApplicationUserId = request.ApplicationUserId,
-                PaymentValuePLN = request.PaymentValuePLN,
-                PaymentStatusHistories = new List<PaymentStatusHistory> {
-                    new PaymentStatusHistory {
-                        PaymentStatus = request.PaymentStatus
-                    }
-                }
+                PaymentMethod = command.PaymentMethod,
+                ReferenceNumber = command.ReferenceNumber,
+                ApplicationUserId = command.ApplicationUserId,
+                PaymentValuePLN = command.PaymentValuePLN.HasValue ? command.PaymentValuePLN.Value : 0,
+                PaymentStatusHistories = new List<PaymentStatusHistory>()
             };
+
+            PaymentStatus pStatus = Domain.Enums.PaymentStatus.None;
+
+            if (command.PaymentStatus.HasValue)
+            {
+                pStatus = command.PaymentStatus.Value;
+            }
+
+            payment.PaymentStatus = pStatus;
+            payment.PaymentStatusHistories.Add(new PaymentStatusHistory
+            {
+                PaymentStatus = pStatus
+            });
+
+            return Task.FromResult(payment);
         }
     }
 }

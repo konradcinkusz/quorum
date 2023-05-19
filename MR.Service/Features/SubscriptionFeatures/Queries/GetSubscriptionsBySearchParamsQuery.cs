@@ -2,8 +2,8 @@
 
 public class GetSubscriptionsBySearchParamsQuery : QueryBase, IRequest<PagedList<Subscription>>, ISubscriptionBaseCommand
 {
-    public string ApplicationUserId { get; set; }
-    public bool OnlyActives { get; set; }
+    public string? ApplicationUserId { get; set; }
+    public bool? OnlyActives { get; set; }
     public DateTime? Begin { get; set; }
     public DateTime? End { get; set; }
 
@@ -23,7 +23,7 @@ public class GetSubscriptionsBySearchParamsQuery : QueryBase, IRequest<PagedList
                 query = query.Where(p => p.ApplicationUserId == request.ApplicationUserId);
             }
             
-            if (request.OnlyActives)
+            if (request.OnlyActives.HasValue && request.OnlyActives.Value)
             {
                 var currentDate = DateTime.UtcNow;
                 query = query.Where(x => currentDate >= x.Begin && currentDate <= x.End);

@@ -1,6 +1,6 @@
 ﻿<div class="col-sm-@Width">
     <button class="btn btn-link" @onclick="@(() => SortData(Name))">
-        RatingValue
+        @Name
         @if (SearchParams.SortColumn == Name)
         {
             <i class="@GetSortIconClass(SearchParams.SortOrder)"></i>
