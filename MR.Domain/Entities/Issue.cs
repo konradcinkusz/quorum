@@ -17,6 +17,8 @@ public class Issue : BaseEntity<Guid>
     //Rating value na podstawie którego okreslamy miejsce w top10
     public int RatingValue { get; set; } = 0;
     public Payment? InitialPayment { get; set; }
+    public string? Icon { get; set; }
+    public string? BackgroundColor { get; set; }
 
     //Kwestia moze nalezec do wielu kwartalow, jezeli wlasciel ja np. przedluza
     [InverseProperty(nameof(QuarterIssue.Issue))]

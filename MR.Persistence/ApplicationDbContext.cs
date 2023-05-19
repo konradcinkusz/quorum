@@ -1,4 +1,6 @@
-﻿namespace MR.Persistence;
+﻿using MR.Domain.Base;
+
+namespace MR.Persistence;
 
 public interface IApplicationDbContext
 {
@@ -43,6 +45,30 @@ public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>, 
         base.OnModelCreating(modelBuilder);
     }
 
+    public override int SaveChanges()
+    {
+        UpdateCreatedAtProperty();
+        return base.SaveChanges();
+    }
+
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        UpdateCreatedAtProperty();
+        return base.SaveChangesAsync(cancellationToken);
+    }
+
+    private void UpdateCreatedAtProperty()
+    {
+        var entities = ChangeTracker.Entries()
+            .Where(e => e.State == EntityState.Added)
+            .Select(e => e.Entity)
+            .OfType<BaseEntity>();
+
+        foreach (var entity in entities)
+        {
+            entity.CreatedAt = DateTime.UtcNow;
+        }
+    }
     private void Logs_config(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Subscription>()

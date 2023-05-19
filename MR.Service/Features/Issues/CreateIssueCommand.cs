@@ -11,6 +11,9 @@ public class CreateIssueCommand : IRequest<Guid>
     public bool IsVerifyByAdmin { get; set; } = false;
     //bazujac na tym statusie ustawiamy widocznosc
     public IssueStatus IssueStatus { get; set; } = IssueStatus.NotVisible;
+    public string? Icon { get; set; }
+    public string? BackgroundColor { get; set; }
+    public int RatingValue { get; set; }
 
     public class CreateIssueCommandHandler : CreateCommandHandlerBase<CreateIssueCommand, Guid, Issue>
     {
@@ -20,16 +23,11 @@ public class CreateIssueCommand : IRequest<Guid>
         {
         }
 
-        protected override Task<Issue> MakeAsync(CreateIssueCommand command, CancellationToken cancellationToken)
+        protected override async Task<Issue> MakeAsync(CreateIssueCommand command, CancellationToken cancellationToken)
         {
-            return Task.FromResult(new Issue
-            {
-                CreatedById = command.ApplicationUserId,
-                Title = command.Title,
-                Question = command.Question,
-                IsVerifyByAdmin = command.IsVerifyByAdmin,
-                IssueStatus = command.IssueStatus
-            });
+            var issue = await base.MakeAsync(command, cancellationToken);
+            issue.CreatedById = command.ApplicationUserId;
+            return issue;
         }
     }
 }

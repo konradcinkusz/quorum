@@ -1,13 +1,15 @@
 ﻿namespace MR.Domain.Base;
+public abstract class BaseEntity
+{
+    public DateTime CreatedAt { get; set; }
+}
 
-public abstract class BaseEntity<Tkey> where Tkey : IEquatable<Tkey>
+public abstract class BaseEntity<Tkey> : BaseEntity where Tkey : IEquatable<Tkey>
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public virtual Tkey Id { get; set; }
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }
-
 public abstract class BaseEntityLog
 {
     [Key]

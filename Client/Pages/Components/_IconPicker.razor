@@ -1,0 +1,45 @@
+﻿<div class="icon-picker">
+    <input type="text" id="icon-value" class="form-control rounded-pill" @bind="@Icon" @oninput="UpdateIcon" style="display: none;" />
+    <div class="icon-gallery">
+        @foreach (var icon in Icons)
+        {
+            <div class="icon-item @(icon == Icon ? "selected" : "")" @onclick="() => SelectIcon(icon)">
+                <i class="@icon"></i>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string Icon { get; set; }
+
+    [Parameter]
+    public EventCallback<string> IconChanged { get; set; }
+
+    private List<string> Icons { get; set; } = new List<string>
+    {
+        "oi oi-home",
+        "oi oi-book",
+        "oi oi-person",
+        "oi oi-info",
+        "oi oi-globe",
+        "oi oi-cog",
+        "oi oi-heart",
+        "oi oi-star",
+        "oi oi-cart",
+        "oi oi-check"
+    };
+
+    private void UpdateIcon(ChangeEventArgs e)
+    {
+        Icon = e.Value.ToString();
+        IconChanged.InvokeAsync(Icon);
+    }
+
+    private void SelectIcon(string selectedIcon)
+    {
+        Icon = selectedIcon;
+        IconChanged.InvokeAsync(Icon);
+    }
+}

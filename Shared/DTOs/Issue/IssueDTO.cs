@@ -16,4 +16,6 @@ public class IssueDTO : BaseDTO
     //Rating value na podstawie którego okreslamy miejsce w top10
     public int RatingValue { get; set; } = 0;
     public PaymentDTO? InitialPayment { get; set; }
+    public string? Icon { get; set; }
+    public string? BackgroundColor { get; set; }
 }

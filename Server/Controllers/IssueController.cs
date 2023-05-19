@@ -53,9 +53,12 @@ public class IssueController : MRBaseController
         {
             ApplicationUserId = uId,
             IssueStatus = (IssueStatus)issueDTO.IssueStatus,
-            IsVerifyByAdmin = false,
+            IsVerifyByAdmin = issueDTO.IsVerifyByAdmin,
+            RatingValue = issueDTO.RatingValue,
             Question = issueDTO.Question,
             Title = issueDTO.Title,
+            Icon = issueDTO.Icon,
+            BackgroundColor = issueDTO.BackgroundColor,
         });
 
         return new ApiResponse<Guid> { Data = paymentId };

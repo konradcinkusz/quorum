@@ -1,0 +1,34 @@
+﻿<div class="color-picker">
+    @foreach (var color in Colors)
+    {
+        <div class="color-item @(color == SelectedColor ? "selected" : "")" style="background-color: @color" @onclick="() => SelectColor(color)">•</div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string SelectedColor { get; set; }
+
+    [Parameter]
+    public EventCallback<string> SelectedColorChanged { get; set; }
+
+    private List<string> Colors { get; set; } = new List<string>
+    {
+        "#eaf5e5", // Smooth green
+        "#d6edeb", // Smooth blue
+        "#c3e0c8", // Smooth mint
+        "#f5e1da", // Smooth peach
+        "#f6edcf", // Smooth yellow
+        "#f9e7d2", // Smooth coral
+        "#e1e7f2", // Smooth lavender
+        "#f0e4f1", // Smooth lilac
+        "#ead2d6", // Smooth rose
+        "#f2e5e7"  // Smooth blush
+    };
+
+    private async Task SelectColor(string color)
+    {
+        SelectedColor = color;
+        await SelectedColorChanged.InvokeAsync(SelectedColor);
+    }
+}

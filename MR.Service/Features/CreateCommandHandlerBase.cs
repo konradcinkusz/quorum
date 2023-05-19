@@ -19,5 +19,25 @@ public abstract class CreateCommandHandlerBase<TCommand, TResult, TCreate> : Com
         return created.Id;
     }
 
-    protected abstract Task<TCreate> MakeAsync(TCommand command, CancellationToken cancellationToken);
+    protected virtual Task<TCreate> MakeAsync(TCommand command, CancellationToken cancellationToken)
+    {
+        Type issueType = typeof(TCreate);
+
+        // Create a new instance of the Issue class using reflection
+        //use the null-forgiving operator (!) to indicate that you are certain the values won't be null. 
+        TCreate issue = (TCreate)Activator.CreateInstance(issueType)!;
+
+        // Set the property values using reflection
+        foreach (var property in issueType.GetProperties())
+        {
+            if (property.CanWrite)
+            {
+                var commandPropertyValue = typeof(TCommand).GetProperty(property.Name)?.GetValue(command);
+                property.SetValue(issue, commandPropertyValue!);
+            }
+        }
+
+        return Task.FromResult(issue);
+    }
+
 }

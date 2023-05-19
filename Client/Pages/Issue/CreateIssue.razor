@@ -57,6 +57,16 @@
                     <ValidationMessage For="@(() => dto.RatingValue)" />
                 </div>
 
+                <div class="col-md-6 mb-4">
+                    <label for="icon-value" class="form-label">Choose icon</label>
+                    <_IconPicker Icon="@dto.Icon" IconChanged="HandleIconChanged" />
+                </div>
+
+                <div class="col-md-6 mb-4">
+                    <label for="color-value" class="form-label">Choose color</label>
+                    <_ColorPicker SelectedColor="@dto.BackgroundColor" SelectedColorChanged="@HandleColorChanged" />
+                </div>
+
                 <div class="col-md-6 d-grid">
                     <button type="submit" class="btn btn-primary rounded-pill">Save Changes</button>
                 </div>
@@ -75,6 +85,15 @@
     private IssueDTO dto = new IssueDTO();
 
     private ApiResponse<Guid> result = null;
+
+    void HandleIconChanged(string selectedIcon)
+    {
+        dto.Icon = selectedIcon;
+    }
+    void HandleColorChanged(string selectedColor)
+    {
+        dto.BackgroundColor = selectedColor;
+    }
     private async Task Create()
     {
         result = await adminService.CreateIssue(dto);

@@ -9,7 +9,7 @@ public class AdminController : MRBaseController
         _configuration = configuration;
     }
 
-    [HttpGet(nameof(GetAdminLogsByQuery))]
+    [HttpGet("GetAdminLogsByQuery")]
     public async Task<ActionResult<AdminLogPagedListDTO>> GetAdminLogsByQuery([FromQuery] AdminLogSearchParamsDTO query)
     {
         var result = await Mediator.Send(new GetAdminLogsBySearchParamsQuery
@@ -29,7 +29,7 @@ public class AdminController : MRBaseController
         return Ok(new AdminLogPagedListDTO { Items = adminLogsDTO, CurrentPage = result.CurrentPage, PageSize = result.PageSize, TotalItems = result.TotalItems, TotalPages = result.TotalPages });
     }
 
-    [HttpPost(nameof(SeedPayments))]
+    [HttpPost("SeedPayments")]
     public async Task<IActionResult> SeedPayments([FromBody] SeedPaymentRequest seedPaymentRequest)
     {
         if (!_configuration.GetValue<bool>("SeedData:IsSeeded"))
@@ -44,7 +44,7 @@ public class AdminController : MRBaseController
     }
 
 
-    [HttpPost(nameof(ActivateSubscription))]
+    [HttpPost("ActivateSubscription")]
     public async Task<IActionResult> ActivateSubscription()
     {
         var result = await Mediator.Send(new ActivateSubscriptionCommand());
