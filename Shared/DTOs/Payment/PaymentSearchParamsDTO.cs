@@ -2,9 +2,8 @@
 
 public class PaymentSearchParamsDTO : SearchParamsDTO
 {
-    public string? ApplicationUserId { get; set; }
+    public string? ApplicationUserEmail { get; set; }
     public decimal? MinPaymentValuePLN { get; set; }
     public decimal? MaxPaymentValuePLN { get; set; }
-    public string? Description { get; set; }
 }
 

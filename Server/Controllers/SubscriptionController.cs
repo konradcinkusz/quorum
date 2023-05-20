@@ -87,12 +87,11 @@ public class SubscriptionController : MRBaseController
     {
         var result = await Mediator.Send(new GetPaymentsBySearchParamsQuery
         {
-            ApplicationUserId = GetUserId(),
+            ApplicationUserEmail = GetUserId(),
             SearchParams = new SearchParams
             {
                 CurrentPage = query.CurrentPage,
-                PageSize = query.PageSize,
-                Question = query.Description
+                PageSize = query.PageSize
             }
         });
 

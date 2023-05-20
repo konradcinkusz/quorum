@@ -1,4 +1,8 @@
-﻿@inject ISubscriptionService paymentService
+﻿@inherits BasePayment
+@page "/payments"
+@inject IPaymentService paymentService
+
+<PageTitle>Payments list</PageTitle>
 
 <AuthorizeView>
     <Authorized>
@@ -8,8 +12,10 @@
         }
         else
         {
-            <PaymentBrowser Refresh="_refresh"
-                        QuerySearch="PaymentQuerySearchDTO"></PaymentBrowser>
+            <BrowserPayment Refresh="_refresh"
+                        SearchParams="PaymentSearchParamsDTO"
+                        TotalItems="PaymentPagedListDto.TotalItems"
+                        TotalPages="PaymentPagedListDto.TotalPages" />
             @if (PaymentPagedListDto.Items.Count == 0)
             {
                 <p><em>Brak kwestii spełniających kryteria wyszukiwania...</em></p>
@@ -18,26 +24,18 @@
             {
                 <br />
                 <br />
-                <_Paging QueryBase="PaymentQuerySearchDTO"
-                 RefreshList="_refresh"
-                 TotalPages="PaymentPagedListDto.TotalPages"
-                 TotalItems="PaymentPagedListDto.TotalItems"></_Paging>
-
+                <HeaderPayment Refresh="_refresh"
+                                  QuerySearch="PaymentSearchParamsDTO"></HeaderPayment>
                 <div class="content">
                     <div class="container">
                         <div class="row align-content-center justify-content-center">
                             @foreach (var p in PaymentPagedListDto.Items)
                             {
-                                <PaymentReadForListBasic Payment="p"></PaymentReadForListBasic>
+                                <ReadPayment Payment="p"></ReadPayment>
                             }
                         </div>
                     </div>
                 </div>
-
-                <_Paging QueryBase="PaymentQuerySearchDTO"
-                 RefreshList="_refresh"
-                 TotalPages="PaymentPagedListDto.TotalPages"
-                 TotalItems="PaymentPagedListDto.TotalItems"></_Paging>
             }
         }
     </Authorized>
@@ -49,19 +47,19 @@
 </AuthorizeView>
 
 @code {
-    PaymentSearchParamsDTO PaymentQuerySearchDTO;
+    PaymentSearchParamsDTO PaymentSearchParamsDTO;
     PaymentPagedListDTO? PaymentPagedListDto;
 
     protected override async Task OnInitializedAsync()
     {
-        PaymentQuerySearchDTO = new PaymentSearchParamsDTO();
+        PaymentSearchParamsDTO = new PaymentSearchParamsDTO();
         await _refresh();
     }
 
     async Task _refresh()
     {
-        PaymentPagedListDto = await paymentService.GetMyPayments(PaymentQuerySearchDTO);
-        PaymentQuerySearchDTO.CurrentPage = PaymentPagedListDto.CurrentPage;
-        PaymentQuerySearchDTO.PageSize = PaymentPagedListDto.PageSize;
+        PaymentPagedListDto = await paymentService.GetPayments(PaymentSearchParamsDTO);
+        PaymentSearchParamsDTO.CurrentPage = PaymentPagedListDto.CurrentPage;
+        PaymentSearchParamsDTO.PageSize = PaymentPagedListDto.PageSize;
     }
 }

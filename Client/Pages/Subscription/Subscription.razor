@@ -21,7 +21,7 @@
 
         @if (subscriptionReadDTO.LastPayment != null && (subscriptionReadDTO.IsActive || subscriptionReadDTO.LastPayment.PaymentStatus == PaymentStatusEnum.Pending || subscriptionReadDTO.LastPayment.PaymentStatus == PaymentStatusEnum.Accepted))
         {
-            <PaymentReadForListBasic Payment="subscriptionReadDTO.LastPayment"></PaymentReadForListBasic>
+            <ReadPayment Payment="subscriptionReadDTO.LastPayment" />
         }
         else
         {
@@ -35,8 +35,6 @@
         </div>
     }
 </div>
-
-<PaymentListForBasicUserPage></PaymentListForBasicUserPage>
 
 @code {
     private SubscriptionReadDTO subscriptionReadDTO = new SubscriptionReadDTO();

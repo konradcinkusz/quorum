@@ -38,19 +38,18 @@ public class PaymentController : MRBaseController
         return paymentDto;
     }
 
-    [HttpGet(nameof(GetPaymentsByQuery))]
+    [HttpGet("GetPaymentsByQuery")]
     public async Task<ActionResult<PaymentPagedListDTO>> GetPaymentsByQuery([FromQuery] PaymentSearchParamsDTO query)
     {
         var result = await Mediator.Send(new GetPaymentsBySearchParamsQuery
         {
-            ApplicationUserId = query.ApplicationUserId,
+            ApplicationUserEmail = query.ApplicationUserEmail,
             MinPaymentValuePLN = query.MinPaymentValuePLN,
             MaxPaymentValuePLN = query.MaxPaymentValuePLN,
             SearchParams = new SearchParams
             {
                 CurrentPage = query.CurrentPage,
-                PageSize = query.PageSize,
-                Question = query.Description
+                PageSize = query.PageSize
             },
             SortColumn = query.SortColumn,
             SortOrder = (Microsoft.Data.SqlClient.SortOrder)query.SortOrder

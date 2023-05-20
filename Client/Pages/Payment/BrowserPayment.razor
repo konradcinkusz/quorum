@@ -1,0 +1,55 @@
+﻿@inherits BasePayment
+
+<div class="row domain-search bg-green rounded">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="row g-3 mt-2">
+                    <div class="col-md-9 col-sm-12">
+                        <input type="search" class="form-control rounded-pill" placeholder="User email" @bind-value="SearchParams.ApplicationUserEmail" @bind-value:event="oninput">
+                    </div>
+                    <div class="col-md-3 col-sm-12 text-end">
+                        <button type="submit" class="btn btn-outline-light btn-block rounded-pill" @onclick="ClearQuery"><span class="flex-center search">Clear</span></button>
+                        <button type="submit" class="btn btn-outline-light btn-block rounded-pill" @onclick="async () => await Refresh.InvokeAsync()"><span class="flex-center search">Search</span></button>
+                    </div>
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-3 col-sm-12">
+                        <label for="minValue" class="text-white">Minimum value</label>
+                        <input type="number" id="minValue" class="form-control rounded-pill" placeholder="User name" @bind-value="SearchParams.MinPaymentValuePLN" @bind-value:event="oninput">
+                    </div>
+                    <div class="col-md-3 col-sm-12">
+                        <label for="maxValue" class="text-white">Maximum value</label>
+                        <input type="number" id="maxValue" class="form-control rounded-pill" placeholder="User name" @bind-value="SearchParams.MaxPaymentValuePLN" @bind-value:event="oninput">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <_Paging QueryBase="SearchParams"
+                     RefreshList="async () => await Refresh.InvokeAsync()"
+                     TotalPages="TotalPages"
+                     TotalItems="TotalItems"></_Paging>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public PaymentSearchParamsDTO SearchParams { get; set; }
+    [Parameter]
+    public EventCallback Refresh { get; set; }
+    [Parameter]
+    public int TotalPages { get; set; }
+    [Parameter]
+    public int TotalItems { get; set; } = 0;
+
+    async Task ClearQuery()
+    {
+        SearchParams.ApplicationUserEmail = null;
+        SearchParams.MinPaymentValuePLN = null;
+        SearchParams.MaxPaymentValuePLN = null;
+        await Refresh.InvokeAsync();
+    }
+}
