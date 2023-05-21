@@ -23,10 +23,7 @@
             }
             @if (SignaturePoolPagedListDto.Items.Count == 0)
             {
-                <hr />
-                <div class="alert alert-danger" role="alert">
-                    <p><em>Brak kwestii spełniających kryteria wyszukiwania...</em></p>
-                </div>
+                <_Info Description="No signature pools for that search params" />
             }
             else
             {
@@ -46,9 +43,7 @@
         }
     </Authorized>
     <NotAuthorized>
-        <div class="m-2 p-2 font-weight-bold" style="background-color:grey">
-            You must be logged as a super admin user at least to see these page
-        </div>
+        <_Info />
     </NotAuthorized>
 </AuthorizeView>
 

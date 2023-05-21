@@ -2,46 +2,10 @@
 
 <div class="header-card">
     <div class="header-row mb-3">
-        <div class="col-sm-3">
-            <button class="btn btn-link" @onclick="@(() => SortData("Id"))">
-                Payment ID
-                @if (SearchParams.SortColumn == "Id")
-                {
-                    <i class="@GetSortIconClass(SearchParams.SortOrder)"></i>
-                }
-            </button>
-        </div>
-
-        <div class="col-sm-3">
-            <button class="btn btn-link" @onclick="@(() => SortData("ApplicationUserId"))">
-                User
-                @if (SearchParams.SortColumn == "ApplicationUserId")
-                {
-                    <i class="@GetSortIconClass(SearchParams.SortOrder)"></i>
-                }
-            </button>
-        </div>
-
-        <div class="col-sm-2">
-            <button class="btn btn-link" @onclick="@(() => SortData("PaymentValuePLN"))">
-                Value
-                @if (SearchParams.SortColumn == "PaymentValuePLN")
-                {
-                    <i class="@GetSortIconClass(SearchParams.SortOrder)"></i>
-                }
-            </button>
-        </div>
-
-        <div class="col-sm-2">
-            <button class="btn btn-link" @onclick="@(() => SortData("CreatedAt"))">
-                CreatedAt
-                @if (SearchParams.SortColumn == "CreatedAt")
-                {
-                    <i class="@GetSortIconClass(SearchParams.SortOrder)"></i>
-                }
-            </button>
-        </div>
-
+        <_HeaderButton Name="Id" Width="3" SearchParams="SearchParams" Refresh="async () => await Refresh.InvokeAsync()" />
+        <_HeaderButton Name="ApplicationUserId" Width="3" SearchParams="SearchParams" Refresh="async () => await Refresh.InvokeAsync()" />
+        <_HeaderButton Name="PaymentValuePLN" Width="2" SearchParams="SearchParams" Refresh="async () => await Refresh.InvokeAsync()" />
+        <_HeaderButton Name="CreatedAt" Width="2" SearchParams="SearchParams" Refresh="async () => await Refresh.InvokeAsync()" />
         <div class="col-sm-3">
             Actions:
         </div>

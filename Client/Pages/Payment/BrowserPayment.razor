@@ -48,9 +48,9 @@
 
     async Task ClearQuery()
     {
-        SearchParams.ApplicationUserEmail = null;
         SearchParams.MinPaymentValuePLN = null;
         SearchParams.MaxPaymentValuePLN = null;
+        SearchParams.ApplicationUserEmail = null;
         await Refresh.InvokeAsync();
     }
 }

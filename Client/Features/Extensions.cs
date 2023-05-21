@@ -2,6 +2,22 @@
 
 public static class Extensions
 {
+    public static void SetNullablePropertiesToNull<T>(ref T obj)
+    {
+        if (obj == null)
+            return;
+
+        var properties = obj.GetType().GetProperties();
+        foreach (var property in properties)
+        {
+            if (property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
+            {
+                property.SetValue(obj, null);
+            }
+        }
+    }
+
+
     public static List<string> ExtractStringList(string input)
     {
         // Check if input is null or empty

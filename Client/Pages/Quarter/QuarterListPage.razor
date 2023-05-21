@@ -13,23 +13,21 @@
         else
         {
             <QuarterBrowser Refresh="_refresh"
-                        QuerySearch="QuarterSearchParamsDTO"></QuarterBrowser>
+                        SearchParams="QuarterSearchParamsDTO"
+                        TotalPages="QuarterPagedListDto.TotalPages"
+                        TotalItems="QuarterPagedListDto.TotalItems"></QuarterBrowser>
             @if (result != null && !result.Success)
             {
                 <_ApiResponse T="QuarterPagedListDTO" result="result" />
             }
             @if (QuarterPagedListDto.Items.Count == 0)
             {
-                <p><em>Brak kwestii spełniających kryteria wyszukiwania...</em></p>
+                <_Info Description="No quarters for that search params" />
             }
             else
             {
                 <br />
                 <br />
-                <_Paging QueryBase="QuarterSearchParamsDTO"
-                 RefreshList="_refresh"
-                 TotalPages="QuarterPagedListDto.TotalPages"
-                 TotalItems="QuarterPagedListDto.TotalItems"></_Paging>
                 <HeaderQuarter Refresh="_refresh"
                        SearchParams="QuarterSearchParamsDTO"></HeaderQuarter>
                 <div class="content">
@@ -42,18 +40,11 @@
                         </div>
                     </div>
                 </div>
-
-                <_Paging QueryBase="QuarterSearchParamsDTO"
-                 RefreshList="_refresh"
-                 TotalPages="QuarterPagedListDto.TotalPages"
-                 TotalItems="QuarterPagedListDto.TotalItems"></_Paging>
             }
         }
     </Authorized>
     <NotAuthorized>
-        <div class="m-2 p-2 font-weight-bold" style="background-color:grey">
-            You must be logged as a super admin user at least to see these page
-        </div>
+        <_Info />
     </NotAuthorized>
 </AuthorizeView>
 
