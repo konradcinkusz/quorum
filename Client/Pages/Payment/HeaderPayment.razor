@@ -1,11 +1,13 @@
-﻿<div class="card">
-    <div class="row mb-3">
-        <div class="col-sm-2">
+﻿@inherits Header
+
+<div class="header-card">
+    <div class="header-row mb-3">
+        <div class="col-sm-3">
             <button class="btn btn-link" @onclick="@(() => SortData("Id"))">
                 Payment ID
-                @if (QuerySearch.SortColumn == "Id")
+                @if (SearchParams.SortColumn == "Id")
                 {
-                    <i class="@GetSortIconClass(QuerySearch.SortOrder)"></i>
+                    <i class="@GetSortIconClass(SearchParams.SortOrder)"></i>
                 }
             </button>
         </div>
@@ -13,9 +15,9 @@
         <div class="col-sm-3">
             <button class="btn btn-link" @onclick="@(() => SortData("ApplicationUserId"))">
                 User
-                @if (QuerySearch.SortColumn == "ApplicationUserId")
+                @if (SearchParams.SortColumn == "ApplicationUserId")
                 {
-                    <i class="@GetSortIconClass(QuerySearch.SortOrder)"></i>
+                    <i class="@GetSortIconClass(SearchParams.SortOrder)"></i>
                 }
             </button>
         </div>
@@ -23,9 +25,9 @@
         <div class="col-sm-2">
             <button class="btn btn-link" @onclick="@(() => SortData("PaymentValuePLN"))">
                 Value
-                @if (QuerySearch.SortColumn == "PaymentValuePLN")
+                @if (SearchParams.SortColumn == "PaymentValuePLN")
                 {
-                    <i class="@GetSortIconClass(QuerySearch.SortOrder)"></i>
+                    <i class="@GetSortIconClass(SearchParams.SortOrder)"></i>
                 }
             </button>
         </div>
@@ -33,9 +35,9 @@
         <div class="col-sm-2">
             <button class="btn btn-link" @onclick="@(() => SortData("CreatedAt"))">
                 CreatedAt
-                @if (QuerySearch.SortColumn == "CreatedAt")
+                @if (SearchParams.SortColumn == "CreatedAt")
                 {
-                    <i class="@GetSortIconClass(QuerySearch.SortOrder)"></i>
+                    <i class="@GetSortIconClass(SearchParams.SortOrder)"></i>
                 }
             </button>
         </div>
@@ -45,31 +47,3 @@
         </div>
     </div>
 </div>
-
-@code {
-    [Parameter]
-    public PaymentSearchParamsDTO QuerySearch { get; set; }
-    [Parameter]
-    public EventCallback Refresh { get; set; }
-
-    private async Task SortData(string column)
-    {
-        if (QuerySearch.SortColumn == column)
-        {
-            QuerySearch.SortOrder = QuerySearch.SortOrder == SortOrder.Ascending ? SortOrder.Descending : SortOrder.Ascending;
-        }
-        else
-        {
-            QuerySearch.SortColumn = column;
-            QuerySearch.SortOrder = SortOrder.Ascending;
-        }
-
-        // implement sorting logic based on the selected column and sort order
-        await Refresh.InvokeAsync();
-    }
-
-    private string GetSortIconClass(SortOrder order)
-    {
-        return order == SortOrder.Ascending ? "bi bi-caret-up" : "bi bi-caret-down";
-    }
-}

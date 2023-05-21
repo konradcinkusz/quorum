@@ -6,7 +6,8 @@
             <div class="col-md-12">
                 <div class="row g-3 mt-2">
                     <div class="col-md-9 col-sm-12">
-                        <input type="search" class="form-control rounded-pill" placeholder="User email" @bind-value="SearchParams.ApplicationUserEmail" @bind-value:event="oninput">
+                        <label for="userEmail" class="text-white">User email</label>
+                        <input type="search" id="userEmail" class="form-control rounded-pill" placeholder="Enter user email..." @bind-value="SearchParams.ApplicationUserEmail" @bind-value:event="oninput">
                     </div>
                     <div class="col-md-3 col-sm-12 text-end">
                         <button type="submit" class="btn btn-outline-light btn-block rounded-pill" @onclick="ClearQuery"><span class="flex-center search">Clear</span></button>
@@ -16,11 +17,11 @@
                 <div class="row g-3">
                     <div class="col-md-3 col-sm-12">
                         <label for="minValue" class="text-white">Minimum value</label>
-                        <input type="number" id="minValue" class="form-control rounded-pill" placeholder="User name" @bind-value="SearchParams.MinPaymentValuePLN" @bind-value:event="oninput">
+                        <input type="number" id="minValue" class="form-control rounded-pill" placeholder="Enter minimum value..." @bind-value="SearchParams.MinPaymentValuePLN" @bind-value:event="oninput">
                     </div>
                     <div class="col-md-3 col-sm-12">
                         <label for="maxValue" class="text-white">Maximum value</label>
-                        <input type="number" id="maxValue" class="form-control rounded-pill" placeholder="User name" @bind-value="SearchParams.MaxPaymentValuePLN" @bind-value:event="oninput">
+                        <input type="number" id="maxValue" class="form-control rounded-pill" placeholder="Enter maximum value..." @bind-value="SearchParams.MaxPaymentValuePLN" @bind-value:event="oninput">
                     </div>
                 </div>
             </div>

@@ -18,14 +18,14 @@
                         TotalPages="PaymentPagedListDto.TotalPages" />
             @if (PaymentPagedListDto.Items.Count == 0)
             {
-                <p><em>Brak kwestii spełniających kryteria wyszukiwania...</em></p>
+                <_Info Description="No payments for that search params" />
             }
             else
             {
                 <br />
                 <br />
                 <HeaderPayment Refresh="_refresh"
-                                  QuerySearch="PaymentSearchParamsDTO"></HeaderPayment>
+                       SearchParams="PaymentSearchParamsDTO"></HeaderPayment>
                 <div class="content">
                     <div class="container">
                         <div class="row align-content-center justify-content-center">
@@ -40,9 +40,7 @@
         }
     </Authorized>
     <NotAuthorized>
-        <div class="m-2 p-2 font-weight-bold" style="background-color:grey">
-            You must be logged as a super admin user at least to see these page
-        </div>
+        <_Info />
     </NotAuthorized>
 </AuthorizeView>
 

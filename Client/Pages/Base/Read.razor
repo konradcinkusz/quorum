@@ -1,0 +1,27 @@
+﻿@code {
+    [Parameter]
+    public string ShowDetailsButtonText { get; set; } = "Show Details";
+
+    [Parameter]
+    public string GetDetailsButtonText { get; set; } = "Get Details";
+
+    protected string DetailsCssClass => showDetails ? "d-block" : "d-none";
+
+    protected bool showDetails = false;
+
+    protected void ToggleDetails()
+    {
+        showDetails = !showDetails;
+
+        if (showDetails)
+        {
+            GetDetailsButtonText = "Hide Details";
+            ShowDetailsButtonText = GetDetailsButtonText;
+        }
+        else
+        {
+            GetDetailsButtonText = "Get Details";
+            ShowDetailsButtonText = GetDetailsButtonText;
+        }
+    }
+}
