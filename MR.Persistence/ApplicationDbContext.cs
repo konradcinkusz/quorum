@@ -1,6 +1,4 @@
-﻿using MR.Domain.Base;
-
-namespace MR.Persistence;
+﻿namespace MR.Persistence;
 
 public interface IApplicationDbContext
 {
@@ -49,6 +47,26 @@ public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>, 
     {
         UpdateCreatedAtProperty();
         return base.SaveChanges();
+    }
+
+    public override EntityEntry<TEntity> Remove<TEntity>(TEntity entity)
+    {
+        var entityEntry = Entry(entity);
+
+        if (entityEntry.State == EntityState.Deleted)
+        {
+            // If the entity is already marked for deletion, return the entity entry
+            return entityEntry;
+        }
+
+        // Otherwise, set the IsDeleted property to true and mark the entity as Modified
+        if (entityEntry.Entity is BaseEntity baseEntity)
+        {
+            baseEntity.IsDeleted = true;
+            entityEntry.State = EntityState.Modified;
+        }
+
+        return entityEntry;
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

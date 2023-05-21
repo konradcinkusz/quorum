@@ -2,6 +2,8 @@
 public abstract class BaseEntity
 {
     public DateTime CreatedAt { get; set; }
+    public DateTime? UpdatedAt { get; set; }
+    public bool IsDeleted { get; set; }
 }
 
 public abstract class BaseEntity<Tkey> : BaseEntity where Tkey : IEquatable<Tkey>
