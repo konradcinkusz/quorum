@@ -12,10 +12,10 @@
         }
         else
         {
-            <QuarterBrowser Refresh="_refresh"
+            <BrowserQuarter Refresh="_refresh"
                         SearchParams="QuarterSearchParamsDTO"
                         TotalPages="QuarterPagedListDto.TotalPages"
-                        TotalItems="QuarterPagedListDto.TotalItems"></QuarterBrowser>
+                        TotalItems="QuarterPagedListDto.TotalItems"></BrowserQuarter>
             @if (result != null && !result.Success)
             {
                 <_ApiResponse T="QuarterPagedListDTO" result="result" />

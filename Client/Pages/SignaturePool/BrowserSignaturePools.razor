@@ -6,7 +6,8 @@
             <div class="col-md-12">
                 <div class="row g-3 mt-2">
                     <div class="col-md-9 col-sm-12">
-                        <input type="search" class="form-control rounded-pill" placeholder="User name" @bind-value="SearchParams.ApplicationUserEmail" @bind-value:event="oninput">
+                        <label for="applicationUserEmail" class="text-white">ApplicationUserEmail</label>
+                        <input type="search" id="applicationUserEmail" class="form-control rounded-pill" placeholder="Enter user email..." @bind-value="SearchParams.ApplicationUserEmail" @bind-value:event="oninput">
                     </div>
                     <div class="col-md-3 col-sm-12 text-end">
                         <button type="submit" class="btn btn-outline-light btn-block rounded-pill" @onclick="ClearQuery"><span class="flex-center search">Clear</span></button>

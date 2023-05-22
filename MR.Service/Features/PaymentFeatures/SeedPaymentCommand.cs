@@ -1,6 +1,6 @@
 ﻿namespace MR.Service.Features.PaymentFeatures;
 
-public class SeedPaymentCommand : IRequest
+public class SeedPaymentCommand : IRequest<PagedList<Payment>>
 {
     public int Count { get; set; } = 1;
     public string ApplicationUserId { get; }
@@ -10,16 +10,18 @@ public class SeedPaymentCommand : IRequest
         ApplicationUserId = applicationUserId;
     }
 
-    public class SeedPaymentCommandHandler : CommandHandlerBase<SeedPaymentCommand, Unit>
+    public class SeedPaymentCommandHandler : CommandHandlerBase<SeedPaymentCommand, PagedList<Payment>>
     {
-
         public SeedPaymentCommandHandler(IApplicationDbContext context, ILogger<SeedPaymentCommand> logger)
             : base(context, logger)
         {
         }
 
-        public override async Task<Unit> Handle(SeedPaymentCommand request, CancellationToken cancellationToken)
+        public override async Task<PagedList<Payment>> Handle(SeedPaymentCommand request, CancellationToken cancellationToken)
         {
+            if (request.Count < 1)
+                request.Count = 1;
+
             var payments = new List<Payment>();
 
             for (int i = 0; i < request.Count; i++)
@@ -33,13 +35,15 @@ public class SeedPaymentCommand : IRequest
             {
                 Action = "Seed Payments",
                 Values = string.Join(", ", payments.Select(x => x.ReferenceNumber))
-            }); ;
+            }, cancellationToken);
 
             await _context.SaveChangesAsync(cancellationToken);
 
             _logger.LogInformation($"Seeded {payments.Count} payments.");
 
-            return Unit.Value;
+            var query = _context.Payments.Where(x => payments.Select(x => x.Id).Contains(x.Id)).AsQueryable();
+
+            return await PagedList<Payment>.CreateAsync(query, new SearchParams { PageSize = 1000 }, cancellationToken);
         }
 
     }

@@ -1,0 +1,49 @@
+﻿@inherits BaseAdmin
+@page "/admin/seeds/payments"
+@inject IAdminService adminService
+
+<PageTitle>Seed payments</PageTitle>
+
+<div class="car">
+    <div class="form-group">
+        <label for="countInput">Count:</label>
+        <input type="range" class="form-control" id="countInput" name="count" @bind-value="count" min="1" max="100" step="1">
+    </div>
+    <button class="btn btn-primary" @onclick="Seed">Seed Payments</button>
+    <div class="count-display">
+        <span class="count-label">Selected Count:</span>
+        <span class="count-value">@count</span>
+    </div>
+</div>
+
+@if (result != null)
+{
+    @if (result.Success)
+    {
+        <div class="content">
+            <div class="container">
+                <div class="row align-content-center justify-content-center">
+                    @foreach (var p in result.Data.Items)
+                    {
+                        <ReadPayment Payment="p"></ReadPayment>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <_Loading LoadingText="Payments list loading"></_Loading>
+    }
+}
+
+@code {
+    private int count = 1;
+
+    ApiResponse<PaymentPagedListDTO> result = null;
+    private async Task Seed()
+    {
+        result = new ApiResponse<PaymentPagedListDTO>() { Success = false };
+        result = await adminService.SeedPayments(new() { Count = count });
+    }
+}

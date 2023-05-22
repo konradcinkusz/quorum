@@ -3,7 +3,7 @@
 public interface IAdminService
 {
     Task<AdminLogPagedListDTO> GetAdminLogs(AdminLogSearchParamsDTO query);
-    Task<bool> SeedPayments(SeedPaymentRequest seedPaymentRequest);
+    Task<ApiResponse<PaymentPagedListDTO>> SeedPayments(SeedPaymentRequest seedPaymentRequest);
     Task<int> ActivateSubscription();
     Task<string> CreateSubscription(SubscriptionCreateForUserDTO SubscriptionDto);
     Task<SubscriptionPagedListDTO> GetSubscriptions(SubscriptionSearchParamsDTO query);
@@ -41,12 +41,12 @@ internal class AdminService : DataServiceBase, IAdminService
         return result ?? throw new Exception("Deserialized response is null.");
     }
 
-    public async Task<bool> SeedPayments(SeedPaymentRequest seedPaymentRequest)
+    public async Task<ApiResponse<PaymentPagedListDTO>> SeedPayments(SeedPaymentRequest seedPaymentRequest)
     {
-        var result = await _httpClient.PostAsJsonAsync($"{_adminControllerPath}/SeedPayments",
-                                                       seedPaymentRequest);
-        return result.IsSuccessStatusCode;
+        var endpoint = $"{_adminControllerPath}/SeedPayments";
+        return await HandleResponse<PaymentPagedListDTO>(async () => await _httpClient.PostAsJsonAsync(endpoint, seedPaymentRequest));
     }
+
     public async Task<string> CreateSubscription(SubscriptionCreateForUserDTO SubscriptionDto)
     {
         var response = await _httpClient.PostAsJsonAsync(

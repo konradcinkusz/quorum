@@ -1,0 +1,33 @@
+﻿.car {
+    background-color: #f0f0f0;
+    width: 300px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.form-group {
+    margin-bottom: 10px;
+}
+
+.btn {
+    margin-top: 10px;
+}
+
+.count-display {
+    margin-top: 10px;
+    font-size: 18px;
+}
+
+.count-label {
+    font-weight: bold;
+}
+
+.count-value {
+    margin-left: 5px;
+    background-color: #f0f0f0;
+    padding: 5px 10px;
+    border-radius: 5px;
+}

@@ -30,17 +30,24 @@ public class AdminController : MRBaseController
     }
 
     [HttpPost("SeedPayments")]
-    public async Task<IActionResult> SeedPayments([FromBody] SeedPaymentRequest seedPaymentRequest)
+    public async Task<ActionResult<ApiResponse<PaymentPagedListDTO>>> SeedPayments(
+        [FromBody] SeedPaymentRequest seedPaymentRequest)
     {
-        if (!_configuration.GetValue<bool>("SeedData:IsSeeded"))
-        {
-            var command = new SeedPaymentCommand(GetUserId()) { Count = seedPaymentRequest.Count };
-            await Mediator.Send(command);
-            _configuration["SeedData:IsSeeded"] = "true";
+        var result = await Mediator.Send(new SeedPaymentCommand(GetUserId()) { Count = seedPaymentRequest.Count });
 
-            return Ok();
-        }
-        return BadRequest("Data has already been seeded");
+        var paymentDTOs = _mapper.Map<List<PaymentDTO>>(result);
+        var response = new ApiResponse<PaymentPagedListDTO>(
+            new PaymentPagedListDTO
+            {
+                Items = paymentDTOs,
+                CurrentPage = result.CurrentPage,
+                PageSize = result.PageSize,
+                TotalItems = result.TotalItems,
+                TotalPages = result.TotalPages
+            })
+        { Success = true };
+
+        return response;
     }
 
 
