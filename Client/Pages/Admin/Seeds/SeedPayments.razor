@@ -4,15 +4,16 @@
 
 <PageTitle>Seed payments</PageTitle>
 
-<div class="car">
-    <div class="form-group">
+<div class="car MRCard">
+    <div class="form-group MRForm-group">
         <label for="countInput">Count:</label>
-        <input type="range" class="form-control" id="countInput" name="count" @bind-value="count" min="1" max="100" step="1">
+        <input type="range" class="form-control" id="countInput" name="count" 
+        value="@count" min="1" max="15" step="1" @oninput="UpdateCount">
     </div>
-    <button class="btn btn-primary" @onclick="Seed">Seed Payments</button>
-    <div class="count-display">
-        <span class="count-label">Selected Count:</span>
-        <span class="count-value">@count</span>
+    <button class="btn btn-primary MRBtn" @onclick="Seed">Seed Payments</button>
+    <div class="count-display MRCount-display">
+        <span class="count-label MRCount-label">Selected Count:</span>
+        <span class="count-value MRCount-value">@count</span>
     </div>
 </div>
 
@@ -45,5 +46,10 @@
     {
         result = new ApiResponse<PaymentPagedListDTO>() { Success = false };
         result = await adminService.SeedPayments(new() { Count = count });
+    }
+
+    void UpdateCount(ChangeEventArgs e)
+    {
+        count = Convert.ToInt32(e.Value);
     }
 }

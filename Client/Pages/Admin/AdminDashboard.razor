@@ -8,18 +8,6 @@
 
 <div class="container-fluid">
     <h1 class="mb-3">Dashboard</h1>
-
-    <div class="row">
-        <div class="col-md-12">
-            <ul class="nav flex-column">
-                <li class="nav-item">
-                    <a class="nav-link active" href="payments"><span class="oi oi-list mr-2"></span> Payments</a>
-                </li>
-            </ul>
-        </div>
-    </div>
-
-    <!-- Payment details -->
     <div class="row">
         <div class="btn-group my-2" role="group">
             <button class="btn btn-primary btn-sm" type="button" @onclick="ToggleDetails">@ShowDetailsButtonText</button>
@@ -78,11 +66,6 @@
             <button class="btn btn-primary btn-sm" type="button" @onclick="ToggleSubscriptionDetails">@ShowSubscriptionDetailsButtonText</button>
         </div>
 
-        <div class="col-md-12">
-            <button class="btn btn-primary" @onclick="ActivateSubscription">Activate Subscription</button>
-            <div>Activate Sub Count: @activatedSub</div>
-        </div>
-
         <div class="@DetailsSubscriptionCssClass">
             <div class="row mt-4">
                 <div class="col-md-12">
@@ -108,12 +91,6 @@
         AdminLogPagedListDto = await adminService.GetAdminLogs(AdminLogQuerySearchDTO);
         AdminLogQuerySearchDTO.CurrentPage = AdminLogPagedListDto.CurrentPage;
         AdminLogQuerySearchDTO.PageSize = AdminLogPagedListDto.PageSize;
-    }
-
-    private int activatedSub = 0;
-    private async Task ActivateSubscription()
-    {
-        activatedSub = await adminService.ActivateSubscription();
     }
 
     private string ShowDetailsButtonText { get; set; } = "Show payments details";

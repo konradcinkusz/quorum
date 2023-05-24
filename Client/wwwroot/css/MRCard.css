@@ -1,4 +1,4 @@
-﻿.car {
+﻿.MRCard {
     background-color: #f0f0f0;
     width: 300px;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
@@ -8,24 +8,24 @@
     justify-content: space-between;
 }
 
-.form-group {
+.MRForm-group {
     margin-bottom: 10px;
 }
 
-.btn {
+.MRBtn {
     margin-top: 10px;
 }
 
-.count-display {
+.MRCount-display {
     margin-top: 10px;
     font-size: 18px;
 }
 
-.count-label {
+.MRCount-label {
     font-weight: bold;
 }
 
-.count-value {
+.MRCount-value {
     margin-left: 5px;
     background-color: #f0f0f0;
     padding: 5px 10px;

@@ -1,8 +1,9 @@
 ﻿namespace MR.Service.Features.SubscriptionFeatures;
 
-public class ActivateSubscriptionCommand : IRequest<int>
+public class ActivateSubscriptionCommand : IRequest<PagedList<Subscription>>
 {
-    public class ActivateSubscriptionCommandHandler : CommandHandlerBase<ActivateSubscriptionCommand, int>
+    public class ActivateSubscriptionCommandHandler : 
+        CommandHandlerBase<ActivateSubscriptionCommand, PagedList<Subscription>>
     {
         public ActivateSubscriptionCommandHandler(
             IApplicationDbContext context, ILogger<ActivateSubscriptionCommand> logger)
@@ -10,7 +11,7 @@ public class ActivateSubscriptionCommand : IRequest<int>
         {
         }
 
-        public override async Task<int> Handle(ActivateSubscriptionCommand request, CancellationToken cancellationToken)
+        public override async Task<PagedList<Subscription>> Handle(ActivateSubscriptionCommand request, CancellationToken cancellationToken)
         {
             var query = _context.SubscriptionPayment
                 .Include(x => x.Subscription)
@@ -32,7 +33,10 @@ public class ActivateSubscriptionCommand : IRequest<int>
                     };
                 }
             }
-            return await _context.SaveChangesAsync(cancellationToken);
+            
+            var sum = await _context.SaveChangesAsync(cancellationToken);
+
+            return await PagedList<Subscription>.CreateAsync(query.Select(x => x.Subscription).AsQueryable(), new(), cancellationToken);
         }
     }
 }

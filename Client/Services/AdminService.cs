@@ -1,10 +1,13 @@
-﻿namespace MR.Client.Services;
+﻿using MR.Shared.DTOs.Admin;
+
+namespace MR.Client.Services;
 
 public interface IAdminService
 {
     Task<AdminLogPagedListDTO> GetAdminLogs(AdminLogSearchParamsDTO query);
     Task<ApiResponse<PaymentPagedListDTO>> SeedPayments(SeedPaymentRequest seedPaymentRequest);
-    Task<int> ActivateSubscription();
+    Task<ApiResponse<SubscriptionPagedListDTO>> ActivateSubscription(); 
+    Task<ApiResponse<SubscriptionPagedListDTO>> GetSubscriptionsThatCouldBeActivate();
     Task<string> CreateSubscription(SubscriptionCreateForUserDTO SubscriptionDto);
     Task<SubscriptionPagedListDTO> GetSubscriptions(SubscriptionSearchParamsDTO query);
     Task<ApiResponse<Guid>> InitQuarter(InitQuarterDTO quarter);
@@ -73,15 +76,6 @@ internal class AdminService : DataServiceBase, IAdminService
         });
 
         return result ?? throw new Exception("Deserialized response is null.");
-    }
-
-    public async Task<int> ActivateSubscription()
-    {
-        var response = await _httpClient.PostAsync($"{_adminControllerPath}/ActivateSubscription",
-                                                       null);
-        response.EnsureSuccessStatusCode();
-        var result = await response.Content.ReadFromJsonAsync<int>();
-        return result;
     }
 
     public async Task<ApiResponse<Guid>> InitQuarter(InitQuarterDTO quarter)
@@ -196,5 +190,19 @@ internal class AdminService : DataServiceBase, IAdminService
         }
 
         return apiResponse;
+    }
+
+    public async Task<ApiResponse<SubscriptionPagedListDTO>> GetSubscriptionsThatCouldBeActivate()
+    {
+        var endpoint = $"{_subscriptionControllerPath}/GetSubscriptionsThatCouldBeActivate";
+        return await HandleResponse<SubscriptionPagedListDTO>(async () => 
+        await _httpClient.GetAsync(endpoint));
+    }
+
+    public async Task<ApiResponse<SubscriptionPagedListDTO>> ActivateSubscription()
+    {
+        var endpoint = $"{_subscriptionControllerPath}/ActivateSubscription";
+        return await HandleResponse<SubscriptionPagedListDTO>(
+            async () => await _httpClient.PostAsync(endpoint, null));
     }
 }

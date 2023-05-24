@@ -1,0 +1,65 @@
+﻿@inherits BaseAdmin
+@page "/admin/activatesubscriptions"
+@inject IAdminService adminService
+<PageTitle>Activate subscriptions</PageTitle>
+
+@if (count > 0)
+{
+    <div class="car MRCard">
+        <div class="form-group MRForm-group">
+            <label for="countInput">Inactive count: </label>@count
+        </div>
+        <button class="btn btn-primary MRBtn" @onclick="Submit">Activate</button>
+    </div>
+}
+
+@if (result != null && result.Success && result.Data?.Items.Count > 0)
+{
+    <div class="content">
+        <div class="container">
+            <div class="row align-content-center justify-content-center">
+                @foreach (var p in result.Data.Items)
+                {
+                    <SubscriptionReadForList Subscription="p"></SubscriptionReadForList>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(message))
+{
+    <_Info Description="@message" />
+}
+
+@code {
+    private ApiResponse<SubscriptionPagedListDTO> result;
+    private int count;
+    private string message = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        result = await adminService.GetSubscriptionsThatCouldBeActivate();
+        count = result.Data.TotalItems;
+
+        if (count == 0)
+        {
+            message = "No subscriptions to activate";
+        }
+    }
+
+    private async Task Submit()
+    {
+        var res = await adminService.ActivateSubscription();
+
+        if (res.Success && res.Data.Items.Count == result.Data.Items.Count)
+        {
+            message = "All subscriptions activated successfully";
+            result = new ApiResponse<SubscriptionPagedListDTO>() { Success = false };
+        }
+        else
+        {
+            message = "Something went wrong, not all subscriptions activated";
+        }
+    }
+}

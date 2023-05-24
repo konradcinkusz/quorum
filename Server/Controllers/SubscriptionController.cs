@@ -7,20 +7,6 @@ public class SubscriptionController : MRBaseController
     {
     }
 
-    [Authorize(Policy = Policies.RequireAdminRole)]
-    [HttpPost(nameof(CreateSubscriptionForUser))]
-    public async Task<IActionResult> CreateSubscriptionForUser(SubscriptionCreateForUserDTO subscriptionDto)
-    {
-        var SubscriptionId = await Mediator.Send(new CreateSubscriptionCommand
-        {
-            ApplicationUserId = subscriptionDto.ApplicationUserId,
-            Begin = subscriptionDto.Begin,
-            End = subscriptionDto.End
-        });
-
-        return CreatedAtAction(nameof(GetSubscription), new { id = subscriptionDto.ApplicationUserId }, null);
-    }
-
     [HttpGet]
     public async Task<ActionResult<SubscriptionReadDTO>> GetSubscription()
     {
@@ -61,7 +47,23 @@ public class SubscriptionController : MRBaseController
         }
     }
 
+    [HttpGet("GetMyPayments")]
+    public async Task<ActionResult<PaymentPagedListDTO>> GetMyPayments([FromQuery] PaymentSearchParamsDTO query)
+    {
+        var result = await Mediator.Send(new GetPaymentsBySearchParamsQuery
+        {
+            ApplicationUserEmail = GetUserId(),
+            SearchParams = new SearchParams
+            {
+                CurrentPage = query.CurrentPage,
+                PageSize = query.PageSize
+            }
+        });
 
+        var paymentDTOs = _mapper.Map<List<PaymentDTO>>(result);
+
+        return Ok(new PaymentPagedListDTO { Items = paymentDTOs, CurrentPage = result.CurrentPage, PageSize = result.PageSize, TotalItems = result.TotalItems, TotalPages = result.TotalPages });
+    }
 
     [Authorize(Policy = Policies.RequireAdminRole)]
     [HttpGet(nameof(GetSubscriptionsByQuery))]
@@ -82,21 +84,50 @@ public class SubscriptionController : MRBaseController
         return Ok(new SubscriptionPagedListDTO { Items = subscriptionDTOs, CurrentPage = result.CurrentPage, PageSize = result.PageSize, TotalItems = result.TotalItems, TotalPages = result.TotalPages });
     }
 
-    [HttpGet(nameof(GetMyPayments))]
-    public async Task<ActionResult<PaymentPagedListDTO>> GetMyPayments([FromQuery] PaymentSearchParamsDTO query)
+    [Authorize(Policy = Policies.RequireAdminRole)]
+    [HttpPost(nameof(CreateSubscriptionForUser))]
+    public async Task<IActionResult> CreateSubscriptionForUser(SubscriptionCreateForUserDTO subscriptionDto)
     {
-        var result = await Mediator.Send(new GetPaymentsBySearchParamsQuery
+        var SubscriptionId = await Mediator.Send(new CreateSubscriptionCommand
         {
-            ApplicationUserEmail = GetUserId(),
-            SearchParams = new SearchParams
-            {
-                CurrentPage = query.CurrentPage,
-                PageSize = query.PageSize
-            }
+            ApplicationUserId = subscriptionDto.ApplicationUserId,
+            Begin = subscriptionDto.Begin,
+            End = subscriptionDto.End
         });
 
-        var paymentDTOs = _mapper.Map<List<PaymentDTO>>(result);
+        return CreatedAtAction(nameof(GetSubscription), new { id = subscriptionDto.ApplicationUserId }, null);
+    }
 
-        return Ok(new PaymentPagedListDTO { Items = paymentDTOs, CurrentPage = result.CurrentPage, PageSize = result.PageSize, TotalItems = result.TotalItems, TotalPages = result.TotalPages });
+    private async Task<ActionResult<ApiResponse<SubscriptionPagedListDTO>>> ProcessSubscriptionRequest<T>(T command)
+    {
+        var result = await Mediator.Send(command) as PagedList<Subscription>;
+
+        var DTOs = _mapper.Map<List<SubscriptionDTO>>(result);
+        var response = new ApiResponse<SubscriptionPagedListDTO>(
+            new SubscriptionPagedListDTO
+            {
+                Items = DTOs,
+                CurrentPage = result.CurrentPage,
+                PageSize = result.PageSize,
+                TotalItems = result.TotalItems,
+                TotalPages = result.TotalPages
+            })
+        { Success = true };
+
+        return response;
+    }
+
+    [Authorize(Policy = Policies.RequireAdminRole)]
+    [HttpPost("ActivateSubscription")]
+    public async Task<ActionResult<ApiResponse<SubscriptionPagedListDTO>>> ActivateSubscription()
+    {
+        return await ProcessSubscriptionRequest(new ActivateSubscriptionCommand());
+    }
+
+    [Authorize(Policy = Policies.RequireAdminRole)]
+    [HttpGet("GetSubscriptionsThatCouldBeActivate")]
+    public async Task<ActionResult<ApiResponse<SubscriptionPagedListDTO>>> GetSubscriptionsThatCouldBeActivate()
+    {
+        return await ProcessSubscriptionRequest(new GetSubscriptionsThatCouldBeActivateCommand());
     }
 }

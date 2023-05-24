@@ -49,12 +49,4 @@ public class AdminController : MRBaseController
 
         return response;
     }
-
-
-    [HttpPost("ActivateSubscription")]
-    public async Task<IActionResult> ActivateSubscription()
-    {
-        var result = await Mediator.Send(new ActivateSubscriptionCommand());
-        return Ok(result);
-    }
 }

@@ -2,8 +2,14 @@
 
 public class GetSubscriptionsBySearchParamsQuery : QueryBase, IRequest<PagedList<Subscription>>, ISubscriptionBaseCommand
 {
+    public enum ActivityEnum
+    {
+        All,
+        Active,
+        InActive
+    }
     public string? ApplicationUserId { get; set; }
-    public bool? OnlyActives { get; set; }
+    public ActivityEnum? Activity { get; set; }
     public DateTime? Begin { get; set; }
     public DateTime? End { get; set; }
 
@@ -23,10 +29,18 @@ public class GetSubscriptionsBySearchParamsQuery : QueryBase, IRequest<PagedList
                 query = query.Where(p => p.ApplicationUserId == request.ApplicationUserId);
             }
             
-            if (request.OnlyActives.HasValue && request.OnlyActives.Value)
+            if (request.Activity.HasValue && request.Activity.Value != ActivityEnum.All)
             {
                 var currentDate = DateTime.UtcNow;
-                query = query.Where(x => currentDate >= x.Begin && currentDate <= x.End);
+                switch (request.Activity.Value)
+                {
+                    case ActivityEnum.Active:
+                        query = query.Where(x => currentDate >= x.Begin && currentDate <= x.End);
+                        break;
+                    case ActivityEnum.InActive:
+                        query = query.Where(x => currentDate <= x.Begin && currentDate >= x.End);
+                        break;
+                }
             }
 
             if (request.Begin != null)
