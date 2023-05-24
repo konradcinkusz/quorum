@@ -8,6 +8,7 @@ public class GetSubscriptionsBySearchParamsQuery : QueryBase, IRequest<PagedList
         Active,
         InActive
     }
+    public string? ApplicationUserEmail { get; set; }
     public string? ApplicationUserId { get; set; }
     public ActivityEnum? Activity { get; set; }
     public DateTime? Begin { get; set; }

@@ -1,0 +1,56 @@
+﻿@inherits BaseAdmin
+
+<div class="row domain-search bg-green rounded">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="row g-3 mt-2">
+                    <div class="col-md-9 col-sm-12">
+                        <label for="userEmail" class="text-white">User email</label>
+                        <input type="search" id="userEmail" class="form-control rounded-pill" placeholder="Enter user email..." @bind-value="SearchParams.ApplicationUserEmail" @bind-value:event="oninput">
+                    </div>
+                    <div class="col-md-3 col-sm-12 text-end">
+                        <button type="submit" class="btn btn-outline-light btn-block rounded-pill" @onclick="ClearQuery"><span class="flex-center search">Clear</span></button>
+                        <button type="submit" class="btn btn-outline-light btn-block rounded-pill" @onclick="async () => await Refresh.InvokeAsync()"><span class="flex-center search">Search</span></button>
+                    </div>
+                </div>
+            </div>
+            <div class="row g-3">
+                <div class="col-md-3 col-sm-12">
+                    <label for="beginDate" class="text-white">Begin Date</label>
+                    <input type="date" id="beginDate" class="form-control rounded-pill" @bind="SearchParams.Begin" @bind:event="oninput">
+                </div>
+                <div class="col-md-3 col-sm-12">
+                    <label for="endDate" class="text-white">End Date</label>
+                    <input type="date" id="endDate" class="form-control rounded-pill" @bind="SearchParams.End" @bind:event="oninput">
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <_Paging QueryBase="SearchParams"
+                     RefreshList="async () => await Refresh.InvokeAsync()"
+                     TotalPages="TotalPages"
+                     TotalItems="TotalItems"></_Paging>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public SubscriptionSearchParamsDTO SearchParams { get; set; }
+    [Parameter]
+    public EventCallback Refresh { get; set; }
+    [Parameter]
+    public int TotalPages { get; set; }
+    [Parameter]
+    public int TotalItems { get; set; } = 0;
+
+    async Task ClearQuery()
+    {
+        SearchParams.ApplicationUserEmail = null;
+        SearchParams.Begin = null;
+        SearchParams.End = null;
+        await Refresh.InvokeAsync();
+    }
+}

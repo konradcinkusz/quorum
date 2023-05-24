@@ -7,6 +7,25 @@ public class SubscriptionController : MRBaseController
     {
     }
 
+    private async Task<ActionResult<ApiResponse<SubscriptionPagedListDTO>>> ProcessSubscriptionRequest<T>(T command)
+    {
+        var result = await Mediator.Send(command) as PagedList<Subscription>;
+
+        var DTOs = _mapper.Map<List<SubscriptionDTO>>(result);
+        var response = new ApiResponse<SubscriptionPagedListDTO>(
+            new SubscriptionPagedListDTO
+            {
+                Items = DTOs,
+                CurrentPage = result.CurrentPage,
+                PageSize = result.PageSize,
+                TotalItems = result.TotalItems,
+                TotalPages = result.TotalPages
+            })
+        { Success = true };
+
+        return response;
+    }
+
     [HttpGet]
     public async Task<ActionResult<SubscriptionReadDTO>> GetSubscription()
     {
@@ -66,22 +85,20 @@ public class SubscriptionController : MRBaseController
     }
 
     [Authorize(Policy = Policies.RequireAdminRole)]
-    [HttpGet(nameof(GetSubscriptionsByQuery))]
-    public async Task<ActionResult<SubscriptionPagedListDTO>> GetSubscriptionsByQuery([FromQuery] SubscriptionSearchParamsDTO query)
+    [HttpGet("GetSubscriptionsByQuery")]
+    public async Task<ActionResult<ApiResponse<SubscriptionPagedListDTO>>> 
+        GetSubscriptionsByQuery([FromQuery] SubscriptionSearchParamsDTO query)
     {
-        var result = await Mediator.Send(new GetSubscriptionsBySearchParamsQuery
+        var command = new GetSubscriptionsBySearchParamsQuery
         {
-            ApplicationUserId = query.ApplicationUserId,
-            SearchParams = new SearchParams
-            {
-                CurrentPage = query.CurrentPage,
-                PageSize = query.PageSize
-            }
-        });
+            ApplicationUserEmail = query.ApplicationUserEmail,
+            Begin = query.Begin,
+            End = query.End
+        };
 
-        var subscriptionDTOs = _mapper.Map<List<SubscriptionDTO>>(result);
+        AddSearchParamsToCommand(command, query);
 
-        return Ok(new SubscriptionPagedListDTO { Items = subscriptionDTOs, CurrentPage = result.CurrentPage, PageSize = result.PageSize, TotalItems = result.TotalItems, TotalPages = result.TotalPages });
+        return await ProcessSubscriptionRequest(command);
     }
 
     [Authorize(Policy = Policies.RequireAdminRole)]
@@ -98,24 +115,6 @@ public class SubscriptionController : MRBaseController
         return CreatedAtAction(nameof(GetSubscription), new { id = subscriptionDto.ApplicationUserId }, null);
     }
 
-    private async Task<ActionResult<ApiResponse<SubscriptionPagedListDTO>>> ProcessSubscriptionRequest<T>(T command)
-    {
-        var result = await Mediator.Send(command) as PagedList<Subscription>;
-
-        var DTOs = _mapper.Map<List<SubscriptionDTO>>(result);
-        var response = new ApiResponse<SubscriptionPagedListDTO>(
-            new SubscriptionPagedListDTO
-            {
-                Items = DTOs,
-                CurrentPage = result.CurrentPage,
-                PageSize = result.PageSize,
-                TotalItems = result.TotalItems,
-                TotalPages = result.TotalPages
-            })
-        { Success = true };
-
-        return response;
-    }
 
     [Authorize(Policy = Policies.RequireAdminRole)]
     [HttpPost("ActivateSubscription")]

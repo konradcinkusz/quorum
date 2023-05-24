@@ -1,0 +1,68 @@
+﻿@inherits BaseAdmin
+@page "/admin/subscriptions"
+@inject IAdminService subscriptionService
+
+<PageTitle>Subscription list admin page</PageTitle>
+
+<AuthorizeView>
+    <Authorized>
+        <CreateSubscriptionPage Refresh="_refresh"></CreateSubscriptionPage>
+        <br />
+        <hr />
+        @if (SubscriptionPagedListDto == null)
+        {
+            <_Loading LoadingText="Ładowanie listy subskrypcji" />
+        }
+        else
+        {
+            <BrowserSubscription Refresh="_refresh"
+                        SearchParams="SubscriptionSearchParamsDTO" />
+            @if (result != null && !result.Success)
+            {
+                <hr />
+                <_ApiResponse T="SubscriptionPagedListDTO" result="result" />
+            }
+            @if (SubscriptionPagedListDto.Items.Count == 0)
+            {
+                <_Info Description="No subs for that search params" />
+            }
+            else
+            {
+                <div class="content">
+                    <div class="container">
+                        <div class="row align-content-center justify-content-center">
+                            @foreach (var p in SubscriptionPagedListDto.Items)
+                            {
+                                <SubscriptionReadForList Subscription="p"></SubscriptionReadForList>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </Authorized>
+    <NotAuthorized>
+        <_Info />
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    SubscriptionSearchParamsDTO SubscriptionSearchParamsDTO;
+    SubscriptionPagedListDTO? SubscriptionPagedListDto;
+
+    private ApiResponse<SubscriptionPagedListDTO> result = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        SubscriptionSearchParamsDTO = new SubscriptionSearchParamsDTO();
+        await _refresh();
+    }
+
+    async Task _refresh()
+    {
+        result = await subscriptionService.GetSubscriptions(SubscriptionSearchParamsDTO);
+        SubscriptionPagedListDto = result.Data;
+        SubscriptionSearchParamsDTO.CurrentPage = SubscriptionPagedListDto.CurrentPage;
+        SubscriptionSearchParamsDTO.PageSize = SubscriptionPagedListDto.PageSize;
+    }
+}

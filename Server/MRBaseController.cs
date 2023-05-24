@@ -31,4 +31,15 @@ public abstract class MRBaseController : ControllerBase
             return errorResponse;
         }
     }
+
+    protected void AddSearchParamsToCommand<T>(T command, SearchParamsDTO searchParamsDTO) where T : QueryBase
+    {
+        command.SearchParams = new SearchParams
+        {
+            CurrentPage = searchParamsDTO.CurrentPage,
+            PageSize = searchParamsDTO.PageSize
+        };
+        command.SortColumn = searchParamsDTO.SortColumn;
+        command.SortOrder = (Microsoft.Data.SqlClient.SortOrder)searchParamsDTO.SortOrder;
+    }
 }

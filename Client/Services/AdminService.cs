@@ -6,10 +6,10 @@ public interface IAdminService
 {
     Task<AdminLogPagedListDTO> GetAdminLogs(AdminLogSearchParamsDTO query);
     Task<ApiResponse<PaymentPagedListDTO>> SeedPayments(SeedPaymentRequest seedPaymentRequest);
-    Task<ApiResponse<SubscriptionPagedListDTO>> ActivateSubscription(); 
+    Task<ApiResponse<SubscriptionPagedListDTO>> ActivateSubscription();
     Task<ApiResponse<SubscriptionPagedListDTO>> GetSubscriptionsThatCouldBeActivate();
+    Task<ApiResponse<SubscriptionPagedListDTO>> GetSubscriptions(SubscriptionSearchParamsDTO query);
     Task<string> CreateSubscription(SubscriptionCreateForUserDTO SubscriptionDto);
-    Task<SubscriptionPagedListDTO> GetSubscriptions(SubscriptionSearchParamsDTO query);
     Task<ApiResponse<Guid>> InitQuarter(InitQuarterDTO quarter);
     Task<ApiResponse<QuarterPagedListDTO>> GetQuarters(QuarterSearchParamsDTO searchParams);
     Task<ApiResponse<SignaturePoolsPagedListDTO>> GetSignaturePools(SignaturePoolsSearchParamsDTO searchParams);
@@ -58,24 +58,6 @@ internal class AdminService : DataServiceBase, IAdminService
         response.EnsureSuccessStatusCode();
 
         return response.Headers.Location.Segments.Last();
-    }
-
-    public async Task<SubscriptionPagedListDTO> GetSubscriptions(SubscriptionSearchParamsDTO query)
-    {
-        var q = BuildQuery(query);
-
-        var response = await _httpClient.GetAsync($"{_subscriptionControllerPath}/GetSubscriptionsByQuery?{q}");
-
-        response.EnsureSuccessStatusCode();
-
-        var content = await response.Content.ReadAsStringAsync();
-
-        var result = JsonSerializer.Deserialize<SubscriptionPagedListDTO>(content, new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        });
-
-        return result ?? throw new Exception("Deserialized response is null.");
     }
 
     public async Task<ApiResponse<Guid>> InitQuarter(InitQuarterDTO quarter)
@@ -195,7 +177,7 @@ internal class AdminService : DataServiceBase, IAdminService
     public async Task<ApiResponse<SubscriptionPagedListDTO>> GetSubscriptionsThatCouldBeActivate()
     {
         var endpoint = $"{_subscriptionControllerPath}/GetSubscriptionsThatCouldBeActivate";
-        return await HandleResponse<SubscriptionPagedListDTO>(async () => 
+        return await HandleResponse<SubscriptionPagedListDTO>(async () =>
         await _httpClient.GetAsync(endpoint));
     }
 
@@ -204,5 +186,13 @@ internal class AdminService : DataServiceBase, IAdminService
         var endpoint = $"{_subscriptionControllerPath}/ActivateSubscription";
         return await HandleResponse<SubscriptionPagedListDTO>(
             async () => await _httpClient.PostAsync(endpoint, null));
+    }
+
+    public async Task<ApiResponse<SubscriptionPagedListDTO>> GetSubscriptions(SubscriptionSearchParamsDTO query)
+    {
+        var q = BuildQuery(query);
+        var endpoint = $"{_subscriptionControllerPath}/GetSubscriptionsByQuery?{q}";
+        return await HandleResponse<SubscriptionPagedListDTO>(async () =>
+            await _httpClient.GetAsync(endpoint));
     }
 }
