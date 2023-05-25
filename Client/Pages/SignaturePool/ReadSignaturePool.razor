@@ -1,4 +1,5 @@
-﻿@inherits BaseAdmin
+﻿@inherits Read
+@inject IAdminService adminService
 
 <div class="card m-1 p-1">
     <div class="row mb-3">
@@ -73,31 +74,6 @@
     [Parameter]
     public EventCallback Refresh { get; set; }
 
-    [Parameter]
-    public string ShowDetailsButtonText { get; set; } = "Show Details";
-
-    [Parameter]
-    public string GetDetailsButtonText { get; set; } = "Get Details";
-
-    private string DetailsCssClass => showDetails ? "d-block" : "d-none";
-
-    private bool showDetails = false;
-
-    private void ToggleDetails()
-    {
-        showDetails = !showDetails;
-
-        if (showDetails)
-        {
-            GetDetailsButtonText = "Hide Details";
-            ShowDetailsButtonText = GetDetailsButtonText;
-        }
-        else
-        {
-            GetDetailsButtonText = "Get Details";
-            ShowDetailsButtonText = GetDetailsButtonText;
-        }
-    }
     private ApiResponse<bool> result = null;
 
     private async Task RemoveSignature(Guid signatureId)

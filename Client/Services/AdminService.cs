@@ -1,10 +1,8 @@
-﻿using MR.Shared.DTOs.Admin;
-
-namespace MR.Client.Services;
+﻿namespace MR.Client.Services;
 
 public interface IAdminService
 {
-    Task<AdminLogPagedListDTO> GetAdminLogs(AdminLogSearchParamsDTO query);
+    Task<ApiResponse<AdminLogPagedListDTO>> GetAdminLogs(AdminLogSearchParamsDTO query);
     Task<ApiResponse<PaymentPagedListDTO>> SeedPayments(SeedPaymentRequest seedPaymentRequest);
     Task<ApiResponse<SubscriptionPagedListDTO>> ActivateSubscription();
     Task<ApiResponse<SubscriptionPagedListDTO>> GetSubscriptionsThatCouldBeActivate();
@@ -26,22 +24,12 @@ internal class AdminService : DataServiceBase, IAdminService
     {
     }
 
-    public async Task<AdminLogPagedListDTO> GetAdminLogs(AdminLogSearchParamsDTO query)
+    public async Task<ApiResponse<AdminLogPagedListDTO>> GetAdminLogs(AdminLogSearchParamsDTO query)
     {
         var q = BuildQuery(query);
-
-        var response = await _httpClient.GetAsync($"{_adminControllerPath}/GetAdminLogsByQuery?{q}");
-
-        response.EnsureSuccessStatusCode();
-
-        var content = await response.Content.ReadAsStringAsync();
-
-        var result = JsonSerializer.Deserialize<AdminLogPagedListDTO>(content, new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        });
-
-        return result ?? throw new Exception("Deserialized response is null.");
+        var endpoint = $"{_adminControllerPath}/GetAdminLogsByQuery?{q}";
+        return await HandleResponse<AdminLogPagedListDTO>(async () =>
+            await _httpClient.GetAsync(endpoint));
     }
 
     public async Task<ApiResponse<PaymentPagedListDTO>> SeedPayments(SeedPaymentRequest seedPaymentRequest)

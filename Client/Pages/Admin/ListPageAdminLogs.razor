@@ -1,0 +1,61 @@
+﻿@inherits BaseAdmin
+@page "/admin/log-list"
+
+<PageTitle>Admin log list</PageTitle>
+
+@if (AdminLogPagedListDto == null)
+{
+    <_Loading LoadingText="Ładowanie listy logów administracyjnych" />
+}
+else
+{
+    <BrowserAdminLogs Refresh="_refresh"
+                  SearchParams="AdminLogQuerySearchDTO"
+                  TotalPages="AdminLogPagedListDto.TotalPages"
+                  TotalItems="AdminLogPagedListDto.TotalItems"></BrowserAdminLogs>
+    @if (result != null && !result.Success)
+    {
+        <hr />
+        <_ApiResponse T="AdminLogPagedListDTO" result="result" />
+    }
+    @if (AdminLogPagedListDto.Items.Count == 0)
+    {
+        <_Info Description="No logs for that search params" />
+    }
+    else
+    {
+        <HeaderAdminLogs Refresh="_refresh"
+                 SearchParams="AdminLogQuerySearchDTO" />
+        <div class="content">
+            <div class="container">
+                <div class="row align-content-center justify-content-center">
+                    @foreach (var p in AdminLogPagedListDto.Items)
+                    {
+                        <ReadAdminLog AdminLogDTO="p" />
+                    }
+                </div>
+            </div>
+        </div>
+    }
+}
+
+@code {
+    private AdminLogSearchParamsDTO AdminLogQuerySearchDTO;
+    private AdminLogPagedListDTO? AdminLogPagedListDto;
+
+    private ApiResponse<AdminLogPagedListDTO> result = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        AdminLogQuerySearchDTO = new AdminLogSearchParamsDTO();
+        await _refresh();
+    }
+
+    private async Task _refresh()
+    {
+        result = await adminService.GetAdminLogs(AdminLogQuerySearchDTO);
+        AdminLogPagedListDto = result.Data;
+        AdminLogQuerySearchDTO.CurrentPage = AdminLogPagedListDto.CurrentPage;
+        AdminLogQuerySearchDTO.PageSize = AdminLogPagedListDto.PageSize;
+    }
+}

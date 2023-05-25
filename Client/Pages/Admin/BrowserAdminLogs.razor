@@ -1,0 +1,57 @@
+﻿@inherits BaseAdmin
+
+<div class="row domain-search bg-green rounded">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="row g-3 mt-2">
+                    <div class="col-md-9 col-sm-12">
+                        <label for="valueText" class="text-white">Value text</label>
+                        <input type="search" id="valueText" class="form-control rounded-pill" placeholder="Enter value text phrase..." @bind-value="SearchParams.ValuesText" @bind-value:event="oninput">
+                    </div>
+                    <div class="col-md-3 col-sm-12 text-end">
+                        <button type="submit" class="btn btn-outline-light btn-block rounded-pill" @onclick="ClearQuery"><span class="flex-center search">Clear</span></button>
+                        <button type="submit" class="btn btn-outline-light btn-block rounded-pill" @onclick="async () => await Refresh.InvokeAsync()"><span class="flex-center search">Search</span></button>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-9 col-sm-12">
+                            <label for="actionLog" class="text-white">Action</label>
+                            <input type="search" id="actionLog" class="form-control rounded-pill" placeholder="Enter action phrase..." @bind-value="SearchParams.Action" @bind-value:event="oninput">
+                        </div>
+                        <div class="centered mt-2">
+                            <div> <input type="checkbox" name="r1" id="r1" @bind-value="SearchParams.LastHour" @bind-value:event="onchange"> <label for="r1" class="text-white font-weight-bold">Last hour</label> </div>
+                            <div> <input type="checkbox" name="r2" id="r2" @bind-value="SearchParams.LastMonth" @bind-value:event="onchange"> <label for="r2" class="text-white font-weight-bold">Last month</label> </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br />
+            <div class="row">
+                <_Paging QueryBase="SearchParams"
+                         RefreshList="async () => await Refresh.InvokeAsync()"
+                         TotalPages="TotalPages"
+                         TotalItems="TotalItems"></_Paging>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public AdminLogSearchParamsDTO SearchParams { get; set; }
+    [Parameter]
+    public EventCallback Refresh { get; set; }
+    [Parameter]
+    public int TotalPages { get; set; }
+    [Parameter]
+    public int TotalItems { get; set; } = 0;
+
+    async Task ClearQuery()
+    {
+        SearchParams.Action = null;
+        SearchParams.ValuesText = null;
+        SearchParams.LastHour = null;
+        SearchParams.LastMonth = null;
+        await Refresh.InvokeAsync();
+    }
+}

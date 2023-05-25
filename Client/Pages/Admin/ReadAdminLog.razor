@@ -1,0 +1,34 @@
+﻿@inherits Read
+
+<div class="card m-1 p-1">
+    <div class="row mb-3">
+        <div class="col-sm-3">
+            <p class="form-control-plaintext" id="Quarter-id">@AdminLogDTO.Action</p>
+        </div>
+        <div class="col-sm-3">
+            <p class="form-control-plaintext" id="Quarter-id">@AdminLogDTO.Values</p>
+        </div>
+        <div class="col-sm-3">
+            <p class="form-control-plaintext" id="Quarter-createdat">@AdminLogDTO.CreatedAt</p>
+        </div>
+        <div class="col-sm-3">
+            <div class="btn-group my-2" role="group">
+                <button class="btn btn-primary btn-sm" type="button" @onclick="ToggleDetails">@ShowDetailsButtonText</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="@DetailsCssClass">
+        <hr />
+        <h5>Admin Logs Details</h5>
+        <dl class="row mb-3">
+            <dt class="col-sm-3">Id</dt>
+            <dd class="col-sm-9">@AdminLogDTO.Id</dd>
+        </dl>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public AdminLogDTO AdminLogDTO { get; set; }
+}

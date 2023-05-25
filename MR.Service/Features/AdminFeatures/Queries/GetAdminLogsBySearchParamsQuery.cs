@@ -17,7 +17,6 @@ public class GetAdminLogsBySearchParamsQuery : QueryBase, IRequest<PagedList<Adm
         {
             var query = _context.Admin_Logs.AsQueryable();
 
-            // apply context search
             if (!string.IsNullOrEmpty(request.ValuesText))
             {
                 query = query.Where(log => log.Values != null && log.Values.Contains(request.ValuesText));
@@ -39,6 +38,8 @@ public class GetAdminLogsBySearchParamsQuery : QueryBase, IRequest<PagedList<Adm
                 var lastHour = DateTime.UtcNow.AddHours(-1);
                 query = query.Where(log => log.CreatedAt >= lastHour);
             }
+
+            query = ApplySorting(query, request.SortColumn, request.SortOrder);
 
             return await PagedList<AdminLog>.CreateAsync(query, request.SearchParams, cancellationToken);
         }

@@ -3,30 +3,44 @@
 [Authorize(Policy = Policies.RequireAdminRole)]
 public class AdminController : MRBaseController
 {
-    private readonly IConfiguration _configuration;
-    public AdminController(IMapper mapper, IConfiguration configuration) : base(mapper)
+    public AdminController(IMapper mapper) : base(mapper)
     {
-        _configuration = configuration;
+    }
+
+    private async Task<ActionResult<ApiResponse<AdminLogPagedListDTO>>> ProcessAdminRequest<T>(T command)
+    {
+        var result = await Mediator.Send(command) as PagedList<AdminLog>;
+
+        var DTOs = _mapper.Map<List<AdminLogDTO>>(result);
+        var response = new ApiResponse<AdminLogPagedListDTO>(
+            new AdminLogPagedListDTO
+            {
+                Items = DTOs,
+                CurrentPage = result.CurrentPage,
+                PageSize = result.PageSize,
+                TotalItems = result.TotalItems,
+                TotalPages = result.TotalPages
+            })
+        { Success = true };
+
+        return response;
     }
 
     [HttpGet("GetAdminLogsByQuery")]
-    public async Task<ActionResult<AdminLogPagedListDTO>> GetAdminLogsByQuery([FromQuery] AdminLogSearchParamsDTO query)
+    public async Task<ActionResult<ApiResponse<AdminLogPagedListDTO>>>
+        GetAdminLogsByQuery([FromQuery] AdminLogSearchParamsDTO query)
     {
-        var result = await Mediator.Send(new GetAdminLogsBySearchParamsQuery
+        var command = new GetAdminLogsBySearchParamsQuery
         {
-            SearchParams = new()
-            {
-                CurrentPage = query.CurrentPage,
-                PageSize = query.PageSize
-            },
             LastHour = query.LastHour,
             LastMonth = query.LastMonth,
             ValuesText = query.ValuesText,
-        });
+            Action = query.Action
+        };
 
-        var adminLogsDTO = _mapper.Map<List<AdminLogDTO>>(result);
+        AddSearchParamsToCommand(command, query);
 
-        return Ok(new AdminLogPagedListDTO { Items = adminLogsDTO, CurrentPage = result.CurrentPage, PageSize = result.PageSize, TotalItems = result.TotalItems, TotalPages = result.TotalPages });
+        return await ProcessAdminRequest(command);
     }
 
     [HttpPost("SeedPayments")]
