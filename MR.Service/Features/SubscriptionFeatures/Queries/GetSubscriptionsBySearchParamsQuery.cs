@@ -1,6 +1,6 @@
 ﻿namespace MR.Service.Features.SubscriptionFeatures.Queries;
 
-public class GetSubscriptionsBySearchParamsQuery : QueryBase, IRequest<PagedList<Subscription>>, ISubscriptionBaseCommand
+public class GetSubscriptionsBySearchParamsQuery : QueryBase, IRequest<PagedList<Subscription>>
 {
     public enum ActivityEnum
     {
@@ -8,13 +8,11 @@ public class GetSubscriptionsBySearchParamsQuery : QueryBase, IRequest<PagedList
         Active,
         InActive
     }
-    public string? ApplicationUserEmail { get; set; }
-    public string? ApplicationUserId { get; set; }
     public ActivityEnum? Activity { get; set; }
     public DateTime? Begin { get; set; }
     public DateTime? End { get; set; }
 
-    public class GetSubscriptionsBySearchParamsHandler : CommandHandlerBase<GetSubscriptionsBySearchParamsQuery, PagedList<Subscription>>
+    public class GetSubscriptionsBySearchParamsHandler : CommandQueryHandlerBase<GetSubscriptionsBySearchParamsQuery, PagedList<Subscription>>
     {
         public GetSubscriptionsBySearchParamsHandler(IApplicationDbContext context, ILogger<GetSubscriptionsBySearchParamsQuery> logger) : base(context, logger)
         {
@@ -22,14 +20,11 @@ public class GetSubscriptionsBySearchParamsQuery : QueryBase, IRequest<PagedList
 
         public override async Task<PagedList<Subscription>> Handle(GetSubscriptionsBySearchParamsQuery request, CancellationToken cancellationToken)
         {
-            var query = _context.Subscriptions
+            var query = _context.Subscriptions.Include(x => x.ApplicationUser)
                 .AsQueryable();
-            
-            if (!string.IsNullOrEmpty(request.ApplicationUserId))
-            {
-                query = query.Where(p => p.ApplicationUserId == request.ApplicationUserId);
-            }
-            
+
+            query = ApplyUserFilter(query, request);
+
             if (request.Activity.HasValue && request.Activity.Value != ActivityEnum.All)
             {
                 var currentDate = DateTime.UtcNow;
@@ -53,6 +48,8 @@ public class GetSubscriptionsBySearchParamsQuery : QueryBase, IRequest<PagedList
             {
                 query = query.Where(p => p.End <= request.End);
             }
+
+            query = ApplySorting(query, request.SortColumn, request.SortOrder);
 
             return await PagedList<Subscription>.CreateAsync(query, request.SearchParams, cancellationToken);
         }

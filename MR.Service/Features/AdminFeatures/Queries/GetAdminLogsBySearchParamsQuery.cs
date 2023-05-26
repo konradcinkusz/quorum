@@ -7,7 +7,7 @@ public class GetAdminLogsBySearchParamsQuery : QueryBase, IRequest<PagedList<Adm
     public bool? LastMonth { get; set; }
     public bool? LastHour { get; set; }
 
-    public class GetAdminLogsByQueryHandler : CommandHandlerBase<GetAdminLogsBySearchParamsQuery, PagedList<AdminLog>>
+    public class GetAdminLogsByQueryHandler : CommandQueryHandlerBase<GetAdminLogsBySearchParamsQuery, PagedList<AdminLog>>
     {
         public GetAdminLogsByQueryHandler(IApplicationDbContext context, ILogger<GetAdminLogsBySearchParamsQuery> logger) : base(context, logger)
         {

@@ -1,13 +1,13 @@
 ﻿@inherits BaseAdmin
-@page "/admin/activate-subscriptions"
+@page "/admin/subscription/activate-subscriptions"
 
 <PageTitle>Activate subscriptions</PageTitle>
 
-@if (count > 0)
+@if (result != null && result.Data?.TotalItems > 0)
 {
     <div class="car MRCard">
         <div class="form-group MRForm-group">
-            <label for="countInput">Inactive count: </label>@count
+                <label for="countInput">Inactive count: </label>@result.Data.TotalItems
         </div>
         <button class="btn btn-primary MRBtn" @onclick="Submit">Activate</button>
     </div>
@@ -20,7 +20,7 @@
             <div class="row align-content-center justify-content-center">
                 @foreach (var p in result.Data.Items)
                 {
-                    <SubscriptionReadForList Subscription="p"></SubscriptionReadForList>
+                    <ReadSubscription SubscriptionDTO="p" />
                 }
             </div>
         </div>
@@ -34,15 +34,14 @@
 
 @code {
     private ApiResponse<SubscriptionPagedListDTO> result;
-    private int count;
+
     private string message = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
         result = await adminService.GetSubscriptionsThatCouldBeActivate();
-        count = result.Data.TotalItems;
 
-        if (count == 0)
+        if (result.Data.TotalItems == 0)
         {
             message = "No subscriptions to activate";
         }

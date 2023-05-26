@@ -3,7 +3,7 @@
 public class GetIssuesBySearchParamsQuery : QueryBase, IRequest<PagedList<Issue>>
 {
     public string? CreatedByEmail { get; set; }
-    public class GetIssuesBySearchParamsQueryHandler : CommandHandlerBase<GetIssuesBySearchParamsQuery, PagedList<Issue>>
+    public class GetIssuesBySearchParamsQueryHandler : CommandQueryHandlerBase<GetIssuesBySearchParamsQuery, PagedList<Issue>>
     {
         public GetIssuesBySearchParamsQueryHandler(IApplicationDbContext context, ILogger<GetIssuesBySearchParamsQuery> logger) : base(context, logger)
         {

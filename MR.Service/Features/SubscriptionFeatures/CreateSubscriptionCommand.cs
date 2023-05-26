@@ -1,6 +1,6 @@
 ﻿namespace MR.Service.Features.SubscriptionFeatures;
 
-public class CreateSubscriptionCommand : ISubscriptionBaseCommand, IRequest<bool>
+public class CreateSubscriptionCommand : IRequest<bool>
 {
     public string ApplicationUserId { get; set; }
     public DateTime? Begin { get; set; }

@@ -2,14 +2,12 @@
 
 public class GetSignaturePoolsBySearchParamsQuery : QueryBase, IRequest<PagedList<SignaturePool>>
 {
-    public string? ApplicationUserId { get; set; }
-    public string? ApplicationUserEmail { get; set; }
     public int? Year { get; set; }
     public int? Quarter { get; set; }
     public DateTime? Begin { get; set; }
     public DateTime? End { get; set; }
 
-    public class GetSignaturePoolsByQueryHandler : CommandHandlerBase<GetSignaturePoolsBySearchParamsQuery, PagedList<SignaturePool>>
+    public class GetSignaturePoolsByQueryHandler : CommandQueryHandlerBase<GetSignaturePoolsBySearchParamsQuery, PagedList<SignaturePool>>
     {
         public GetSignaturePoolsByQueryHandler(IApplicationDbContext context, ILogger<GetSignaturePoolsBySearchParamsQuery> logger) :
             base(context, logger)
@@ -22,16 +20,7 @@ public class GetSignaturePoolsBySearchParamsQuery : QueryBase, IRequest<PagedLis
             var query = _context.SignaturePools
                 .Include(x=>x.Signatures).Include(x=>x.Quarter).Include(x=>x.ApplicationUser).AsQueryable();
 
-            if (!string.IsNullOrEmpty(request.ApplicationUserId))
-            {
-                query = query.Where(x => x.ApplicationUserId == request.ApplicationUserId);
-            }
-
-            if (!string.IsNullOrEmpty(request.ApplicationUserEmail))
-            {
-                query = query.Where(x => !string.IsNullOrEmpty(x.ApplicationUser.Email) &&
-                            x.ApplicationUser.Email.Contains(request.ApplicationUserEmail));
-            }
+            query = ApplyUserFilter(query, request);
 
             if (request.Year.HasValue)
             {
@@ -70,16 +59,6 @@ public class GetSignaturePoolsBySearchParamsQuery : QueryBase, IRequest<PagedLis
             {
                 switch (sortColumn)
                 {
-                    case "ApplicationUserEmail":
-                        if (sortOrder == SortOrder.Ascending)
-                        {
-                            query = query.OrderBy(p => (p as SignaturePool).ApplicationUser.Email);
-                        }
-                        else if (sortOrder == SortOrder.Descending)
-                        {
-                            query = query.OrderByDescending(p => (p as SignaturePool).ApplicationUser.Email);
-                        }
-                        break;
                     case "Year":
                         if (sortOrder == SortOrder.Ascending)
                         {

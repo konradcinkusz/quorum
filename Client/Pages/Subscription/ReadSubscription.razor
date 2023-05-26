@@ -1,0 +1,38 @@
+﻿@inherits Read
+
+<div class="card m-1 p-1">
+    <div class="row mb-3">
+        <div class="col-sm-2">
+            <p class="form-control-plaintext" id="user-email">@SubscriptionDTO.ApplicationUserEmail</p>
+        </div>
+        <div class="col-sm-2">
+            <p class="form-control-plaintext" id="begin-date">@SubscriptionDTO.Begin?.ToString("MM/dd/yyyy")</p>
+        </div>
+        <div class="col-sm-2">
+            <p class="form-control-plaintext" id="end-date">@SubscriptionDTO.End?.ToString("MM/dd/yyyy")</p>
+        </div>
+        <div class="col-sm-3">
+            <p class="form-control-plaintext" id="is-active">@SubscriptionDTO.IsActive</p>
+        </div>
+        <div class="col-sm-3">
+            <div class="btn-group my-2" role="group">
+                <button class="btn btn-primary btn-sm" type="button" @onclick="ToggleDetails">@ShowDetailsButtonText</button>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="@DetailsCssClass">
+        <hr />
+        <h5>Signature Pools Details</h5>
+        <dl class="row mb-3">
+            <dt class="col-sm-3">Id</dt>
+            <dd class="col-sm-9">@SubscriptionDTO.Id</dd>
+        </dl>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public SubscriptionDTO SubscriptionDTO { get; set; }
+}

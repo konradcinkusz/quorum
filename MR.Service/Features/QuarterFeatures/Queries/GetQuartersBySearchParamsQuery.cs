@@ -7,7 +7,7 @@ public class GetQuartersBySearchParamsQuery : QueryBase, IRequest<PagedList<Quar
     public DateTime? Begin { get; set; }
     public DateTime? End { get; set; }
 
-    public class GetQuartersByQueryHandler : CommandHandlerBase<GetQuartersBySearchParamsQuery, PagedList<Quarter>>
+    public class GetQuartersByQueryHandler : CommandQueryHandlerBase<GetQuartersBySearchParamsQuery, PagedList<Quarter>>
     {
         public GetQuartersByQueryHandler(IApplicationDbContext context, ILogger<GetQuartersBySearchParamsQuery> logger) : 
             base(context, logger)
@@ -44,7 +44,6 @@ public class GetQuartersBySearchParamsQuery : QueryBase, IRequest<PagedList<Quar
             }
 
             query = ApplySorting(query, request.SortColumn, request.SortOrder);
-
 
             var pagedList = await PagedList<Quarter>.CreateAsync(query, request.SearchParams, cancellationToken);
 

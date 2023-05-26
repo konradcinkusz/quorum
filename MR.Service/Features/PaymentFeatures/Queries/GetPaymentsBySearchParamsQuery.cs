@@ -4,14 +4,13 @@ public class GetPaymentsBySearchParamsQuery : QueryBase, IRequest<PagedList<Paym
 {
     public Guid? PaymentId { get; set; }
     public PaymentStatus? PaymentStatus { get; set; }
-    public string? ApplicationUserEmail { get; set; }
     public decimal? PaymentValuePLN { get; set; }
     public string? PaymentMethod { get; set; }
     public string? ReferenceNumber { get; set; }
     public decimal? MinPaymentValuePLN { get; set; }
     public decimal? MaxPaymentValuePLN { get; set; }
 
-    public class GetPaymentsByQueryHandler : CommandHandlerBase<GetPaymentsBySearchParamsQuery, PagedList<Payment>>
+    public class GetPaymentsByQueryHandler : CommandQueryHandlerBase<GetPaymentsBySearchParamsQuery, PagedList<Payment>>
     {
         public GetPaymentsByQueryHandler(IApplicationDbContext context, ILogger<GetPaymentsBySearchParamsQuery> logger) : base(context, logger)
         {
@@ -21,10 +20,7 @@ public class GetPaymentsBySearchParamsQuery : QueryBase, IRequest<PagedList<Paym
         {
             var query = _context.Payments.Include(x => x.PaymentStatusHistories).Include(x => x.ApplicationUser).AsQueryable();
 
-            if (!string.IsNullOrEmpty(request.ApplicationUserEmail))
-            {
-                query = query.Where(p => p.ApplicationUser != null && !string.IsNullOrEmpty(p.ApplicationUser.Email) && p.ApplicationUser.Email.Contains(request.ApplicationUserEmail));
-            }
+            query = ApplyUserFilter(query, request);
 
             if (!string.IsNullOrEmpty(request.PaymentMethod))
             {

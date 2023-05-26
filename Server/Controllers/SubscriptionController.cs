@@ -93,7 +93,8 @@ public class SubscriptionController : MRBaseController
         {
             ApplicationUserEmail = query.ApplicationUserEmail,
             Begin = query.Begin,
-            End = query.End
+            End = query.End,
+            Activity = (GetSubscriptionsBySearchParamsQuery.ActivityEnum?)query.Activity
         };
 
         AddSearchParamsToCommand(command, query);

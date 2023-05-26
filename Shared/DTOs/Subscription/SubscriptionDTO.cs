@@ -3,7 +3,7 @@
 public class SubscriptionDTO
 {
     public Guid Id { get; set; }
-    public string ApplicationUserId { get; set; }
+    public string ApplicationUserEmail { get; set; }
 
     public DateTime? Begin { get; set; }
     public DateTime? End { get; set; }
