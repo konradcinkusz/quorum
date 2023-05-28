@@ -116,7 +116,6 @@ public class SubscriptionController : MRBaseController
         return CreatedAtAction(nameof(GetSubscription), new { id = subscriptionDto.ApplicationUserId }, null);
     }
 
-
     [Authorize(Policy = Policies.RequireAdminRole)]
     [HttpPost("ActivateSubscription")]
     public async Task<ActionResult<ApiResponse<SubscriptionPagedListDTO>>> ActivateSubscription()
@@ -129,5 +128,19 @@ public class SubscriptionController : MRBaseController
     public async Task<ActionResult<ApiResponse<SubscriptionPagedListDTO>>> GetSubscriptionsThatCouldBeActivate()
     {
         return await ProcessSubscriptionRequest(new GetSubscriptionsThatCouldBeActivateCommand());
+    }
+
+    [Authorize(Policy = Policies.RequireAdminRole)]
+    [HttpPost("DeactivateSubscription")]
+    public async Task<ActionResult<ApiResponse<SubscriptionPagedListDTO>>> DeactivateSubscription()
+    {
+        return await ProcessSubscriptionRequest(new DeactivateSubscriptionCommand());
+    }
+
+    [Authorize(Policy = Policies.RequireAdminRole)]
+    [HttpGet("GetSubscriptionsThatCouldBeDeactivate")]
+    public async Task<ActionResult<ApiResponse<SubscriptionPagedListDTO>>> GetSubscriptionsThatCouldBeDeactivate()
+    {
+        return await ProcessSubscriptionRequest(new GetSubscriptionsThatCouldBeDeactivateCommand());
     }
 }

@@ -4,8 +4,10 @@ public interface IAdminService
 {
     Task<ApiResponse<AdminLogPagedListDTO>> GetAdminLogs(AdminLogSearchParamsDTO query);
     Task<ApiResponse<PaymentPagedListDTO>> SeedPayments(SeedPaymentRequest seedPaymentRequest);
-    Task<ApiResponse<SubscriptionPagedListDTO>> ActivateSubscription();
     Task<ApiResponse<SubscriptionPagedListDTO>> GetSubscriptionsThatCouldBeActivate();
+    Task<ApiResponse<SubscriptionPagedListDTO>> GetSubscriptionsThatCouldBeDeactivate();
+    Task<ApiResponse<SubscriptionPagedListDTO>> ActivateSubscription();
+    Task<ApiResponse<SubscriptionPagedListDTO>> DeactivateSubscription();
     Task<ApiResponse<SubscriptionPagedListDTO>> GetSubscriptions(SubscriptionSearchParamsDTO query);
     Task<string> CreateSubscription(SubscriptionCreateForUserDTO SubscriptionDto);
     Task<ApiResponse<Guid>> InitQuarter(InitQuarterDTO quarter);
@@ -168,6 +170,12 @@ internal class AdminService : DataServiceBase, IAdminService
         return await HandleResponse<SubscriptionPagedListDTO>(async () =>
         await _httpClient.GetAsync(endpoint));
     }
+    public async Task<ApiResponse<SubscriptionPagedListDTO>> GetSubscriptionsThatCouldBeDeactivate()
+    {
+        var endpoint = $"{_subscriptionControllerPath}/GetSubscriptionsThatCouldBeDeactivate";
+        return await HandleResponse<SubscriptionPagedListDTO>(async () =>
+        await _httpClient.GetAsync(endpoint));
+    }
 
     public async Task<ApiResponse<SubscriptionPagedListDTO>> ActivateSubscription()
     {
@@ -176,6 +184,12 @@ internal class AdminService : DataServiceBase, IAdminService
             async () => await _httpClient.PostAsync(endpoint, null));
     }
 
+    public async Task<ApiResponse<SubscriptionPagedListDTO>> DeactivateSubscription()
+    {
+        var endpoint = $"{_subscriptionControllerPath}/DeactivateSubscription";
+        return await HandleResponse<SubscriptionPagedListDTO>(
+            async () => await _httpClient.PostAsync(endpoint, null));
+    }
     public async Task<ApiResponse<SubscriptionPagedListDTO>> GetSubscriptions(SubscriptionSearchParamsDTO query)
     {
         var q = BuildQuery(query);
