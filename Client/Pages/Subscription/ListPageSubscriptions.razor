@@ -6,9 +6,6 @@
 
 <AuthorizeView>
     <Authorized>
-        <CreateSubscriptionPage Refresh="_refresh"></CreateSubscriptionPage>
-        <br />
-        <hr />
         @if (SubscriptionPagedListDto == null)
         {
             <_Loading LoadingText="Ładowanie listy subskrypcji" />

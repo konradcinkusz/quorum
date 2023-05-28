@@ -1,4 +1,6 @@
-﻿namespace MR.Server.Controllers;
+﻿using MR.Service;
+
+namespace MR.Server.Controllers;
 
 [Authorize]
 public class SubscriptionController : MRBaseController
@@ -26,23 +28,31 @@ public class SubscriptionController : MRBaseController
         return response;
     }
 
-    [HttpGet]
-    public async Task<ActionResult<SubscriptionReadDTO>> GetSubscription()
+    [HttpGet("get-subscription")]
+    public async Task<ActionResult<ApiResponse<SubscriptionReadDTO>>> GetSubscription()
     {
-        var Subscription = await Mediator.Send(new GetSubscriptionsBySearchParamsQuery { ApplicationUserId = GetUserId() });
+        var sub = await Mediator.Send(new GetSubscriptionsBySearchParamsQuery
+        { ApplicationUserId = GetUserId() });
 
-        if (Subscription == null || !Subscription.Any())
+        if (sub == null || !sub.Any())
         {
-            return NotFound();
+            return new ApiResponse<SubscriptionReadDTO>
+            {
+                Success = false,
+                StatusCode = (int)HttpStatusCode.NotFound
+            };
         }
 
-        var SubscriptionDto = _mapper.Map<SubscriptionReadDTO>(Subscription.FirstOrDefault());
+        var subscriptionDto = _mapper.Map<SubscriptionReadDTO>(sub.FirstOrDefault());
+        subscriptionDto.Price = 5;
 
-        SubscriptionDto.Price = 5;
         var payment = await Mediator.Send(new GetSubscriptionPayment { ApplicationUserId = GetUserId() });
         var paymentDTO = _mapper.Map<PaymentDTO>(payment);
-        SubscriptionDto.LastPayment = paymentDTO;
-        return SubscriptionDto;
+        subscriptionDto.LastPayment = paymentDTO;
+        return new ApiResponse<SubscriptionReadDTO>
+        {
+            Data = subscriptionDto
+        };
     }
 
     [HttpPost]
@@ -86,7 +96,7 @@ public class SubscriptionController : MRBaseController
 
     [Authorize(Policy = Policies.RequireAdminRole)]
     [HttpGet("GetSubscriptionsByQuery")]
-    public async Task<ActionResult<ApiResponse<SubscriptionPagedListDTO>>> 
+    public async Task<ActionResult<ApiResponse<SubscriptionPagedListDTO>>>
         GetSubscriptionsByQuery([FromQuery] SubscriptionSearchParamsDTO query)
     {
         var command = new GetSubscriptionsBySearchParamsQuery

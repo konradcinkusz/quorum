@@ -42,7 +42,12 @@ public abstract class CommandQueryHandlerBase<TCommand, TResult> : CommandHandle
 
         if (userIdProperty != null && !string.IsNullOrEmpty(queryBase.ApplicationUserId))
         {
-            query = query.Where(x => (string)userIdProperty.GetValue(x) == queryBase.ApplicationUserId);
+            var parameterExpression = Expression.Parameter(type, "x");
+            var userIdExpression = Expression.Property(parameterExpression, userIdProperty);
+            var valueExpression = Expression.Constant(queryBase.ApplicationUserId, typeof(string));
+            var equalExpression = Expression.Equal(userIdExpression, valueExpression);
+            var lambdaExpression = Expression.Lambda<Func<T, bool>>(equalExpression, parameterExpression);
+            query = query.Where(lambdaExpression);
         }
 
         if (emailProperty != null && !string.IsNullOrEmpty(queryBase.ApplicationUserEmail))
