@@ -1,4 +1,5 @@
 ﻿namespace MR.Domain.Base;
+
 public abstract class BaseEntity
 {
     public DateTime CreatedAt { get; set; }

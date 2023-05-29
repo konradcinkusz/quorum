@@ -47,6 +47,36 @@
         background-color: #0069d9;
     }
 
+.active-subscription-info {
+    margin-top: 1rem;
+    color: #28a745;
+    font-weight: bold;
+}
+
+.inactive-subscription-info {
+    margin-top: 1rem;
+    color: #dc3545;
+    font-weight: bold;
+}
+
 .payment-info {
     margin-top: 1rem;
+    background-color: #f9f9f9;
+    border-radius: 0.3rem;
+    padding: 1rem;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+    .payment-info > span {
+        font-weight: bold;
+        margin-right: 0.5rem;
+    }
+
+.payment-status {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+.payment-date {
+    color: #6c757d;
 }

@@ -20,7 +20,10 @@ public class GetSubscriptionsBySearchParamsQuery : QueryBase, IRequest<PagedList
 
         public override async Task<PagedList<Subscription>> Handle(GetSubscriptionsBySearchParamsQuery request, CancellationToken cancellationToken)
         {
-            var query = _context.Subscriptions.Include(x => x.ApplicationUser)
+            var query =
+                _context.Subscriptions
+                .Include(x => x.ApplicationUser)
+                .Include(x => x.SubscriptionPayments).ThenInclude(sp => sp.Payment)
                 .AsQueryable();
 
             query = ApplyUserFilter(query, request);

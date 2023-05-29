@@ -24,10 +24,18 @@
 
     <div class="@DetailsCssClass">
         <hr />
-        <h5>Signature Pools Details</h5>
+        <h5>Subscription Details</h5>
         <dl class="row mb-3">
             <dt class="col-sm-3">Id</dt>
-            <dd class="col-sm-9">@SubscriptionDTO.Id</dd>
+            <dd class="col-sm-9">@SubscriptionDTO.ApplicationUserId</dd>
+
+            <dt class="col-sm-12">Payments:</dt>
+            <dd class="col-sm-12">
+                @foreach (var p in SubscriptionDTO.PaymentDTOs)
+                {
+                    <ReadPayment Payment="p" />
+                }
+            </dd>
         </dl>
     </div>
 </div>

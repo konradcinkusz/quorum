@@ -1,6 +1,4 @@
-﻿using MR.Service;
-
-namespace MR.Server.Controllers;
+﻿namespace MR.Server.Controllers;
 
 [Authorize]
 public class SubscriptionController : MRBaseController
@@ -31,10 +29,12 @@ public class SubscriptionController : MRBaseController
     [HttpGet("get-subscription")]
     public async Task<ActionResult<ApiResponse<SubscriptionReadDTO>>> GetSubscription()
     {
-        var sub = await Mediator.Send(new GetSubscriptionsBySearchParamsQuery
-        { ApplicationUserId = GetUserId() });
+        var commandResult = await Mediator.Send(new GetSubscriptionsBySearchParamsQuery
+        {
+            ApplicationUserId = GetUserId()
+        });
 
-        if (sub == null || !sub.Any())
+        if (commandResult == null || !commandResult.Any())
         {
             return new ApiResponse<SubscriptionReadDTO>
             {
@@ -43,19 +43,23 @@ public class SubscriptionController : MRBaseController
             };
         }
 
-        var subscriptionDto = _mapper.Map<SubscriptionReadDTO>(sub.FirstOrDefault());
-        subscriptionDto.Price = 5;
+        var subscription = commandResult.FirstOrDefault();
+        var lastPayment = subscription?.SubscriptionPayments
+            .Select(x => x.Payment)
+            .OrderByDescending(x => x?.CreatedAt)
+            .FirstOrDefault();
 
-        var payment = await Mediator.Send(new GetSubscriptionPayment { ApplicationUserId = GetUserId() });
-        var paymentDTO = _mapper.Map<PaymentDTO>(payment);
-        subscriptionDto.LastPayment = paymentDTO;
+        var subscriptionDto = _mapper.Map<SubscriptionReadDTO>(subscription);
+        subscriptionDto.PaymentStatus = (PaymentStatusEnum?)lastPayment?.PaymentStatus;
+        subscriptionDto.PaymentDate = lastPayment?.CreatedAt;
+
         return new ApiResponse<SubscriptionReadDTO>
         {
             Data = subscriptionDto
         };
     }
 
-    [HttpPost]
+    [HttpPost("buy-subscription")]
     public async Task<ActionResult<ApiResponse<bool>>> BuySubscription()
     {
         try

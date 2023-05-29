@@ -2,31 +2,45 @@
 @page "/subscription"
 @inject ISubscriptionService subscriptionService
 
+<PageTitle>Sub & Payments</PageTitle>
+
 <div class="subscription-container">
-    <h2 class="subscription-header">Sub & payments</h2>
-
     <div class="subscription-info">
-        <div class="price">
-            <span>Price:</span> <span class="price-value">@subscriptionReadDTO.Price</span>
-        </div>
-        <div class="description">
-            <span>Description:</span> You will buy a subscription for premium portal features.
-        </div>
-
-        @if (subscriptionReadDTO.Begin != null && subscriptionReadDTO.End != null)
+        @if (subscriptionReadDTO.IsActive || subscriptionReadDTO.PaymentStatus == PaymentStatusEnum.Accepted)
         {
-            <div class="subscription-period">
-                <span>Subscription period:</span> @subscriptionReadDTO.Begin.Value.ToShortDateString() - @subscriptionReadDTO.End.Value.ToShortDateString()
+            <div class="active-subscription-info">
+                <span>You have an active subscription.</span>
+            </div>
+            @if (subscriptionReadDTO.Begin != null && subscriptionReadDTO.End != null)
+            {
+                <div class="subscription-period">
+                    <span>Subscription period:</span> @subscriptionReadDTO.Begin.Value.ToShortDateString() - @subscriptionReadDTO.End.Value.ToShortDateString()
+                </div>
+            }
+            <div class="payment-info">
+                <span>Your last payment status:</span>
+                <div class="payment-status">@subscriptionReadDTO.PaymentStatus</div>
+                <div class="payment-date">@subscriptionReadDTO.PaymentDate</div>
             </div>
         }
-
-        @if (subscriptionReadDTO.LastPayment != null && (subscriptionReadDTO.IsActive || subscriptionReadDTO.LastPayment.PaymentStatus == PaymentStatusEnum.Pending || subscriptionReadDTO.LastPayment.PaymentStatus == PaymentStatusEnum.Accepted))
+        else if (subscriptionReadDTO.PaymentStatus == PaymentStatusEnum.Pending)
         {
-            <ReadPayment Payment="subscriptionReadDTO.LastPayment" />
+            <div class="active-subscription-info">
+                <span>You have bought subscription and we are waiting for your payment. </span>
+                <span>Transfer any amount to the account: XXX XXX, providing your PESEL number in the title.</span>
+            </div>
+            <div class="payment-info">
+                <span>Your last payment status: </span>
+                <div class="payment-status">@subscriptionReadDTO.PaymentStatus </div>
+                <div class="payment-date">@subscriptionReadDTO.PaymentDate</div>
+            </div>
         }
         else
         {
-            <button class="buy-subscription-button" @onclick="Buy">Buy subscription</button>
+            <div class="inactive-subscription-info">
+                <span>You do not have an active subscription.</span>
+                <button class="buy-subscription-button" @onclick="Buy">Buy subscription</button>
+            </div>
         }
     </div>
     @if (!string.IsNullOrEmpty(appUserResult))
@@ -40,7 +54,7 @@
 @code {
     private SubscriptionReadDTO subscriptionReadDTO = new SubscriptionReadDTO();
     ApiResponse<SubscriptionReadDTO>? result = null;
-    
+
     protected async override Task OnInitializedAsync()
     {
         result = await subscriptionService.GetSubscription();
@@ -50,6 +64,6 @@
     private string appUserResult { get; set; } = string.Empty;
     private async Task Buy()
     {
-        appUserResult = await subscriptionService.Buy();
+        appUserResult = await subscriptionService.BuySubscription();
     }
 }
