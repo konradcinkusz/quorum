@@ -15,6 +15,12 @@
                     </div>
                 </div>
                 <div class="row g-3">
+                    <div class="col-md-9 col-sm-9">
+                        <label for="paymentId" class="text-white">Payment Id (full or just a part)</label>
+                        <input type="search" id="paymentId" class="form-control rounded-pill" placeholder="Enter part of payment ID" @bind-value="SearchParams.PaymentId" @bind-value:event="oninput">
+                    </div>
+                </div>
+                <div class="row g-3">
                     <div class="col-md-3 col-sm-12">
                         <label for="minValue" class="text-white">Minimum value</label>
                         <input type="number" id="minValue" class="form-control rounded-pill" placeholder="Enter minimum value..." @bind-value="SearchParams.MinPaymentValuePLN" @bind-value:event="oninput">

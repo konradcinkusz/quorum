@@ -2,7 +2,12 @@
 
 public class BuySubscriptionCommand : IRequest<bool>
 {
-    public string ApplicationUserId { get; set; }
+    public readonly string ApplicationUserId;
+
+    public BuySubscriptionCommand(string applicationUserId)
+    {
+        ApplicationUserId = applicationUserId;
+    }
 
     public class BuySubscriptionCommandHandler : CommandHandlerBase<BuySubscriptionCommand, bool>
     {
@@ -13,15 +18,21 @@ public class BuySubscriptionCommand : IRequest<bool>
 
         public override async Task<bool> Handle(BuySubscriptionCommand request, CancellationToken cancellationToken)
         {
-            var activeSubscriptionExists = await _context.Subscriptions.Include(x=>x.SubscriptionPayments).ThenInclude(x=>x.Payment)
-                .FirstAsync(s => s.ApplicationUserId == request.ApplicationUserId);
+            var userSub = 
+                await _context.Subscriptions.Include(x=>x.SubscriptionPayments).ThenInclude(x=>x.Payment)
+                .FirstOrDefaultAsync(s => s.ApplicationUserId == request.ApplicationUserId, cancellationToken);
 
-            if (activeSubscriptionExists.IsActive())
+            if (userSub == null)
+            {
+                throw new ApplicationException("User don't have subscription record, contact with admin. Subscription had to been added while registering.");
+            }
+
+            if (userSub.IsActive())
             {
                 throw new ApplicationException("User already has an active subscription");
             }
 
-            if (activeSubscriptionExists.SubscriptionPayments.Any(x=> x.Payment != null 
+            if (userSub.SubscriptionPayments.Any(x=> x.Payment != null 
                 && x.Payment.PaymentStatus == PaymentStatus.Pending))
             {
                 throw new ApplicationException("User has pending payment for that subscription");
@@ -31,8 +42,9 @@ public class BuySubscriptionCommand : IRequest<bool>
             {
                 ApplicationUserId = request.ApplicationUserId,
                 PaymentMethod = "Bank",
+                ReferenceNumber = "any amount of money",
                 PaymentStatus = PaymentStatus.Pending,
-                PaymentValuePLN = 5,
+                PaymentValuePLN = 0.01M,
                 PaymentStatusHistories = new List<PaymentStatusHistory>()
                     {
                         new PaymentStatusHistory {

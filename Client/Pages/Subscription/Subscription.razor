@@ -1,4 +1,5 @@
 ﻿@inherits Read
+@attribute [Authorize]
 @page "/subscription"
 @inject ISubscriptionService subscriptionService
 
@@ -6,64 +7,76 @@
 
 <div class="subscription-container">
     <div class="subscription-info">
-        @if (subscriptionReadDTO.IsActive || subscriptionReadDTO.PaymentStatus == PaymentStatusEnum.Accepted)
+        @if (result == null)
         {
-            <div class="active-subscription-info">
-                <span>You have an active subscription.</span>
-            </div>
+                <div class="active-subscription-info row">
+                    <div class="col-md-12">
+                        <_Info Description="Please wait, sub page is loading..." TextColor="#b58900" BackgroundColor="#eae8e8" />
+                    </div>
+                </div>
+        }
+        else if (subscriptionReadDTO.IsActive && subscriptionReadDTO.PaymentStatus == PaymentStatusEnum.Completed)
+        {
+                <_HelperReadActiveSubscription SubscriptionReadDTO="@subscriptionReadDTO"
+                Infos="@(new List<string> {"You have an active subscription."})"/>
             @if (subscriptionReadDTO.Begin != null && subscriptionReadDTO.End != null)
             {
-                <div class="subscription-period">
-                    <span>Subscription period:</span> @subscriptionReadDTO.Begin.Value.ToShortDateString() - @subscriptionReadDTO.End.Value.ToShortDateString()
-                </div>
+                        <div class="subscription-period">
+                            <span>Subscription period:</span> @subscriptionReadDTO.Begin.Value.ToShortDateString() - @subscriptionReadDTO.End.Value.ToShortDateString()
+                        </div>
             }
-            <div class="payment-info">
-                <span>Your last payment status:</span>
-                <div class="payment-status">@subscriptionReadDTO.PaymentStatus</div>
-                <div class="payment-date">@subscriptionReadDTO.PaymentDate</div>
-            </div>
+        }
+        else if (!subscriptionReadDTO.IsActive && subscriptionReadDTO.PaymentStatus == PaymentStatusEnum.Accepted)
+        {
+                <_HelperReadActiveSubscription SubscriptionReadDTO="@subscriptionReadDTO"
+                Infos="@(new List<string> {"Payment has been accepted. Waiting for admin activation."})"/>
         }
         else if (subscriptionReadDTO.PaymentStatus == PaymentStatusEnum.Pending)
         {
-            <div class="active-subscription-info">
-                <span>You have bought subscription and we are waiting for your payment. </span>
-                <span>Transfer any amount to the account: XXX XXX, providing your PESEL number in the title.</span>
-            </div>
-            <div class="payment-info">
-                <span>Your last payment status: </span>
-                <div class="payment-status">@subscriptionReadDTO.PaymentStatus </div>
-                <div class="payment-date">@subscriptionReadDTO.PaymentDate</div>
-            </div>
+                <_HelperReadActiveSubscription SubscriptionReadDTO="@subscriptionReadDTO"
+                Infos="@(new List<string> {"You have bought subscription and we are waiting for your payment.", 
+                    "Transfer any amount to the account: XXX XXX, providing your PESEL number in the title. After the transfer, you need to wait for up to 3 days for payment approval. Once the payment is approved, the annual subscription is automatically accepted."})" />
         }
         else
         {
-            <div class="inactive-subscription-info">
-                <span>You do not have an active subscription.</span>
-                <button class="buy-subscription-button" @onclick="Buy">Buy subscription</button>
-            </div>
+            @if (appUserResult == null)
+            {
+                        <div class="inactive-subscription-info">
+                            <span>You do not have an active subscription.</span>
+                            <button class="buy-subscription-button" @onclick="Buy">Buy subscription</button>
+                        </div>
+            }
+            else
+            {
+                        <div class="alert alert-success" role="alert">
+                            <_ApiResponse result="appUserResult" />
+                        </div>
+            }
         }
     </div>
-    @if (!string.IsNullOrEmpty(appUserResult))
-    {
-        <div class="alert alert-success" role="alert">
-            <span>@appUserResult</span>
-        </div>
-    }
 </div>
 
 @code {
     private SubscriptionReadDTO subscriptionReadDTO = new SubscriptionReadDTO();
-    ApiResponse<SubscriptionReadDTO>? result = null;
+    private ApiResponse<SubscriptionReadDTO>? result = null;
 
     protected async override Task OnInitializedAsync()
     {
-        result = await subscriptionService.GetSubscription();
-        subscriptionReadDTO = result?.Data;
+        await _refresh();
     }
 
-    private string appUserResult { get; set; } = string.Empty;
+    private ApiResponse<bool>? appUserResult { get; set; } = null;
     private async Task Buy()
     {
         appUserResult = await subscriptionService.BuySubscription();
+        await _refresh(5000);
+    }
+
+    private async Task _refresh(int delay_miliseconds = 0)
+    {
+        if (delay_miliseconds > 0)
+            await Task.Delay(delay_miliseconds); // Delay for delay seconds
+        result = await subscriptionService.GetSubscription();
+        subscriptionReadDTO = result?.Data;
     }
 }

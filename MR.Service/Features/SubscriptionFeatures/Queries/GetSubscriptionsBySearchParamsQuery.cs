@@ -23,7 +23,7 @@ public class GetSubscriptionsBySearchParamsQuery : QueryBase, IRequest<PagedList
             var query =
                 _context.Subscriptions
                 .Include(x => x.ApplicationUser)
-                .Include(x => x.SubscriptionPayments).ThenInclude(sp => sp.Payment)
+                .Include(x => x.SubscriptionPayments).ThenInclude(sp => sp.Payment).ThenInclude(spH => spH.PaymentStatusHistories)
                 .AsQueryable();
 
             query = ApplyUserFilter(query, request);

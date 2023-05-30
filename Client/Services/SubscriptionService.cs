@@ -3,7 +3,7 @@
 public interface ISubscriptionService
 {
     Task<ApiResponse<SubscriptionReadDTO>> GetSubscription();
-    Task<string> BuySubscription();
+    Task<ApiResponse<bool>> BuySubscription();
     Task<PaymentPagedListDTO> GetMyPayments(PaymentSearchParamsDTO query);
 }
 
@@ -13,13 +13,11 @@ internal class SubscriptionService : DataServiceBase, ISubscriptionService
     {
     }
 
-    public async Task<string> BuySubscription()
+    public async Task<ApiResponse<bool>> BuySubscription()
     {
         var endpoint = $"{_subscriptionControllerPath}/buy-subscription";
-        var response = await _httpClient.PostAsync(endpoint, null);
-        var apiResponse = await response.Content.ReadFromJsonAsync<ApiResponse<bool>>();
-
-        return apiResponse.Message.ToString();
+        return await HandleResponse<bool>(async () =>
+                    await _httpClient.PostAsync(endpoint, null));
     }
 
     public async Task<ApiResponse<SubscriptionReadDTO>> GetSubscription()

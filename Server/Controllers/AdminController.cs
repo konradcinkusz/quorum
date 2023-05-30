@@ -8,20 +8,30 @@ public class AdminController : MRBaseController
     }
 
     private async Task<ActionResult<ApiResponse<AdminLogPagedListDTO>>> ProcessAdminRequest<T>(T command)
+    where T : notnull
     {
         var result = await Mediator.Send(command) as PagedList<AdminLog>;
 
+        if (result is null)
+        {
+            // Handle the case when result is null, for example by returning an appropriate error response
+            return new ApiResponse<AdminLogPagedListDTO>
+                ("Failed to process the admin log request.", (int)HttpStatusCode.BadRequest);
+        }
         var DTOs = _mapper.Map<List<AdminLogDTO>>(result);
-        var response = new ApiResponse<AdminLogPagedListDTO>(
-            new AdminLogPagedListDTO
+        var response =
+            new ApiResponse<AdminLogPagedListDTO>(
+                new AdminLogPagedListDTO
+                {
+                    Items = DTOs,
+                    CurrentPage = result.CurrentPage,
+                    PageSize = result.PageSize,
+                    TotalItems = result.TotalItems,
+                    TotalPages = result.TotalPages
+                })
             {
-                Items = DTOs,
-                CurrentPage = result.CurrentPage,
-                PageSize = result.PageSize,
-                TotalItems = result.TotalItems,
-                TotalPages = result.TotalPages
-            })
-        { Success = true };
+                Success = true
+            };
 
         return response;
     }

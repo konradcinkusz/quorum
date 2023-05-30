@@ -1,0 +1,22 @@
+﻿<div class="active-subscription-info row">
+    @foreach (var i in Infos)
+    {
+        <div class="col-md-12">
+            <_Info Description="@i" TextColor="#28a745" BackgroundColor="#eae8e8" />
+        </div>
+    }
+</div>
+<div class="payment-info row">
+    <div class="col-md-12">
+        <span>Your last payment status: </span>
+    </div>
+    <div class="payment-status col-md-12">@SubscriptionReadDTO.PaymentStatus </div>
+    <div class="payment-date col-md-12">At: @SubscriptionReadDTO.PaymentDate</div>
+</div>
+
+@code {
+    [Parameter]
+    public SubscriptionReadDTO SubscriptionReadDTO { get; set; }
+    [Parameter]
+    public List<string> Infos { get; set; }
+}

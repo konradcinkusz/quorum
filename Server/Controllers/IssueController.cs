@@ -1,6 +1,4 @@
-﻿using MR.Service.Features.Issues;
-
-namespace MR.Server.Controllers;
+﻿namespace MR.Server.Controllers;
 
 public class IssueController : MRBaseController
 {

@@ -8,20 +8,30 @@ public class SubscriptionController : MRBaseController
     }
 
     private async Task<ActionResult<ApiResponse<SubscriptionPagedListDTO>>> ProcessSubscriptionRequest<T>(T command)
+    where T : notnull
     {
         var result = await Mediator.Send(command) as PagedList<Subscription>;
 
+        if (result is null)
+        {
+            // Handle the case when result is null, for example by returning an appropriate error response
+            return new ApiResponse<SubscriptionPagedListDTO>("Failed to process the subscription request.", (int)HttpStatusCode.BadRequest);
+        }
+
         var DTOs = _mapper.Map<List<SubscriptionDTO>>(result);
-        var response = new ApiResponse<SubscriptionPagedListDTO>(
-            new SubscriptionPagedListDTO
+        var response =
+            new ApiResponse<SubscriptionPagedListDTO>(
+                new SubscriptionPagedListDTO
+                {
+                    Items = DTOs,
+                    CurrentPage = result.CurrentPage,
+                    PageSize = result.PageSize,
+                    TotalItems = result.TotalItems,
+                    TotalPages = result.TotalPages
+                })
             {
-                Items = DTOs,
-                CurrentPage = result.CurrentPage,
-                PageSize = result.PageSize,
-                TotalItems = result.TotalItems,
-                TotalPages = result.TotalPages
-            })
-        { Success = true };
+                Success = true
+            };
 
         return response;
     }
@@ -64,10 +74,9 @@ public class SubscriptionController : MRBaseController
     {
         try
         {
-            var uId = GetUserId();
-            var subscription = await Mediator.Send(new BuySubscriptionCommand { ApplicationUserId = uId });
+            var subscription = await Mediator.Send(new BuySubscriptionCommand(GetUserId()));
 
-            if (subscription == null || !subscription)
+            if (!subscription)
             {
                 return new ApiResponse<bool> { StatusCode = (int)HttpStatusCode.NotFound, Success = false, Message = "Subscription not found" };
             }

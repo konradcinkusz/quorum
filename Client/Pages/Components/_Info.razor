@@ -20,7 +20,7 @@
 
     .info-content {
         font-weight: bold;
-        color: white;
+        color: @TextColor;
         transition: opacity 0.3s;
     }
 
@@ -32,6 +32,9 @@
 @code {
     [Parameter]
     public string BackgroundColor { get; set; } = "grey";
+
+    [Parameter]
+    public string TextColor { get; set; } = "white";
 
     [Parameter]
     public string Description { get; set; } = "You must be logged in as a super admin user at least to see this page.";

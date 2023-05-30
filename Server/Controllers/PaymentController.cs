@@ -41,8 +41,11 @@ public class PaymentController : MRBaseController
     [HttpGet("GetPaymentsByQuery")]
     public async Task<ActionResult<PaymentPagedListDTO>> GetPaymentsByQuery([FromQuery] PaymentSearchParamsDTO query)
     {
+        Guid.TryParse(query.PaymentId, out Guid paymentGuid);
+
         var result = await Mediator.Send(new GetPaymentsBySearchParamsQuery
         {
+            PaymentId = paymentGuid,
             ApplicationUserEmail = query.ApplicationUserEmail,
             MinPaymentValuePLN = query.MinPaymentValuePLN,
             MaxPaymentValuePLN = query.MaxPaymentValuePLN,
