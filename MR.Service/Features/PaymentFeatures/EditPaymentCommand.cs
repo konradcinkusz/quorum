@@ -42,6 +42,5 @@ public class EditPaymentCommand : IRequest<Guid>
 
             return payment.Id;
         }
-
     }
 }

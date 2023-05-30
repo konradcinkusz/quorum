@@ -2,10 +2,13 @@
 
 public class CreateSubscriptionCommand : IRequest<bool>
 {
-    public string ApplicationUserId { get; set; }
+    public readonly string ApplicationUserId;
     public DateTime? Begin { get; set; }
     public DateTime? End { get; set; }
-
+    public CreateSubscriptionCommand(string applicationUserId)
+    {
+        ApplicationUserId = applicationUserId;
+    }
     public class CreateSubscriptionCommandHandler : CommandHandlerBase<CreateSubscriptionCommand, bool>
     {
         public CreateSubscriptionCommandHandler(IApplicationDbContext context, ILogger<CreateSubscriptionCommand> logger)
@@ -15,14 +18,24 @@ public class CreateSubscriptionCommand : IRequest<bool>
 
         public override async Task<bool> Handle(CreateSubscriptionCommand request, CancellationToken cancellationToken)
         {
-            var subscription = new Subscription
+            var subscritpion = await _context.Subscriptions.Where(x => x.ApplicationUserId == request.ApplicationUserId).FirstOrDefaultAsync(cancellationToken);
+            if (subscritpion != null)
             {
-                ApplicationUserId = request.ApplicationUserId,
-                Begin = request.Begin,
-                End = request.End
-            };
+                subscritpion.Begin = request.Begin;
+                subscritpion.End = request.End;
+            }
+            else
+            {
+                var subscription = new Subscription
+                {
+                    ApplicationUserId = request.ApplicationUserId,
+                    Begin = request.Begin,
+                    End = request.End
+                };
 
-            await _context.Subscriptions.AddAsync(subscription, cancellationToken);
+                await _context.Subscriptions.AddAsync(subscription, cancellationToken);
+            }
+
             var result = await _context.SaveChangesAsync(cancellationToken);
 
             return result > 0;

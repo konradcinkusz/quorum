@@ -7,9 +7,8 @@
 {
     <div class="car MRCard">
         <div class="form-group MRForm-group">
-            <label for="countInput">Inactive count: </label>@result.Data.TotalItems
+            <label for="countInput">Active count: </label>@result.Data.TotalItems
         </div>
-        <button class="btn btn-primary MRBtn" @onclick="Submit">Activate</button>
     </div>
 }
 
@@ -21,6 +20,7 @@
                 @foreach (var p in result.Data.Items)
                 {
                     <ReadSubscription SubscriptionDTO="p" />
+                    <button class="btn btn-primary MRBtn" @onclick="()=>Submit(p.ApplicationUserId)">Force dectivate</button>
                 }
             </div>
         </div>
@@ -39,7 +39,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        result = await adminService.GetSubscriptionsThatCouldBeActivate();
+        result = await adminService.GetSubscriptionsThatCouldBeDeactivate();
 
         if (result.Data.TotalItems == 0)
         {
@@ -47,9 +47,9 @@
         }
     }
 
-    private async Task Submit()
+    private async Task Submit(string applicationUserId)
     {
-        var res = await adminService.ActivateSubscription();
+        var res = await adminService.DeactivateSubscription(applicationUserId);
 
         if (res.Success && res.Data.Items.Count == result.Data.Items.Count)
         {

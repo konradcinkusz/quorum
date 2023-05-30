@@ -13,17 +13,20 @@ public class ActivateSubscriptionCommand : IRequest<PagedList<Subscription>>
 
         public override async Task<PagedList<Subscription>> Handle(ActivateSubscriptionCommand request, CancellationToken cancellationToken)
         {
-            var query = _context.SubscriptionPayment
+            var currentDate = DateTime.UtcNow;
+
+            var query = await _context.SubscriptionPayment
                 .Include(x => x.Subscription)
                 .Include(x => x.Payment)
-                .Where(x => x.Payment.PaymentStatus == PaymentStatus.Accepted).ToList();
+                .Where(x => x.Payment.PaymentStatus == PaymentStatus.Accepted)
+                .ToListAsync(cancellationToken);
 
             foreach (var item in query)
             {
                 if (!item.Subscription.IsActive())
                 {
-                    item.Subscription.Begin = DateTime.UtcNow;
-                    item.Subscription.End = DateTime.UtcNow.AddDays(365);
+                    item.Subscription.Begin = currentDate;
+                    item.Subscription.End = currentDate.AddYears(1);
                     item.Payment.PaymentStatus = PaymentStatus.Completed;
                     item.Payment.PaymentStatusHistories = new List<PaymentStatusHistory>() 
                     { 
@@ -36,7 +39,7 @@ public class ActivateSubscriptionCommand : IRequest<PagedList<Subscription>>
             
             var sum = await _context.SaveChangesAsync(cancellationToken);
 
-            return await PagedList<Subscription>.CreateAsync(query.Select(x => x.Subscription).AsQueryable(), new(), cancellationToken);
+            return PagedList<Subscription>.Create(query.Select(x => x.Subscription).ToList(), new());
         }
     }
 }

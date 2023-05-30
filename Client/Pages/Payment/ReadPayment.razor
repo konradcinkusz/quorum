@@ -37,7 +37,11 @@
 
             <dt class="col-sm-3">Created At:</dt>
             <dd class="col-sm-9">@Payment.CreatedAt.ToString("g", CultureInfo.InvariantCulture)</dd>
-
+            @if (Payment.UpdatedAt.HasValue)
+            {
+                <dt class="col-sm-3">Updated At:</dt>
+                <dd class="col-sm-9">@Payment.UpdatedAt.Value.ToString("g", CultureInfo.InvariantCulture)</dd>
+            }
             <dt class="col-sm-3">More:</dt>
             <dd class="col-sm-9"><a href="/payments/@Payment.Id">View Payment Details</a></dd>
 

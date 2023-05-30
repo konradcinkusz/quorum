@@ -6,16 +6,17 @@
             <p class="form-control-plaintext" id="user-email">@SubscriptionDTO.ApplicationUserEmail</p>
         </div>
         <div class="col-sm-2">
-            <p class="form-control-plaintext" id="begin-date">@SubscriptionDTO.Begin?.ToString("MM/dd/yyyy")</p>
+            <p class="form-control-plaintext" id="begin-date">@SubscriptionDTO.Begin?.ToString("g", CultureInfo.InvariantCulture)</p>
         </div>
         <div class="col-sm-2">
-            <p class="form-control-plaintext" id="end-date">@SubscriptionDTO.End?.ToString("MM/dd/yyyy")</p>
+            <p class="form-control-plaintext" id="end-date">@SubscriptionDTO.End?.ToString("g", CultureInfo.InvariantCulture)</p>
         </div>
         <div class="col-sm-3">
             <p class="form-control-plaintext" id="is-active">@SubscriptionDTO.IsActive</p>
         </div>
         <div class="col-sm-3">
             <div class="btn-group my-2" role="group">
+                <a href="/admin/create-subscription/@SubscriptionDTO.ApplicationUserId" class="btn btn-secondary btn-sm me-2">Edit</a>
                 <button class="btn btn-primary btn-sm" type="button" @onclick="ToggleDetails">@ShowDetailsButtonText</button>
             </div>
         </div>

@@ -1,0 +1,52 @@
+﻿<div class="reject-subscription-info">
+    <span>@Text subscription</span>
+    <div class="center-align">
+        <input id="confirmationCheckbox" type="checkbox" @bind="confirmationCheckboxChecked" />
+        <label for="confirmationCheckbox">Confirm</label>
+    </div>
+    <button class="reject-subscription-button btn-sm" @onclick="@(async () => await Action.InvokeAsync())"
+            disabled="@(!confirmationCheckboxChecked)">
+        @Text
+    </button>
+</div>
+
+<style>
+    .reject-subscription-info {
+        margin-top: 1rem;
+        color: #dc3545;
+        font-weight: bold;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .center-align {
+        display: flex;
+        align-items: center;
+    }
+
+    .reject-subscription-button {
+        margin-top: 1rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.5rem;
+        font-weight: bold;
+        color: white;
+        background-color: @(!confirmationCheckboxChecked ? "grey" : "#007bff");
+        border: none;
+        cursor: pointer;
+    }
+
+        .reject-subscription-button:hover {
+            background-color: @(!confirmationCheckboxChecked ? "grey" : "#0069d9");
+        }
+</style>
+
+@code {
+    [Parameter]
+    public string Text { get; set; } = "Reject";
+    [Parameter]
+    public EventCallback Action { get; set; }
+
+    private bool confirmationCheckboxChecked;
+}

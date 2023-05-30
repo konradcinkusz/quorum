@@ -38,6 +38,9 @@ public class BuySubscriptionCommand : IRequest<bool>
                 throw new ApplicationException("User has pending payment for that subscription");
             }
 
+            userSub.Begin = null;
+            userSub.End = null;
+
             Payment payment = new Payment
             {
                 ApplicationUserId = request.ApplicationUserId,

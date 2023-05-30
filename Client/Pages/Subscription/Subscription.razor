@@ -9,48 +9,50 @@
     <div class="subscription-info">
         @if (result == null)
         {
-                <div class="active-subscription-info row">
-                    <div class="col-md-12">
-                        <_Info Description="Please wait, sub page is loading..." TextColor="#b58900" BackgroundColor="#eae8e8" />
-                    </div>
+            <div class="active-subscription-info row">
+                <div class="col-md-12">
+                    <_Info Description="Please wait, sub page is loading..." TextColor="#b58900" BackgroundColor="#eae8e8" />
                 </div>
+            </div>
         }
         else if (subscriptionReadDTO.IsActive && subscriptionReadDTO.PaymentStatus == PaymentStatusEnum.Completed)
         {
-                <_HelperReadActiveSubscription SubscriptionReadDTO="@subscriptionReadDTO"
-                Infos="@(new List<string> {"You have an active subscription."})"/>
+            <_HelperReadActiveSubscription SubscriptionReadDTO="@subscriptionReadDTO"
+                                       Infos="@(new List<string> {"You have an active subscription. I you still see InActive in header, refresh your page."})" />
             @if (subscriptionReadDTO.Begin != null && subscriptionReadDTO.End != null)
             {
-                        <div class="subscription-period">
-                            <span>Subscription period:</span> @subscriptionReadDTO.Begin.Value.ToShortDateString() - @subscriptionReadDTO.End.Value.ToShortDateString()
-                        </div>
+                <div class="subscription-period">
+                    <span>Subscription period:</span> @subscriptionReadDTO.Begin.Value.ToShortDateString() - @subscriptionReadDTO.End.Value.ToShortDateString()
+                </div>
             }
         }
         else if (!subscriptionReadDTO.IsActive && subscriptionReadDTO.PaymentStatus == PaymentStatusEnum.Accepted)
         {
-                <_HelperReadActiveSubscription SubscriptionReadDTO="@subscriptionReadDTO"
-                Infos="@(new List<string> {"Payment has been accepted. Waiting for admin activation."})"/>
+            <_HelperReadActiveSubscription SubscriptionReadDTO="@subscriptionReadDTO"
+                                       Infos="@(new List<string> {"Payment has been accepted. Waiting for admin activation."})" />
         }
-        else if (subscriptionReadDTO.PaymentStatus == PaymentStatusEnum.Pending)
+        else if (subscriptionReadDTO.PaymentStatus == PaymentStatusEnum.Pending && subscriptionReadDTO.Begin == null && subscriptionReadDTO.End == null)
         {
-                <_HelperReadActiveSubscription SubscriptionReadDTO="@subscriptionReadDTO"
-                Infos="@(new List<string> {"You have bought subscription and we are waiting for your payment.", 
+            <_HelperReadActiveSubscription SubscriptionReadDTO="@subscriptionReadDTO"
+                                       Infos="@(new List<string> {"You have bought subscription and we are waiting for your payment.",
                     "Transfer any amount to the account: XXX XXX, providing your PESEL number in the title. After the transfer, you need to wait for up to 3 days for payment approval. Once the payment is approved, the annual subscription is automatically accepted."})" />
+            
+            <_HelperRejectUnsubscribe Action="Reject" />
         }
         else
         {
             @if (appUserResult == null)
             {
-                        <div class="inactive-subscription-info">
-                            <span>You do not have an active subscription.</span>
-                            <button class="buy-subscription-button" @onclick="Buy">Buy subscription</button>
-                        </div>
+                <div class="inactive-subscription-info">
+                    <span>You do not have an active subscription.</span>
+                    <button class="buy-subscription-button" @onclick="Buy">Buy subscription</button>
+                </div>
             }
             else
             {
-                        <div class="alert alert-success" role="alert">
-                            <_ApiResponse result="appUserResult" />
-                        </div>
+                <div class="alert alert-success" role="alert">
+                    <_ApiResponse result="appUserResult" />
+                </div>
             }
         }
     </div>
@@ -69,7 +71,7 @@
     private async Task Buy()
     {
         appUserResult = await subscriptionService.BuySubscription();
-        await _refresh(5000);
+        await _refresh();
     }
 
     private async Task _refresh(int delay_miliseconds = 0)
@@ -78,5 +80,22 @@
             await Task.Delay(delay_miliseconds); // Delay for delay seconds
         result = await subscriptionService.GetSubscription();
         subscriptionReadDTO = result?.Data;
+    }
+
+    private bool confirmationCheckboxChecked;
+
+    private async Task Reject()
+    {
+        if (confirmationCheckboxChecked)
+        {
+            appUserResult = await subscriptionService.RejectSubscription();
+            await _refresh();
+        }
+    }
+
+    private async Task Unsubscribe()
+    {
+        appUserResult = await subscriptionService.UnsubscribeSubscription();
+        await _refresh();
     }
 }

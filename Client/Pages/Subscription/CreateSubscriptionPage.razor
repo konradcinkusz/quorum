@@ -1,5 +1,5 @@
 ﻿@inherits BaseAdmin
-@page "/admin/create-subscription"
+@page "/admin/create-subscription/{id?}"
 @inject IAdminService subscriptionService
 
 <div class="card shadow rounded-3">
@@ -38,25 +38,40 @@
         </EditForm>
     </div>
 </div>
-@if (created)
+@if (result != null)
 {
     <div class="alert alert-success" role="alert">
-        Subscription created successfully.
+        <_ApiResponse result="result" />
     </div>
 }
 
 @code {
-    private SubscriptionCreateForUserDTO Subscription = new SubscriptionCreateForUserDTO();
-    private bool created = false;
+    [Parameter]
+    public string id { get; set; }
+
     [Parameter]
     public EventCallback Refresh { get; set; }
 
+    private SubscriptionCreateForUserDTO Subscription = new SubscriptionCreateForUserDTO();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrEmpty(id))
+        {
+            var subs = await subscriptionService.GetSubscriptionsBySearchParams(new() { Id = id });
+            var sub = subs.Data.Items.First();
+            Subscription.End = sub.End;
+            Subscription.Begin = sub.Begin;
+            Subscription.ApplicationUserId = id;
+        }
+    }
+
+    private ApiResponse<string>? result = null;
     private async Task CreateSubscription()
     {
-        string result = await subscriptionService.CreateSubscription(Subscription);
-        created = !string.IsNullOrWhiteSpace(result);
+        result = await subscriptionService.CreateOrEditSubscription(Subscription);
 
-        if(Refresh.HasDelegate)
+        if (Refresh.HasDelegate)
         {
             await Refresh.InvokeAsync();
         }

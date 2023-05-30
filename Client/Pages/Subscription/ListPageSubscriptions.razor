@@ -59,7 +59,7 @@
 
     async Task _refresh()
     {
-        result = await subscriptionService.GetSubscriptions(SubscriptionSearchParamsDTO);
+        result = await subscriptionService.GetSubscriptionsBySearchParams(SubscriptionSearchParamsDTO);
         SubscriptionPagedListDto = result.Data;
         SubscriptionSearchParamsDTO.CurrentPage = SubscriptionPagedListDto.CurrentPage;
         SubscriptionSearchParamsDTO.PageSize = SubscriptionPagedListDto.PageSize;

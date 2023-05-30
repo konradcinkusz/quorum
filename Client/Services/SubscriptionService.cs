@@ -4,7 +4,8 @@ public interface ISubscriptionService
 {
     Task<ApiResponse<SubscriptionReadDTO>> GetSubscription();
     Task<ApiResponse<bool>> BuySubscription();
-    Task<PaymentPagedListDTO> GetMyPayments(PaymentSearchParamsDTO query);
+    Task<ApiResponse<bool>> RejectSubscription();
+    Task<ApiResponse<bool>> UnsubscribeSubscription();
 }
 
 internal class SubscriptionService : DataServiceBase, ISubscriptionService
@@ -27,21 +28,13 @@ internal class SubscriptionService : DataServiceBase, ISubscriptionService
                     await _httpClient.GetAsync(endpoint));
     }
 
-    public async Task<PaymentPagedListDTO> GetMyPayments(PaymentSearchParamsDTO query)
+    public Task<ApiResponse<bool>> RejectSubscription()
     {
-        var q = BuildQuery(query);
+        throw new NotImplementedException();
+    }
 
-        var response = await _httpClient.GetAsync($"{_subscriptionControllerPath}/GetMyPayments?{q}");
-
-        response.EnsureSuccessStatusCode();
-
-        var content = await response.Content.ReadAsStringAsync();
-
-        var result = JsonSerializer.Deserialize<PaymentPagedListDTO>(content, new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        });
-
-        return result ?? throw new Exception("Deserialized response is null.");
+    public Task<ApiResponse<bool>> UnsubscribeSubscription()
+    {
+        throw new NotImplementedException();
     }
 }

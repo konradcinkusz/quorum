@@ -9,6 +9,7 @@ public class PaymentDTO
     public string ReferenceNumber { get; set; } // a reference number associated with the payment (e.g. transaction ID)
 
     public DateTime CreatedAt { get; set; }
+    public DateTime? UpdatedAt { get; set; }
     public decimal PaymentValuePLN { get; set; }
     public List<PaymentStatusHistoryDTO> PaymentStatusHistories { get; set; }
     public PaymentStatusEnum PaymentStatus { get; set; }

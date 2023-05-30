@@ -15,7 +15,7 @@ public class GetSubscriptionsThatCouldBeActivateCommand :
             var query = _context.SubscriptionPayment
                 .Include(x => x.Subscription)
                 .Include(x => x.Payment)
-                .Where(x => x.Payment.PaymentStatus == PaymentStatus.Accepted);
+                .Where(x => x.Payment.PaymentStatus == PaymentStatus.Accepted && !x.Subscription.Begin.HasValue && !x.Subscription.End.HasValue);
 
             return await PagedList<Subscription>.CreateAsync(query.Select(x=>x.Subscription).AsQueryable(), new(), cancellationToken);
         }

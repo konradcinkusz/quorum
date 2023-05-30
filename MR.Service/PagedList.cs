@@ -31,4 +31,28 @@ public class PagedList<T> : List<T>
 
         return pagedList;
     }
+
+    public static PagedList<T> Create(IEnumerable<T> source, SearchParams options)
+    {
+        var pagedList = new PagedList<T>
+        {
+            CurrentPage = options.CurrentPage,
+            PageSize = options.PageSize
+        };
+
+        pagedList.TotalItems = source.Count();
+        pagedList.TotalPages = (int)Math.Ceiling(pagedList.TotalItems / (double)pagedList.PageSize);
+
+        // Check if the new PageSize would result in a page number greater than the total number of pages
+        if (pagedList.CurrentPage > pagedList.TotalPages && pagedList.TotalPages > 0)
+        {
+            pagedList.CurrentPage = pagedList.TotalPages;
+        }
+
+        var items = source.Skip((pagedList.CurrentPage - 1) * pagedList.PageSize).Take(pagedList.PageSize);
+        pagedList.AddRange(items);
+
+        return pagedList;
+    }
 }
+

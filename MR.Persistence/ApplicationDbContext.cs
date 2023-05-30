@@ -72,6 +72,7 @@ public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>, 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         UpdateCreatedAtProperty();
+        UpdateUpdatedAtProperty();
         return base.SaveChangesAsync(cancellationToken);
     }
 
@@ -87,6 +88,20 @@ public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>, 
             entity.CreatedAt = DateTime.UtcNow;
         }
     }
+
+    private void UpdateUpdatedAtProperty()
+    {
+        var entities = ChangeTracker.Entries()
+            .Where(e => e.State == EntityState.Modified)
+            .Select(e => e.Entity)
+            .OfType<BaseEntity>();
+
+        foreach (var entity in entities)
+        {
+            entity.UpdatedAt = DateTime.UtcNow;
+        }
+    }
+
     private void Logs_config(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Subscription>()

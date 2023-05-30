@@ -2,6 +2,11 @@
 
 public class DeactivateSubscriptionCommand : IRequest<PagedList<Subscription>>
 {
+    public readonly string ApplicationUserId;
+    public DeactivateSubscriptionCommand(string applicationUserId)
+    {
+        ApplicationUserId = applicationUserId;
+    }
     public class DeactivateSubscriptionCommandHandler :
         CommandHandlerBase<DeactivateSubscriptionCommand, PagedList<Subscription>>
     {
@@ -13,12 +18,18 @@ public class DeactivateSubscriptionCommand : IRequest<PagedList<Subscription>>
 
         public override async Task<PagedList<Subscription>> Handle(DeactivateSubscriptionCommand request, CancellationToken cancellationToken)
         {
-            var currentDate = DateTime.UtcNow.AddDays(-1);
+            var currentDate = DateTime.UtcNow.Date;
 
             var query = await _context.SubscriptionPayment
                 .Include(x => x.Subscription)
                 .Include(x => x.Payment)
-                .Where(x => x.Payment.PaymentStatus == PaymentStatus.Accepted).ToListAsync(cancellationToken);
+                .Where(x =>
+                    x.Payment.PaymentStatus == PaymentStatus.Completed &&
+                    x.Subscription.Begin.HasValue && x.Subscription.End.HasValue &&
+                            x.Subscription.End.Value >= currentDate &&
+                    x.SubscriptionId == request.ApplicationUserId)
+                .ToListAsync(cancellationToken);
+
 
             foreach (var item in query)
             {
@@ -30,7 +41,7 @@ public class DeactivateSubscriptionCommand : IRequest<PagedList<Subscription>>
 
             var sum = await _context.SaveChangesAsync(cancellationToken);
 
-            return await PagedList<Subscription>.CreateAsync(query.Select(x => x.Subscription).AsQueryable(), new(), cancellationToken);
+            return PagedList<Subscription>.Create(query.Select(x => x.Subscription).Distinct().ToList(), new());
         }
     }
 }

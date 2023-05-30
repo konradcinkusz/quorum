@@ -14,13 +14,26 @@ public class GetSubscriptionsThatCouldBeDeactivateCommand :
         {
             var currentDate = DateTime.UtcNow;
 
-            var query = _context.SubscriptionPayment
-                .Include(x => x.Subscription)
-                .Include(x => x.Payment)
-                .Where(x => x.Payment.PaymentStatus == PaymentStatus.Accepted
-                    && x.Subscription.End >= currentDate);
+            var query = _context.Subscriptions
+                        .Include(x => x.ApplicationUser)
+                        .Include(x => x.SubscriptionPayments)
+                            .ThenInclude(x => x.Payment)
+                        .Where(x => x.SubscriptionPayments.Any(sp =>
+                            sp.Payment.PaymentStatus == PaymentStatus.Completed &&
+                            sp.Subscription.End >= currentDate))
+                        .Select(x => new Subscription
+                        {
+                            ApplicationUserId = x.ApplicationUserId,
+                            ApplicationUser = x.ApplicationUser,
+                            Begin = x.Begin,
+                            End = x.End,
+                            CreatedAt = x.CreatedAt,
+                            SubscriptionPayments = x.SubscriptionPayments
+                                .OrderByDescending(sp => sp.Payment.CreatedAt)
+                                .ToList()
+                        });
 
-            return await PagedList<Subscription>.CreateAsync(query.Select(x => x.Subscription).AsQueryable(), new(), cancellationToken);
+            return await PagedList<Subscription>.CreateAsync(query, new(), cancellationToken);
         }
     }
 }
