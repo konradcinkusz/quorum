@@ -17,7 +17,7 @@ public interface IAdminService
     Task<ApiResponse<bool>> RemoveSignature(Guid signatureId);
     Task<ApiResponse<bool>> AddSignatureToSignaturePool(Guid signaturePoolId);
     Task<ApiResponse<IssuePagedListDTO>> GetIssues(IssueSearchParamsDTO searchParams);
-    Task<ApiResponse<Guid>> CreateIssue(IssueDTO issueDTO);
+    Task<ApiResponse<Guid>> CreateIssue(IssueAdminCreateDTO issueDTO);
 }
 
 internal class AdminService : DataServiceBase, IAdminService
@@ -125,47 +125,23 @@ internal class AdminService : DataServiceBase, IAdminService
     public async Task<ApiResponse<IssuePagedListDTO>> GetIssues(IssueSearchParamsDTO searchParams)
     {
         var q = BuildQuery(searchParams);
-
-        var response = await _httpClient.GetAsync($"{_issueControllerPath}/GetIssuesBySearchParams?{q}");
-
-        response.EnsureSuccessStatusCode();
-
-        var content = await response.Content.ReadAsStringAsync();
-
-        var result = JsonSerializer.Deserialize<ApiResponse<IssuePagedListDTO>>(content, new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        });
-
-        return result ?? throw new Exception("Deserialized response is null.");
+        var endpoint = $"{_issueControllerPath}/get-issues-by-search-params?{q}";
+        return await HandleResponse<IssuePagedListDTO>(async () =>
+        await _httpClient.GetAsync(endpoint));
     }
 
-    public async Task<ApiResponse<Guid>> CreateIssue(IssueDTO issueDTO)
+    public async Task<ApiResponse<Guid>> CreateIssue(IssueAdminCreateDTO issueDTO)
     {
-        var endpoint = $"{_issueControllerPath}/CreateIssue";
-
-        var response = await _httpClient.PostAsJsonAsync(endpoint, issueDTO);
-
-        if (!response.IsSuccessStatusCode)
-        {
-            // Handle error response
-        }
-
-        var apiResponse = await response.Content.ReadFromJsonAsync<ApiResponse<Guid>>();
-
-        if (apiResponse == null)
-        {
-            apiResponse = new ApiResponse<Guid> { Data = Guid.Empty, Message = "The response is empty" };
-        }
-
-        return apiResponse;
+        var endpoint = $"{_issueControllerPath}/create-issue-by-admin";
+        return await HandleResponse<Guid>(
+            async () => await _httpClient.PostAsJsonAsync(endpoint, issueDTO));
     }
 
     public async Task<ApiResponse<SubscriptionPagedListDTO>> GetSubscriptionsThatCouldBeActivate()
     {
         var endpoint = $"{_subscriptionControllerPath}/get-subscriptions-that-could-be-activated";
-        return await HandleResponse<SubscriptionPagedListDTO>(async () =>
-        await _httpClient.GetAsync(endpoint));
+        return await HandleResponse<SubscriptionPagedListDTO>(
+            async () => await _httpClient.GetAsync(endpoint));
     }
     public async Task<ApiResponse<SubscriptionPagedListDTO>> GetSubscriptionsThatCouldBeDeactivate()
     {

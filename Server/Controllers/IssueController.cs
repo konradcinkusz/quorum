@@ -7,7 +7,7 @@ public class IssueController : MRBaseController
     }
 
     [Authorize(Policy = Policies.RequireAdminRole)]
-    [HttpGet("GetIssuesBySearchParams")]
+    [HttpGet("get-issues-by-search-params")]
     public async Task<ActionResult<ApiResponse<IssuePagedListDTO>>>
         GetIssuesBySearchParams([FromQuery] IssueSearchParamsDTO searchParams)
     {
@@ -27,7 +27,7 @@ public class IssueController : MRBaseController
 
             var IssuePoolPagedListDto = new IssuePagedListDTO
             {
-                Items = _mapper.Map<List<IssueDTO>>(result),
+                Items = _mapper.Map<List<IssueReadDTO>>(result),
                 CurrentPage = result.CurrentPage,
                 PageSize = result.PageSize,
                 TotalItems = result.TotalItems,
@@ -43,13 +43,12 @@ public class IssueController : MRBaseController
     }
 
     [Authorize(Policy = Policies.RequireAdminRole)]
-    [HttpPost("CreateIssue")]
-    public async Task<ActionResult<ApiResponse<Guid>>> CreateIssue(IssueDTO issueDTO)
+    [HttpPost("create-issue-by-admin")]
+    public async Task<ActionResult<ApiResponse<Guid>>> CreateIssue(IssueAdminCreateDTO issueDTO)
     {
-        string uId = GetUserId();
         var paymentId = await Mediator.Send(new CreateIssueCommand
         {
-            ApplicationUserId = uId,
+            ApplicationUserId = string.IsNullOrEmpty(issueDTO.ApplicationUserId) ? GetUserId() : issueDTO.ApplicationUserId,
             IssueStatus = (IssueStatus)issueDTO.IssueStatus,
             IsVerifyByAdmin = issueDTO.IsVerifyByAdmin,
             RatingValue = issueDTO.RatingValue,

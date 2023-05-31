@@ -1,7 +1,4 @@
-﻿using MR.Shared.DTOs.Issue;
-using MR.Shared.DTOs.SignaturePools;
-
-namespace MR.Shared.DTOs.Quarter;
+﻿namespace MR.Shared.DTOs.Quarter;
 
 public class QuarterDTO
 {
@@ -9,6 +6,6 @@ public class QuarterDTO
     public int Year { get; set; }
     public int Month { get; set; }
     public DateTime CreatedAt { get; set; }
-    public List<IssueDTO> Issues { get; set; } = new List<IssueDTO>();
+    public List<IssueReadDTO> Issues { get; set; } = new List<IssueReadDTO>();
     public List<SignaturePoolDTO> SignaturePools { get; set; } = new List<SignaturePoolDTO>();
 }

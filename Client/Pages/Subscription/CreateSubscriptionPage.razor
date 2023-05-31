@@ -49,9 +49,6 @@
     [Parameter]
     public string id { get; set; }
 
-    [Parameter]
-    public EventCallback Refresh { get; set; }
-
     private SubscriptionCreateForUserDTO Subscription = new SubscriptionCreateForUserDTO();
 
     protected override async Task OnInitializedAsync()
@@ -70,10 +67,5 @@
     private async Task CreateSubscription()
     {
         result = await subscriptionService.CreateOrEditSubscription(Subscription);
-
-        if (Refresh.HasDelegate)
-        {
-            await Refresh.InvokeAsync();
-        }
     }
 }

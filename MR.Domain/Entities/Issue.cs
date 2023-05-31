@@ -4,7 +4,7 @@
 public class Issue : BaseEntity<Guid>
 {
     //nullable
-    [ForeignKey(nameof(Issue.CreatedBy))]
+    [ForeignKey(nameof(CreatedBy))]
     public string? CreatedById { get; set; }
     public ApplicationUser? CreatedBy { get; set; }
 
@@ -26,4 +26,7 @@ public class Issue : BaseEntity<Guid>
 
     [InverseProperty(nameof(Signature.Issue))]
     public ICollection<Signature> Signatures { get; set; }
+
+    [InverseProperty(nameof(IssueStatusHistory.Issue))]
+    public ICollection<IssueStatusHistory> IssueStatusHistories { get; set; }
 }

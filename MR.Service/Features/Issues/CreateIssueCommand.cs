@@ -27,6 +27,9 @@ public class CreateIssueCommand : IRequest<Guid>
         {
             var issue = await base.MakeAsync(command, cancellationToken);
             issue.CreatedById = command.ApplicationUserId;
+
+            issue.IssueStatusHistories = new List<IssueStatusHistory> { new() { IssueStatus = command.IssueStatus } };
+
             return issue;
         }
     }

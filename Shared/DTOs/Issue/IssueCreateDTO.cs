@@ -1,12 +1,7 @@
-﻿using MR.Shared.DTOs.Payment;
+﻿namespace MR.Shared.DTOs.Issue;
 
-namespace MR.Shared.DTOs.Issue;
-
-public class IssueDTO : BaseDTO
+public class IssueCreateDTO : BaseDTO
 {
-    //nullable
-    public string ApplicationUserEmail { get; set; }
-
     //not null
     public string Title { get; set; }
     public string Question { get; set; }
@@ -19,3 +14,4 @@ public class IssueDTO : BaseDTO
     public string? Icon { get; set; }
     public string? BackgroundColor { get; set; }
 }
+

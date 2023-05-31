@@ -32,6 +32,9 @@
             <dt class="col-sm-3">Id</dt>
             <dd class="col-sm-9">@IssueDTO.Id</dd>
 
+            <dt class="col-sm-3">ApplicationUser Id</dt>
+            <dd class="col-sm-9">@IssueDTO.ApplicationUserId</dd>
+
             <dt class="col-sm-3">Full title</dt>
             <dd class="col-sm-9">@IssueDTO.Title</dd>
 
@@ -73,7 +76,7 @@
 
 @code {
     [Parameter]
-    public IssueDTO IssueDTO { get; set; }
+    public IssueReadDTO IssueDTO { get; set; }
 
     [Parameter]
     public EventCallback Refresh { get; set; }

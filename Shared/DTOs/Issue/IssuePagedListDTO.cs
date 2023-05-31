@@ -1,4 +1,4 @@
 ﻿namespace MR.Shared.DTOs.Issue;
-public class IssuePagedListDTO : PagedListDto<IssueDTO>
+public class IssuePagedListDTO : PagedListDto<IssueReadDTO>
 {
 }

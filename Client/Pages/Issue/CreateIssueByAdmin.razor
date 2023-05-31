@@ -1,11 +1,11 @@
 ﻿@inherits BaseAdmin
-@page "/admin/issue"
+@page "/admin/create-issue-by-admin/{id?}"
 
-<PageTitle>Admin Issue Edit</PageTitle>
+<PageTitle>Admin Issue Create or Edit</PageTitle>
 
 <div class="card shadow rounded-3">
     <div class="card-header bg-primary text-white py-3 rounded-3">
-        <h5 class="card-title mb-0">Create Issue</h5>
+        <h5 class="card-title mb-0">Create or Edit Issue</h5>
     </div>
 
     <div class="card-body">
@@ -15,9 +15,9 @@
 
             <div class="row">
                 <div class="col-md-6 mb-4">
-                    <label for="email-value" class="form-label">Application User Email</label>
-                    <InputText id="email-value" class="form-control rounded-pill" @bind-Value="@dto.ApplicationUserEmail" required />
-                    <ValidationMessage For="@(() => dto.ApplicationUserEmail)" />
+                    <label for="email-value" class="form-label">Application User Id</label>
+                    <InputText id="email-value" class="form-control rounded-pill" @bind-Value="@dto.ApplicationUserId" required />
+                    <ValidationMessage For="@(() => dto.ApplicationUserId)" />
                 </div>
 
                 <div class="col-md-6 mb-4">
@@ -81,18 +81,23 @@
 }
 
 @code {
-    private IssueDTO dto = new IssueDTO();
+    [Parameter]
+    public string id { get; set; }
+
+    private IssueAdminCreateDTO dto = new IssueAdminCreateDTO();
 
     private ApiResponse<Guid> result = null;
 
-    void HandleIconChanged(string selectedIcon)
+    private void HandleIconChanged(string selectedIcon)
     {
         dto.Icon = selectedIcon;
     }
-    void HandleColorChanged(string selectedColor)
+    
+    private void HandleColorChanged(string selectedColor)
     {
         dto.BackgroundColor = selectedColor;
     }
+
     private async Task Create()
     {
         result = await adminService.CreateIssue(dto);
