@@ -18,8 +18,8 @@ public class BuySubscriptionCommand : IRequest<bool>
 
         public override async Task<bool> Handle(BuySubscriptionCommand request, CancellationToken cancellationToken)
         {
-            var userSub = 
-                await _context.Subscriptions.Include(x=>x.SubscriptionPayments).ThenInclude(x=>x.Payment)
+            var userSub =
+                await _context.Subscriptions.Include(x => x.SubscriptionPayments).ThenInclude(x => x.Payment)
                 .FirstOrDefaultAsync(s => s.ApplicationUserId == request.ApplicationUserId, cancellationToken);
 
             if (userSub == null)
@@ -32,7 +32,7 @@ public class BuySubscriptionCommand : IRequest<bool>
                 throw new ApplicationException("User already has an active subscription");
             }
 
-            if (userSub.SubscriptionPayments.Any(x=> x.Payment != null 
+            if (userSub.SubscriptionPayments.Any(x => x.Payment != null
                 && x.Payment.PaymentStatus == PaymentStatus.Pending))
             {
                 throw new ApplicationException("User has pending payment for that subscription");

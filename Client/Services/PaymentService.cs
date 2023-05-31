@@ -6,12 +6,20 @@ public interface IPaymentService
     Task<PaymentDTO> GetPayment(Guid id);
     Task<string> UpdatePayment(PaymentUpdateDTO paymentUpdateDTO);
     Task<PaymentPagedListDTO> GetPayments(PaymentSearchParamsDTO query);
+    Task<ApiResponse<bool>> AcceptPayment(Guid paymentId);
 }
 
 internal class PaymentService : DataServiceBase, IPaymentService
 {
     public PaymentService(HttpClient httpclient) : base(httpclient)
     {
+    }
+
+    public async Task<ApiResponse<bool>> AcceptPayment(Guid paymentId)
+    {
+        var endpoint = $"{_paymentControllerPath}/accept-payment/{paymentId}";
+        return await HandleResponse<bool>(async () =>
+                    await _httpClient.PutAsync(endpoint, null));
     }
 
     public async Task<string> CreatePayment(PaymentCreateDTO paymentDto)

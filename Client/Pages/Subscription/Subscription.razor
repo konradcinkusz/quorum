@@ -15,10 +15,26 @@
                 </div>
             </div>
         }
+        else if (subscriptionReadDTO.Begin == null && subscriptionReadDTO.End == null)
+        {
+            @if (subscriptionReadDTO.PaymentStatus == PaymentStatusEnum.Pending)
+            {
+                <_HelperReadActiveSubscription SubscriptionReadDTO="@subscriptionReadDTO"
+                                       Infos="@(new List<string> {"You have bought subscription and we are waiting for your payment.",
+                    "Transfer any amount to the account: XXX XXX, providing your PESEL number in the title. After the transfer, you need to wait for up to 3 days for payment approval. Once the payment is approved, the annual subscription is automatically accepted."})" />
+
+                <_HelperRejectUnsubscribe Action="Reject" />
+            }
+            else
+            {
+                <_HelperReadActiveSubscription SubscriptionReadDTO="@subscriptionReadDTO"
+                                       Infos="@(new List<string> {"You have bought subscription but something went wrong with payment acceptation, contact administrator."})" />
+            }
+        }
         else if (subscriptionReadDTO.IsActive && subscriptionReadDTO.PaymentStatus == PaymentStatusEnum.Completed)
         {
             <_HelperReadActiveSubscription SubscriptionReadDTO="@subscriptionReadDTO"
-                                       Infos="@(new List<string> {"You have an active subscription. I you still see InActive in header, refresh your page."})" />
+                                       Infos="@(new List<string> {"You have an active subscription. If you still see InActive in header, refresh your page."})" />
             @if (subscriptionReadDTO.Begin != null && subscriptionReadDTO.End != null)
             {
                 <div class="subscription-period">
@@ -30,14 +46,6 @@
         {
             <_HelperReadActiveSubscription SubscriptionReadDTO="@subscriptionReadDTO"
                                        Infos="@(new List<string> {"Payment has been accepted. Waiting for admin activation."})" />
-        }
-        else if (subscriptionReadDTO.PaymentStatus == PaymentStatusEnum.Pending && subscriptionReadDTO.Begin == null && subscriptionReadDTO.End == null)
-        {
-            <_HelperReadActiveSubscription SubscriptionReadDTO="@subscriptionReadDTO"
-                                       Infos="@(new List<string> {"You have bought subscription and we are waiting for your payment.",
-                    "Transfer any amount to the account: XXX XXX, providing your PESEL number in the title. After the transfer, you need to wait for up to 3 days for payment approval. Once the payment is approved, the annual subscription is automatically accepted."})" />
-            
-            <_HelperRejectUnsubscribe Action="Reject" />
         }
         else
         {
@@ -82,15 +90,10 @@
         subscriptionReadDTO = result?.Data;
     }
 
-    private bool confirmationCheckboxChecked;
-
     private async Task Reject()
     {
-        if (confirmationCheckboxChecked)
-        {
-            appUserResult = await subscriptionService.RejectSubscription();
-            await _refresh();
-        }
+        appUserResult = await subscriptionService.RejectSubscription();
+        await _refresh();
     }
 
     private async Task Unsubscribe()

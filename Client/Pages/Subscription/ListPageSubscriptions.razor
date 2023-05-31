@@ -1,6 +1,7 @@
 ﻿@inherits BaseAdmin
 @page "/admin/subscriptions"
 @inject IAdminService subscriptionService
+@inject IPaymentService paymentService
 
 <PageTitle>Subscription list admin page</PageTitle>
 
@@ -27,12 +28,16 @@
             {
                 <HeaderSubscription Refresh="_refresh"
                             SearchParams="SubscriptionSearchParamsDTO" />
+                @if (response != null && !response.Success)
+                {
+                    <_ApiResponse T="bool" result="response" />
+                }
                 <div class="content">
                     <div class="container">
                         <div class="row align-content-center justify-content-center">
                             @foreach (var p in SubscriptionPagedListDto.Items)
                             {
-                                <ReadSubscription SubscriptionDTO="p" />
+                                <ReadSubscription SubscriptionDTO="p" AcceptPayment="acceptPayment" />
                             }
                         </div>
                     </div>
@@ -46,8 +51,8 @@
 </AuthorizeView>
 
 @code {
-    SubscriptionSearchParamsDTO SubscriptionSearchParamsDTO;
-    SubscriptionPagedListDTO? SubscriptionPagedListDto;
+    private SubscriptionSearchParamsDTO SubscriptionSearchParamsDTO;
+    private SubscriptionPagedListDTO? SubscriptionPagedListDto;
 
     private ApiResponse<SubscriptionPagedListDTO> result = null;
 
@@ -57,11 +62,18 @@
         await _refresh();
     }
 
-    async Task _refresh()
+    private async Task _refresh()
     {
         result = await subscriptionService.GetSubscriptionsBySearchParams(SubscriptionSearchParamsDTO);
         SubscriptionPagedListDto = result.Data;
         SubscriptionSearchParamsDTO.CurrentPage = SubscriptionPagedListDto.CurrentPage;
         SubscriptionSearchParamsDTO.PageSize = SubscriptionPagedListDto.PageSize;
+    }
+    
+    private ApiResponse<bool> response = null;
+    private async Task acceptPayment(Guid paymentId)
+    {
+        response = await paymentService.AcceptPayment(paymentId);
+        await _refresh();
     }
 }

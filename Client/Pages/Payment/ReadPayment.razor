@@ -19,7 +19,14 @@
         </div>
         <div class="col-sm-3">
             <div class="btn-group my-2" role="group">
-                <a href="/edit-payment/@Payment.Id" class="btn btn-secondary btn-sm me-2">Edit</a>
+                @if (Accept.HasDelegate)
+                {
+                    <button class="btn btn-secondary btn-sm me-2" type="button" @onclick="@(async ()=>await Accept.InvokeAsync(Payment.Id))">Accept</button>
+                }
+                else
+                {
+                    <a href="/edit-payment/@Payment.Id" class="btn btn-secondary btn-sm me-2">Edit</a>
+                }
                 <button class="btn btn-primary btn-sm" type="button" @onclick="ToggleDetails">@ShowDetailsButtonText</button>
             </div>
         </div>
@@ -84,4 +91,8 @@
 @code {
     [Parameter]
     public PaymentDTO Payment { get; set; }
+
+    [Parameter]
+    public EventCallback<Guid> Accept { get; set; }
+
 }

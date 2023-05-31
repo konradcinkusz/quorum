@@ -48,8 +48,8 @@
 </AuthorizeView>
 
 @code {
-    QuarterSearchParamsDTO QuarterSearchParamsDTO;
-    QuarterPagedListDTO? QuarterPagedListDto;
+    private QuarterSearchParamsDTO QuarterSearchParamsDTO;
+    private QuarterPagedListDTO? QuarterPagedListDto;
 
     private ApiResponse<QuarterPagedListDTO> result = null;
 
@@ -59,7 +59,7 @@
         await _refresh();
     }
 
-    async Task _refresh()
+    private async Task _refresh()
     {
         result = await adminService.GetQuarters(QuarterSearchParamsDTO);
         QuarterPagedListDto = result.Data;

@@ -151,4 +151,13 @@ public class SubscriptionController : MRBaseController
     {
         return await ProcessSubscriptionRequest(new GetSubscriptionsThatCouldBeDeactivateCommand());
     }
+
+    [HttpPost("reject-subscription")]
+    public async Task<ActionResult<ApiResponse<bool>>> RejectSubscription()
+    {
+        var result =await Mediator.Send(new RejectSubscriptionCommand(GetUserId()));
+        if(result)
+            return new ApiResponse<bool>(result) { Success = true, Message = "Succesfully rejected", StatusCode = (int)HttpStatusCode.Accepted };
+        return new ApiResponse<bool>(result) { Success = false, Message = "Problem with rejected", StatusCode = (int)HttpStatusCode.BadRequest };
+    }
 }

@@ -28,9 +28,11 @@ internal class SubscriptionService : DataServiceBase, ISubscriptionService
                     await _httpClient.GetAsync(endpoint));
     }
 
-    public Task<ApiResponse<bool>> RejectSubscription()
+    public async Task<ApiResponse<bool>> RejectSubscription()
     {
-        throw new NotImplementedException();
+        var endpoint = $"{_subscriptionControllerPath}/reject-subscription";
+        return await HandleResponse<bool>(async () =>
+                    await _httpClient.PostAsync(endpoint, null));
     }
 
     public Task<ApiResponse<bool>> UnsubscribeSubscription()

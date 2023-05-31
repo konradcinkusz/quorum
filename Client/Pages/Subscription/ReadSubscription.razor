@@ -34,7 +34,7 @@
             <dd class="col-sm-12">
                 @foreach (var p in SubscriptionDTO.PaymentDTOs)
                 {
-                    <ReadPayment Payment="p" />
+                    <ReadPayment Payment="p" Accept="AcceptPayment" />
                 }
             </dd>
         </dl>
@@ -44,4 +44,6 @@
 @code {
     [Parameter]
     public SubscriptionDTO SubscriptionDTO { get; set; }
+    [Parameter]
+    public EventCallback<Guid> AcceptPayment { get; set; }
 }

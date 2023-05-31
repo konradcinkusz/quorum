@@ -94,4 +94,9 @@ public class PaymentController : MRBaseController
         }
     }
 
+    [HttpPut("accept-payment/{id}")]
+    public async Task<ActionResult<ApiResponse<bool>>> AcceptPayment(Guid id)
+    {
+        return await HandleErrors(async () => await Mediator.Send(new AcceptPaymentCommand(id)), $"Payment {id} accepted");
+    }
 }
