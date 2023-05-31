@@ -51,7 +51,7 @@
     {
         var res = await adminService.DeactivateSubscription(applicationUserId);
 
-        if (res.Success && res.Data.Items.Count == result.Data.Items.Count)
+        if (res.Success)
         {
             message = "All subscriptions deactivated successfully";
             result = new ApiResponse<SubscriptionPagedListDTO>() { Success = false };
