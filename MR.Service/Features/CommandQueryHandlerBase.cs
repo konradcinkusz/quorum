@@ -1,4 +1,6 @@
-﻿namespace MR.Service.Features;
+﻿using MR.Service.Extensions;
+
+namespace MR.Service.Features;
 
 public abstract class CommandQueryHandlerBase<TCommand, TResult> : CommandHandlerBase<TCommand, TResult>
     where TCommand : IRequest<TResult>

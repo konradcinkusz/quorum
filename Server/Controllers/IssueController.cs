@@ -13,17 +13,15 @@ public class IssueController : MRBaseController
     {
         try
         {
-            var result = await Mediator.Send(new GetIssuesBySearchParamsQuery
+            var command = new GetIssuesBySearchParamsQuery
             {
-                CreatedByEmail = searchParams.CreatedByEmail,
-                SearchParams = new SearchParams
-                {
-                    CurrentPage = searchParams.CurrentPage,
-                    PageSize = searchParams.PageSize
-                },
-                SortColumn = searchParams.SortColumn,
-                SortOrder = (Microsoft.Data.SqlClient.SortOrder)searchParams.SortOrder
-            });
+                IssueId = searchParams.IssueId,
+                CreatedByEmail = searchParams.CreatedByEmail
+            };
+
+            AddSearchParamsToCommand(command, searchParams);
+
+            var result = await Mediator.Send(command);
 
             var IssuePoolPagedListDto = new IssuePagedListDTO
             {
@@ -44,10 +42,12 @@ public class IssueController : MRBaseController
 
     [Authorize(Policy = Policies.RequireAdminRole)]
     [HttpPost("create-issue-by-admin")]
-    public async Task<ActionResult<ApiResponse<Guid>>> CreateIssue(IssueAdminCreateDTO issueDTO)
+    public async Task<ActionResult<ApiResponse<Guid>>>
+        CreateOrEditIssue([FromBody] IssueAdminCreateDTO issueDTO)
     {
-        var paymentId = await Mediator.Send(new CreateIssueCommand
+        var paymentId = await Mediator.Send(new CreateOrEditIssueCommand
         {
+            IssueId = issueDTO.IssueId,
             ApplicationUserId = string.IsNullOrEmpty(issueDTO.ApplicationUserId) ? GetUserId() : issueDTO.ApplicationUserId,
             IssueStatus = (IssueStatus)issueDTO.IssueStatus,
             IsVerifyByAdmin = issueDTO.IsVerifyByAdmin,

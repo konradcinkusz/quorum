@@ -7,7 +7,7 @@ public class CreatePaymentCommand : IRequest<Guid>
     public decimal? PaymentValuePLN { get; set; }
     public string? PaymentMethod { get; set; }
     public string? ReferenceNumber { get; set; }
-    public class CreatePaymentCommandHandler : CreateCommandHandlerBase<CreatePaymentCommand, Guid, Payment>
+    public class CreatePaymentCommandHandler : CreateOrEditCommandHandlerBase<CreatePaymentCommand, Guid, Payment>
     {
         public CreatePaymentCommandHandler(IApplicationDbContext context, ILogger<CreatePaymentCommand> logger) : base(context, logger)
         {

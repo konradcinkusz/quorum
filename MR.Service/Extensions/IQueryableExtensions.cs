@@ -1,4 +1,4 @@
-﻿namespace MR.Infrastructure.Extension;
+﻿namespace MR.Service.Extensions;
 
 public static class IQueryableExtensions
 {

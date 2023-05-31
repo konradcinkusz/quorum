@@ -16,8 +16,8 @@ public interface IAdminService
     Task<ApiResponse<bool>> UnpinSignatureFromIssue(Guid signatureId);
     Task<ApiResponse<bool>> RemoveSignature(Guid signatureId);
     Task<ApiResponse<bool>> AddSignatureToSignaturePool(Guid signaturePoolId);
-    Task<ApiResponse<IssuePagedListDTO>> GetIssues(IssueSearchParamsDTO searchParams);
-    Task<ApiResponse<Guid>> CreateIssue(IssueAdminCreateDTO issueDTO);
+    Task<ApiResponse<IssuePagedListDTO>> GetIssuesBySearchParams(IssueSearchParamsDTO searchParams);
+    Task<ApiResponse<Guid>> CreateOrEditIssue(IssueAdminCreateDTO issueDTO);
 }
 
 internal class AdminService : DataServiceBase, IAdminService
@@ -122,7 +122,7 @@ internal class AdminService : DataServiceBase, IAdminService
         return await HandleResponse<bool>(async () => await _httpClient.PostAsJsonAsync(endpoint, signaturePoolId));
     }
 
-    public async Task<ApiResponse<IssuePagedListDTO>> GetIssues(IssueSearchParamsDTO searchParams)
+    public async Task<ApiResponse<IssuePagedListDTO>> GetIssuesBySearchParams(IssueSearchParamsDTO searchParams)
     {
         var q = BuildQuery(searchParams);
         var endpoint = $"{_issueControllerPath}/get-issues-by-search-params?{q}";
@@ -130,7 +130,7 @@ internal class AdminService : DataServiceBase, IAdminService
         await _httpClient.GetAsync(endpoint));
     }
 
-    public async Task<ApiResponse<Guid>> CreateIssue(IssueAdminCreateDTO issueDTO)
+    public async Task<ApiResponse<Guid>> CreateOrEditIssue(IssueAdminCreateDTO issueDTO)
     {
         var endpoint = $"{_issueControllerPath}/create-issue-by-admin";
         return await HandleResponse<Guid>(

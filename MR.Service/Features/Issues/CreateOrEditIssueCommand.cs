@@ -1,6 +1,6 @@
 ﻿namespace MR.Service.Features.Issues;
 
-public class CreateIssueCommand : IRequest<Guid>
+public class CreateOrEditIssueCommand : IRequest<Guid>
 {
     //nullable
     public string ApplicationUserId { get; set; }
@@ -15,18 +15,29 @@ public class CreateIssueCommand : IRequest<Guid>
     public string? BackgroundColor { get; set; }
     public int RatingValue { get; set; }
 
-    public class CreateIssueCommandHandler : CreateCommandHandlerBase<CreateIssueCommand, Guid, Issue>
+    public Guid? IssueId { get; set; }
+
+    public class CreateIssueCommandHandler : CreateOrEditCommandHandlerBase<CreateOrEditIssueCommand, Guid, Issue>
     {
         public CreateIssueCommandHandler(
             IApplicationDbContext context,
-            ILogger<CreateIssueCommand> logger) : base(context, logger)
+            ILogger<CreateOrEditIssueCommand> logger) : base(context, logger)
         {
         }
 
-        protected override async Task<Issue> MakeAsync(CreateIssueCommand command, CancellationToken cancellationToken)
+        protected override async Task<Issue> MakeAsync(CreateOrEditIssueCommand command, CancellationToken cancellationToken)
         {
-            var issue = await base.MakeAsync(command, cancellationToken);
-            issue.CreatedById = command.ApplicationUserId;
+            Issue issue;
+
+            if (command.IssueId.HasValue)
+            {
+                issue = await _context.Issues.FirstAsync(x => x.Id == command.IssueId, cancellationToken);
+            }
+            else
+            {
+                issue = await base.MakeAsync(command, cancellationToken);
+                issue.CreatedById = command.ApplicationUserId;
+            }
 
             issue.IssueStatusHistories = new List<IssueStatusHistory> { new() { IssueStatus = command.IssueStatus } };
 

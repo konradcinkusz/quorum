@@ -3,17 +3,14 @@
 public class IssueReadDTO : BaseDTO
 {
     public string ApplicationUserEmail { get; set; }
-    //nullable
     public string ApplicationUserId { get; set; }
-    //not null
     public string Title { get; set; }
     public string Question { get; set; }
     public bool IsVerifyByAdmin { get; set; } = false;
-    //bazujac na tym statusie ustawiamy widocznosc
     public IssueStatusEnum IssueStatus { get; set; } = IssueStatusEnum.NotVisible;
-    //Rating value na podstawie którego okreslamy miejsce w top10
     public int RatingValue { get; set; } = 0;
     public PaymentDTO? InitialPayment { get; set; }
     public string? Icon { get; set; }
     public string? BackgroundColor { get; set; }
+    public List<IssueStatusHistoryDTO> IssueStatusHistories { get; set; }
 }

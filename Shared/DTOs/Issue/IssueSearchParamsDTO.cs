@@ -2,6 +2,7 @@
 
 public class IssueSearchParamsDTO : SearchParamsDTO
 {
+    public Guid? IssueId { get; set; }
     public string? CreatedByEmail { get; set; }
     public string? Title { get; set; }
     public string? Question { get; set; }

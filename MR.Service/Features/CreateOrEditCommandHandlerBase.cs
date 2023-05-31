@@ -1,22 +1,31 @@
 ﻿namespace MR.Service.Features;
 
-public abstract class CreateCommandHandlerBase<TCommand, TResult, TCreate> : CommandHandlerBase<TCommand, TResult>
+public abstract class CreateOrEditCommandHandlerBase<TCommand, TResult, TCreate> : CommandHandlerBase<TCommand, TResult>
     where TCommand : IRequest<TResult>
     where TCreate : BaseEntity<TResult>
     where TResult : IEquatable<TResult>
 {
-    public CreateCommandHandlerBase(IApplicationDbContext context, ILogger<TCommand> logger) : base(context, logger)
+    public CreateOrEditCommandHandlerBase(IApplicationDbContext context, ILogger<TCommand> logger) : base(context, logger)
     {
     }
 
     public override async Task<TResult> Handle(TCommand request, CancellationToken cancellationToken)
     {
-        var created = await MakeAsync(request, cancellationToken);
+        var entity = await MakeAsync(request, cancellationToken);
 
-        _ = await _context.Set<TCreate>().AddAsync(created);
-        _ = await _context.SaveChangesAsync(cancellationToken);
+        var existingEntity = await _context.Set<TCreate>().FindAsync(entity.Id);
+        if (existingEntity == null)
+        {
+            _ = await _context.Set<TCreate>().AddAsync(entity);
+        }
+        else
+        {
+            _context.Set<TCreate>().Update(entity);
+        }
 
-        return created.Id;
+        var sum = await _context.SaveChangesAsync(cancellationToken);
+
+        return entity.Id;
     }
 
     protected virtual Task<TCreate> MakeAsync(TCommand command, CancellationToken cancellationToken)
@@ -39,5 +48,4 @@ public abstract class CreateCommandHandlerBase<TCommand, TResult, TCreate> : Com
 
         return Task.FromResult(issue);
     }
-
 }

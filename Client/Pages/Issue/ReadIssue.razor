@@ -20,6 +20,7 @@
         </div>
         <div class="col-sm-2">
             <div class="btn-group my-2" role="group">
+                <a href="/admin/create-issue-by-admin/@IssueDTO.Id" class="btn btn-secondary btn-sm me-2">Edit</a>
                 <button class="btn btn-primary btn-sm" type="button" @onclick="ToggleDetails">@ShowDetailsButtonText</button>
             </div>
         </div>
@@ -55,8 +56,8 @@
 
             @foreach (var quarter in IssueDTO.QuarterDTOs)
             {
-                <dt class="col-sm-3">Quarter Y-M</dt>
-                <dd class="col-sm-9">@quarter.Year - @quarter.Month</dd>
+            <dt class="col-sm-3">Quarter Y-M</dt>
+            <dd class="col-sm-9">@quarter.Year - @quarter.Month</dd>
             }
 
             <dt class="col-sm-3">Signatures</dt>
@@ -64,9 +65,37 @@
 
             @foreach (var signature in IssueDTO.SignatureDTOs)
             {
-                <dt class="col-sm-3">Signature ID</dt>
-                <dd class="col-sm-9">@signature.Id</dd>
+            <dt class="col-sm-3">Signature ID</dt>
+            <dd class="col-sm-9">@signature.Id</dd>
             }*@
+
+            <dt class="col-sm-3">Issue Status History:</dt>
+            <dd class="col-sm-9">
+                @if (IssueDTO.IssueStatusHistories != null && IssueDTO.IssueStatusHistories.Any())
+                {
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>IssueDTO Status</th>
+                                <th>Status Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var history in IssueDTO.IssueStatusHistories)
+                            {
+                                <tr>
+                                    <td>@history.IssueStatus</td>
+                                    <td>@history.CreatedAt.ToString("g", CultureInfo.InvariantCulture)</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <_Info Description="No issue status history available." />
+                }
+            </dd>
         </dl>
         <h5>Preview</h5>
         <_CustomCard BackgroundColor="@IssueDTO.BackgroundColor" Title="@IssueDTO.Title" Icon="@IssueDTO.Icon" Text="@IssueDTO.Question" />

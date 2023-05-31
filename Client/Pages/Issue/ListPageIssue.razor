@@ -64,7 +64,7 @@
 
     async Task _refresh()
     {
-        result = await adminService.GetIssues(IssueSearchParamsDTO);
+        result = await adminService.GetIssuesBySearchParams(IssueSearchParamsDTO);
         IssuePagedListDto = result.Data;
         IssueSearchParamsDTO.CurrentPage = IssuePagedListDto.CurrentPage;
         IssueSearchParamsDTO.PageSize = IssuePagedListDto.PageSize;

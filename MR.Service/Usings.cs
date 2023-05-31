@@ -20,6 +20,6 @@ global using MR.Domain.Auth;
 global using System.Security.Claims;
 global using System.Linq.Expressions;
 global using Microsoft.Data.SqlClient;
-global using MR.Service.Extension;
+global using MR.Service.Extensions;
 global using MR.Domain.Base;
 global using MR.Service.Features.PaymentFeatures;

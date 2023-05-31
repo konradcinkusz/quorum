@@ -5,7 +5,7 @@
 
 <div class="card shadow rounded-3">
     <div class="card-header bg-primary text-white py-3 rounded-3">
-        <h5 class="card-title mb-0">Create or Edit Issue</h5>
+        <h5 class="card-title mb-0">Create or Edit Issue by Admin</h5>
     </div>
 
     <div class="card-body">
@@ -86,13 +86,31 @@
 
     private IssueAdminCreateDTO dto = new IssueAdminCreateDTO();
 
+    protected override async Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrEmpty(id) && Guid.TryParse(id, out Guid result))
+        {
+            var issues = await adminService.GetIssuesBySearchParams(new() { IssueId = result });
+            var issue = issues.Data.Items.First();
+            dto.Title = issue.Title;
+            dto.IssueStatus = issue.IssueStatus;
+            dto.ApplicationUserId = issue.ApplicationUserId;
+            dto.ApplicationUserEmail = issue.ApplicationUserEmail;
+            dto.Question = issue.Question;
+            dto.IsVerifyByAdmin = issue.IsVerifyByAdmin;
+            dto.RatingValue = issue.RatingValue;
+            dto.Icon = issue.Icon;
+            dto.BackgroundColor = issue.BackgroundColor;
+        }
+    }
+
     private ApiResponse<Guid> result = null;
 
     private void HandleIconChanged(string selectedIcon)
     {
         dto.Icon = selectedIcon;
     }
-    
+
     private void HandleColorChanged(string selectedColor)
     {
         dto.BackgroundColor = selectedColor;
@@ -100,6 +118,9 @@
 
     private async Task Create()
     {
-        result = await adminService.CreateIssue(dto);
+        if (!string.IsNullOrEmpty(id) && Guid.TryParse(id, out Guid issueId))
+            dto.IssueId = issueId;
+
+        result = await adminService.CreateOrEditIssue(dto);
     }
 }

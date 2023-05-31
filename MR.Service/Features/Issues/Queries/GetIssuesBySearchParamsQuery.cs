@@ -2,6 +2,7 @@
 
 public class GetIssuesBySearchParamsQuery : QueryBase, IRequest<PagedList<Issue>>
 {
+    public Guid? IssueId { get; set; }
     public string? CreatedByEmail { get; set; }
     public class GetIssuesBySearchParamsQueryHandler : CommandQueryHandlerBase<GetIssuesBySearchParamsQuery, PagedList<Issue>>
     {
@@ -11,7 +12,14 @@ public class GetIssuesBySearchParamsQuery : QueryBase, IRequest<PagedList<Issue>
 
         public override async Task<PagedList<Issue>> Handle(GetIssuesBySearchParamsQuery request, CancellationToken cancellationToken)
         {
-            var query = _context.Issues.Include(x=>x.CreatedBy).AsQueryable();
+            var query = _context.Issues
+                .Include(x => x.IssueStatusHistories)
+                .Include(x => x.CreatedBy).AsQueryable();
+            
+            if (request.IssueId.HasValue)
+            {
+                query = query.Where(x => x.Id == request.IssueId.Value);
+            }
 
             if (!string.IsNullOrEmpty(request.CreatedByEmail))
             {

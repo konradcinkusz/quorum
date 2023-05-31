@@ -1,6 +1,5 @@
 ﻿@inherits BaseAdmin
 @page "/admin/create-subscription/{id?}"
-@inject IAdminService subscriptionService
 
 <div class="card shadow rounded-3">
     <div class="card-header bg-primary text-white py-3 rounded-3">
@@ -55,7 +54,7 @@
     {
         if (!string.IsNullOrEmpty(id))
         {
-            var subs = await subscriptionService.GetSubscriptionsBySearchParams(new() { Id = id });
+            var subs = await adminService.GetSubscriptionsBySearchParams(new() { Id = id });
             var sub = subs.Data.Items.First();
             Subscription.End = sub.End;
             Subscription.Begin = sub.Begin;
@@ -66,6 +65,6 @@
     private ApiResponse<string>? result = null;
     private async Task CreateSubscription()
     {
-        result = await subscriptionService.CreateOrEditSubscription(Subscription);
+        result = await adminService.CreateOrEditSubscription(Subscription);
     }
 }

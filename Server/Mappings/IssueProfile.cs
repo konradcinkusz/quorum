@@ -4,6 +4,8 @@ public class IssueProfile : Profile
 {
     public IssueProfile()
     {
+        CreateMap<IssueStatusHistory,  IssueStatusHistoryDTO>();
+
         CreateMap<Issue, IssueAdminCreateDTO>()
             .ForMember(dest => dest.InitialPayment, opt => opt.MapFrom(src => src.InitialPayment))
             .ForMember(dest => dest.ApplicationUserId, opt => opt.MapFrom(src => src.CreatedBy != null ? src.CreatedBy.Id : string.Empty))
