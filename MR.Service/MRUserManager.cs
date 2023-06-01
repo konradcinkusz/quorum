@@ -1,8 +1,11 @@
-﻿namespace MR.Service;
+﻿using Microsoft.Extensions.DependencyInjection;
+
+namespace MR.Service;
 
 public class MRUserManager : UserManager<ApplicationUser>
 {
     private readonly IApplicationDbContext _context;
+    private readonly IServiceProvider _serviceProvider;
     public MRUserManager(IApplicationDbContext context, IUserStore<ApplicationUser> store, IOptions<IdentityOptions> optionsAccessor,
         IPasswordHasher<ApplicationUser> passwordHasher, IEnumerable<IUserValidator<ApplicationUser>> userValidators,
         IEnumerable<IPasswordValidator<ApplicationUser>> passwordValidators, ILookupNormalizer keyNormalizer,
@@ -10,6 +13,7 @@ public class MRUserManager : UserManager<ApplicationUser>
         : base(store, optionsAccessor, passwordHasher, userValidators, passwordValidators, keyNormalizer, errors, services, logger)
     {
         _context = context;
+        _serviceProvider = services;
     }
 
     public override async Task<IdentityResult> CreateAsync(ApplicationUser user)
@@ -25,5 +29,30 @@ public class MRUserManager : UserManager<ApplicationUser>
             await _context.SaveChangesAsync(token);
         }
         return result;
+    }
+
+    public async Task<IEnumerable<Claim>> GetClaims(string userId)
+    {
+        var claimsFactory = _serviceProvider.GetRequiredService<CustomClaimsPrincipalFactory>();
+        var user = await FindByIdAsync(userId);
+        var principal = await claimsFactory.CreateAsync(user);
+        return principal.Claims;
+    }
+
+    public async Task<bool> HasActiveSubscription(string applicationUserId)
+    {
+        var claimsFactory = _serviceProvider.GetRequiredService<CustomClaimsPrincipalFactory>();
+        var user = await FindByIdAsync(applicationUserId);
+        var principal = await claimsFactory.CreateAsync(user);
+        var isActiveSubscriptionClaim = principal.Claims.FirstOrDefault(c => c.Type == "isActiveSubscription");
+
+        if (isActiveSubscriptionClaim != null && bool.TryParse(isActiveSubscriptionClaim.Value, out bool isActiveSubscription))
+        {
+            return isActiveSubscription;
+        }
+        else
+        {
+            throw new ApplicationException("The isActiveSubscription claim is not present or cannot be parsed");
+        }
     }
 }

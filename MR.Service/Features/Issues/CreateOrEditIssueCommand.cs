@@ -30,6 +30,13 @@ public class CreateOrEditIssueCommand : IRequest<Guid>
 
         protected override async Task<Issue> MakeAsync(CreateOrEditIssueCommand command, CancellationToken cancellationToken)
         {
+            var isActiveSub = await _MRUserManager.HasActiveSubscription(command.CreatedById);
+
+            if(!isActiveSub)
+            {
+                throw new ApplicationException("You don't have an active sub and you cannot create issue.");
+            }
+
             Issue issue;
 
             if (command.IssueId.HasValue)
