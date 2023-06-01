@@ -29,21 +29,21 @@ public class GetSignaturePoolsBySearchParamsQuery : QueryBase, IRequest<PagedLis
 
             if (request.Quarter.HasValue)
             {
-                query = query.Where(p => p.Quarter.Month == request.Quarter.Value);
+                query = query.Where(p => p.Quarter.QuarterNumber == request.Quarter.Value);
             }
 
             if (request.Begin.HasValue)
             {
                 var beginYear = request.Begin.Value.Year;
                 var beginMonth = request.Begin.Value.Month;
-                query = query.Where(p => (p.Quarter.Year > beginYear) || (p.Quarter.Year == beginYear && p.Quarter.Month >= beginMonth));
+                query = query.Where(p => (p.Quarter.Year > beginYear) || (p.Quarter.Year == beginYear && p.Quarter.QuarterNumber >= beginMonth));
             }
 
             if (request.End.HasValue)
             {
                 var endYear = request.End.Value.Year;
                 var endMonth = request.End.Value.Month;
-                query = query.Where(p => (p.Quarter.Year < endYear) || (p.Quarter.Year == endYear && p.Quarter.Month <= endMonth));
+                query = query.Where(p => (p.Quarter.Year < endYear) || (p.Quarter.Year == endYear && p.Quarter.QuarterNumber <= endMonth));
             }
 
             query = ApplySorting(query, request.SortColumn, request.SortOrder);
@@ -72,11 +72,11 @@ public class GetSignaturePoolsBySearchParamsQuery : QueryBase, IRequest<PagedLis
                     case "Month":
                         if (sortOrder == SortOrder.Ascending)
                         {
-                            query = query.OrderBy(p => (p as SignaturePool).Quarter.Month);
+                            query = query.OrderBy(p => (p as SignaturePool).Quarter.QuarterNumber);
                         }
                         else if (sortOrder == SortOrder.Descending)
                         {
-                            query = query.OrderByDescending(p => (p as SignaturePool).Quarter.Month);
+                            query = query.OrderByDescending(p => (p as SignaturePool).Quarter.QuarterNumber);
                         }
                         break;
                     default:

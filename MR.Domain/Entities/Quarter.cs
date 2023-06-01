@@ -4,7 +4,7 @@
 public class Quarter : BaseEntity<Guid>
 {
     public int Year { get; set; }
-    public int Month { get; set; }
+    public int QuarterNumber { get; set; }
 
     //kwestie rozpatrywane w danym kwartale
     [InverseProperty(nameof(QuarterIssue.Quarter))]

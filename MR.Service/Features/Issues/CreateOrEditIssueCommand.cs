@@ -3,7 +3,7 @@
 public class CreateOrEditIssueCommand : IRequest<Guid>
 {
     //nullable
-    public string ApplicationUserId { get; set; }
+    public string CreatedById { get; set; }
 
     //not null
     public string Title { get; set; }
@@ -19,10 +19,13 @@ public class CreateOrEditIssueCommand : IRequest<Guid>
 
     public class CreateIssueCommandHandler : CreateOrEditCommandHandlerBase<CreateOrEditIssueCommand, Guid, Issue>
     {
+        private readonly MRUserManager _MRUserManager;
         public CreateIssueCommandHandler(
+            MRUserManager MRUserManager,
             IApplicationDbContext context,
             ILogger<CreateOrEditIssueCommand> logger) : base(context, logger)
         {
+            _MRUserManager = MRUserManager;
         }
 
         protected override async Task<Issue> MakeAsync(CreateOrEditIssueCommand command, CancellationToken cancellationToken)
@@ -36,7 +39,7 @@ public class CreateOrEditIssueCommand : IRequest<Guid>
             else
             {
                 issue = await base.MakeAsync(command, cancellationToken);
-                issue.CreatedById = command.ApplicationUserId;
+                issue.CreatedById = command.CreatedById;
             }
 
             issue.IssueStatusHistories = new List<IssueStatusHistory> { new() { IssueStatus = command.IssueStatus } };

@@ -23,3 +23,4 @@ global using MR.Service;
 global using MR.Shared.DTOs.SignaturePools;
 global using MR.Shared.DTOs.Issue;
 global using System.Reflection;
+global using MR.Client.Features;

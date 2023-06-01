@@ -30,10 +30,10 @@
                     </div>
                     <div class="col-md-3 col-sm-12">
                         <label for="isVerifyByAdmin" class="text-white">Verified by Admin</label>
-                        <select id="isVerifyByAdmin" class="form-control rounded-pill" @bind="SearchParams.IsVerifyByAdmin" @bind:event="onchange">
+                        <select id="isVerifyByAdmin" class="form-control rounded-pill" @onchange="OnVerifyByAdminChanged">
                             <option value="">-- Select Verification --</option>
-                            <option value="true">Yes</option>
-                            <option value="false">No</option>
+                            <option value="true" selected="@SearchParams.IsVerifyByAdmin">Yes</option>
+                            <option value="false" selected="@(SearchParams.IsVerifyByAdmin == false)">No</option>
                         </select>
                     </div>
                     <div class="col-md-3 col-sm-12">
@@ -54,10 +54,10 @@
                     </div>
                     <div class="col-md-3 col-sm-12">
                         <label for="hasInitialPayment" class="text-white">Has Initial Payment</label>
-                        <select id="hasInitialPayment" class="form-control rounded-pill" @bind="SearchParams.HasInitialPayment" @bind:event="onchange">
-                            <option value="">-- Select Payment --</option>
-                            <option value="true">Yes</option>
-                            <option value="false">No</option>
+                        <select id="hasInitialPayment" class="form-control rounded-pill" @onchange="OnHasInitialPaymentChanged">
+                            <option value="">-- Select Verification --</option>
+                            <option value="true" selected="@SearchParams.HasInitialPayment">Yes</option>
+                            <option value="false" selected="@(SearchParams.HasInitialPayment == false)">No</option>
                         </select>
                     </div>
                 </div>
@@ -87,5 +87,41 @@
     {
         SearchParams.CreatedByEmail = string.Empty;
         await Refresh.InvokeAsync();
+    }
+
+    public bool? IsVerifyByAdmin
+    {
+        get => SearchParams.IsVerifyByAdmin;
+        set => SearchParams.IsVerifyByAdmin = value;
+    }
+
+    private void OnVerifyByAdminChanged(ChangeEventArgs e)
+    {
+        if (bool.TryParse(e.Value?.ToString(), out bool result))
+        {
+            IsVerifyByAdmin = result;
+        }
+        else
+        {
+            IsVerifyByAdmin = null;
+        }
+    }
+
+    public bool? HasInitialPayment
+    {
+        get => SearchParams.HasInitialPayment;
+        set => SearchParams.HasInitialPayment = value;
+    }
+
+    private void OnHasInitialPaymentChanged(ChangeEventArgs e)
+    {
+        if (bool.TryParse(e.Value?.ToString(), out bool result))
+        {
+            HasInitialPayment = result;
+        }
+        else
+        {
+            HasInitialPayment = null;
+        }
     }
 }

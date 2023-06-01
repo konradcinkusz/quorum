@@ -10,4 +10,6 @@ public class IssueSearchParamsDTO : SearchParamsDTO
     public IssueStatusEnum? IssueStatus { get; set; }
     public int? RatingValue { get; set; }
     public bool? HasInitialPayment { get; set; }
+    public int? QuarterYear { get; set; }
+    public int? QuarterNumber { get; set; }
 }

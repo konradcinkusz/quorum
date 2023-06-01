@@ -1,0 +1,119 @@
+﻿@attribute [Authorize]
+@page "/issue/create-issue/{id?}"
+@inject IIssueService issueService
+
+<PageTitle>Issue Create or Edit</PageTitle>
+
+<div class="card shadow rounded-3">
+    <div class="card-header bg-primary text-white py-3 rounded-3">
+        <h5 class="card-title mb-0">Create or Edit Issue</h5>
+    </div>
+
+    <div class="card-body">
+        <EditForm Model="@dto" OnValidSubmit="@Create">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <label for="title-value" class="form-label">Title</label>
+                    <InputText id="title-value" class="form-control rounded-pill" @bind-Value="@dto.Title" required />
+                    <ValidationMessage For="@(() => dto.Title)" />
+                </div>
+
+                <div class="col-md-6 mb-4">
+                    <label for="question-value" class="form-label">Question</label>
+                    <InputText id="question-value" class="form-control rounded-pill" @bind-Value="@dto.Question" required />
+                    <ValidationMessage For="@(() => dto.Question)" />
+                </div>
+
+                <div class="col-md-6 mb-4">
+                    <label for="icon-value" class="form-label">Choose icon</label>
+                    <_IconPicker Icon="@dto.Icon" IconChanged="HandleIconChanged" />
+                </div>
+
+                <div class="col-md-6 mb-4">
+                    <label for="color-value" class="form-label">Choose color</label>
+                    <_ColorPicker SelectedColor="@dto.BackgroundColor" SelectedColorChanged="@HandleColorChanged" />
+                </div>
+
+                <div class="col-md-6 d-grid">
+                    <button type="submit" class="btn btn-primary rounded-pill inactive-subscription-button"
+                            disabled="@(!isActiveSubscription)">
+                        Save Changes
+                    </button>
+                </div>
+            </div>
+        </EditForm>
+
+    </div>
+</div>
+
+@if (result != null)
+{
+    <_ApiResponse T="Guid" result="result" />
+}
+<style>
+    .inactive-subscription-button {
+        background-color: @(!isActiveSubscription ? "grey" : "#007bff");
+    }
+</style>
+@code {
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthTask { get; set; }
+
+    [Parameter]
+    public string id { get; set; }
+
+    private bool isActiveSubscription = false;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+
+        var authState = await AuthTask;
+        var user = authState.User;
+        var claim = user.Claims.FirstOrDefault(x => x.Type == "isActiveSubscription");
+        if (claim != null && bool.TryParse(claim.Value, out bool subscriptionF))
+        {
+            isActiveSubscription = subscriptionF;
+        }
+    }
+
+    private IssueCreateDTO dto = new IssueCreateDTO();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrEmpty(id) && Guid.TryParse(id, out Guid result))
+        {
+            var issues = await issueService.GetIssuesBySearchParams(new() { IssueId = result });
+            var issue = issues.Data.Items.First();
+            dto.Title = issue.Title;
+            dto.Question = issue.Question;
+            dto.Icon = issue.Icon;
+            dto.BackgroundColor = issue.BackgroundColor;
+        }
+    }
+
+    private ApiResponse<Guid> result = null;
+
+    private void HandleIconChanged(string selectedIcon)
+    {
+        dto.Icon = selectedIcon;
+    }
+
+    private void HandleColorChanged(string selectedColor)
+    {
+        dto.BackgroundColor = selectedColor;
+    }
+
+    private async Task Create()
+    {
+        if (!string.IsNullOrEmpty(id) && Guid.TryParse(id, out Guid issueId))
+            dto.IssueId = issueId;
+        if (isActiveSubscription)
+            result = await issueService.CreateOrEditIssue(dto);
+        else
+            throw new ApplicationException("You don't have an active sub and you cannot create issue");
+    }
+}

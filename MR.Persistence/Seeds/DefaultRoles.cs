@@ -1,6 +1,4 @@
-﻿using MR.Domain.Constants;
-
-namespace MR.Persistence.Seeds;
+﻿namespace MR.Persistence.Seeds;
 
 public static class DefaultRoles
 {

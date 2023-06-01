@@ -19,12 +19,12 @@ public class InitQuarterCommand : IRequest<Guid>
 
         public override async Task<Guid> Handle(InitQuarterCommand request, CancellationToken cancellationToken)
         {
-            var q = await _context.Quarters.FirstOrDefaultAsync(x => x.Year == request.Year && x.Month == request.Month);
+            var q = await _context.Quarters.FirstOrDefaultAsync(x => x.Year == request.Year && x.QuarterNumber == request.Month);
             if (q != null)
             {
                 throw new ApplicationException("There is already a quarter at this dates");
             }
-            var quarter = new Quarter { Month = request.Month, Year = request.Year };
+            var quarter = new Quarter { QuarterNumber = request.Month, Year = request.Year };
             await _context.Quarters.AddAsync(quarter, cancellationToken);
 
             //dla wszytkich userów dodaj pule sygnatur na ten kwartał

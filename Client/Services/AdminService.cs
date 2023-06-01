@@ -125,7 +125,7 @@ internal class AdminService : DataServiceBase, IAdminService
     public async Task<ApiResponse<IssuePagedListDTO>> GetIssuesBySearchParams(IssueSearchParamsDTO searchParams)
     {
         var q = BuildQuery(searchParams);
-        var endpoint = $"{_issueControllerPath}/get-issues-by-search-params?{q}";
+        var endpoint = $"{_issueControllerPath}/get-issues-by-search-params-admin?{q}";
         return await HandleResponse<IssuePagedListDTO>(async () =>
         await _httpClient.GetAsync(endpoint));
     }

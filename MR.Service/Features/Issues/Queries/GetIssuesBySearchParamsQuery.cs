@@ -4,6 +4,14 @@ public class GetIssuesBySearchParamsQuery : QueryBase, IRequest<PagedList<Issue>
 {
     public Guid? IssueId { get; set; }
     public string? CreatedByEmail { get; set; }
+    public string? Title { get; set; }
+    public string? Question { get; set; }
+    public bool? IsVerifyByAdmin { get; set; }
+    public IssueStatus? IssueStatus { get; set; }
+    public int? RatingValue { get; set; }
+    public bool? HasInitialPayment { get; set; }
+    public int? QuarterYear { get; set; }
+    public int? QuarterNumber { get; set; }
     public class GetIssuesBySearchParamsQueryHandler : CommandQueryHandlerBase<GetIssuesBySearchParamsQuery, PagedList<Issue>>
     {
         public GetIssuesBySearchParamsQueryHandler(IApplicationDbContext context, ILogger<GetIssuesBySearchParamsQuery> logger) : base(context, logger)
@@ -13,9 +21,10 @@ public class GetIssuesBySearchParamsQuery : QueryBase, IRequest<PagedList<Issue>
         public override async Task<PagedList<Issue>> Handle(GetIssuesBySearchParamsQuery request, CancellationToken cancellationToken)
         {
             var query = _context.Issues
+                .Include(x => x.QuarterIssues).ThenInclude(qi => qi.Quarter)
                 .Include(x => x.IssueStatusHistories)
                 .Include(x => x.CreatedBy).AsQueryable();
-            
+
             if (request.IssueId.HasValue)
             {
                 query = query.Where(x => x.Id == request.IssueId.Value);
@@ -25,6 +34,45 @@ public class GetIssuesBySearchParamsQuery : QueryBase, IRequest<PagedList<Issue>
             {
                 query = query.Where(x => x.CreatedBy != null && !string.IsNullOrEmpty(x.CreatedBy.Email) &&
                             x.CreatedBy.Email.Contains(request.CreatedByEmail));
+            }
+            if (!string.IsNullOrEmpty(request.Title))
+            {
+                query = query.Where(x => x.Title != null && x.Title.Contains(request.Title));
+            }
+
+            if (!string.IsNullOrEmpty(request.Question))
+            {
+                query = query.Where(x => x.Question != null && x.Question.Contains(request.Question));
+            }
+
+            if (request.IsVerifyByAdmin.HasValue)
+            {
+                query = query.Where(x => x.IsVerifyByAdmin == request.IsVerifyByAdmin.Value);
+            }
+
+            if (request.IssueStatus.HasValue)
+            {
+                query = query.Where(x => x.IssueStatus == request.IssueStatus.Value);
+            }
+
+            if (request.RatingValue.HasValue)
+            {
+                query = query.Where(x => x.RatingValue == request.RatingValue.Value);
+            }
+
+            if (request.HasInitialPayment.HasValue)
+            {
+                query = query.Where(x => request.HasInitialPayment.Value ? x.InitialPayment != null : x.InitialPayment == null);
+            }
+
+            if (request.QuarterYear.HasValue)
+            {
+                query = query.Where(p => p.QuarterIssues.Any(y => y.Quarter.Year == request.QuarterYear.Value));
+            }
+
+            if (request.QuarterNumber.HasValue)
+            {
+                query = query.Where(p => p.QuarterIssues.Any(y => y.Quarter.QuarterNumber == request.QuarterNumber.Value));
             }
 
             query = ApplySorting(query, request.SortColumn, request.SortOrder);

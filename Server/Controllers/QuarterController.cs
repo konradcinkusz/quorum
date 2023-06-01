@@ -15,7 +15,7 @@ public class QuarterController : MRBaseController
         {
             var result = await Mediator.Send(new GetQuartersBySearchParamsQuery
             {
-                Quarter = searchParams.Quarter,
+                QuarterNumber = searchParams.Quarter,
                 Year =  searchParams.Year,
                 Begin = searchParams.Begin,
                 End = searchParams.End,
