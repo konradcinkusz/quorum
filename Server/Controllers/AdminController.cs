@@ -36,9 +36,11 @@ public class AdminController : MRBaseController
         return response;
     }
 
-    [HttpGet("GetAdminLogsByQuery")]
-    public async Task<ActionResult<ApiResponse<AdminLogPagedListDTO>>>
-        GetAdminLogsByQuery([FromQuery] AdminLogSearchParamsDTO query)
+    [HttpGet("get-user-email-by-user-id")]
+    public async Task<ActionResult<ApiResponse<string>>> GetUserEmailByUserId([FromQuery] string userId) => await HandleErrors(async () => await Mediator.Send(new GetUserEmailByUserIdCommand(userId)));
+
+    [HttpGet("get-admin-logs-by-query")]
+    public async Task<ActionResult<ApiResponse<AdminLogPagedListDTO>>> GetAdminLogsByQuery([FromQuery] AdminLogSearchParamsDTO query)
     {
         var command = new GetAdminLogsBySearchParamsQuery
         {
@@ -53,9 +55,8 @@ public class AdminController : MRBaseController
         return await ProcessAdminRequest(command);
     }
 
-    [HttpPost("SeedPayments")]
-    public async Task<ActionResult<ApiResponse<PaymentPagedListDTO>>> SeedPayments(
-        [FromBody] SeedPaymentRequest seedPaymentRequest)
+    [HttpPost("seed-payments")]
+    public async Task<ActionResult<ApiResponse<PaymentPagedListDTO>>> SeedPayments([FromBody] SeedPaymentRequest seedPaymentRequest)
     {
         var result = await Mediator.Send(new SeedPaymentCommand(GetUserId()) { Count = seedPaymentRequest.Count });
 

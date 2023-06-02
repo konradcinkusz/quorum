@@ -18,6 +18,7 @@ public interface IAdminService
     Task<ApiResponse<bool>> AddSignatureToSignaturePool(Guid signaturePoolId);
     Task<ApiResponse<IssuePagedListDTO>> GetIssuesBySearchParams(IssueSearchParamsDTO searchParams);
     Task<ApiResponse<Guid>> CreateOrEditIssue(IssueAdminCreateDTO issueDTO);
+    Task<ApiResponse<string>> GetUserEmailByUserId(string userId);
 }
 
 internal class AdminService : DataServiceBase, IAdminService
@@ -29,21 +30,21 @@ internal class AdminService : DataServiceBase, IAdminService
     public async Task<ApiResponse<AdminLogPagedListDTO>> GetAdminLogs(AdminLogSearchParamsDTO query)
     {
         var q = BuildQuery(query);
-        var endpoint = $"{_adminControllerPath}/GetAdminLogsByQuery?{q}";
+        var endpoint = $"{_adminControllerPath}/get-admin-logs-by-query?{q}";
         return await HandleResponse<AdminLogPagedListDTO>(async () =>
             await _httpClient.GetAsync(endpoint));
     }
 
     public async Task<ApiResponse<PaymentPagedListDTO>> SeedPayments(SeedPaymentRequest seedPaymentRequest)
     {
-        var endpoint = $"{_adminControllerPath}/SeedPayments";
+        var endpoint = $"{_adminControllerPath}/seed-payments";
         return await HandleResponse<PaymentPagedListDTO>(async () => await _httpClient.PostAsJsonAsync(endpoint, seedPaymentRequest));
     }
 
     public async Task<ApiResponse<string>> CreateOrEditSubscription(SubscriptionCreateForUserDTO SubscriptionDto)
     {
         var endpoint = $"{_subscriptionControllerPath}/CreateOrEditSubscription";
-        return await HandleResponse<string>(async () => 
+        return await HandleResponse<string>(async () =>
             await _httpClient.PostAsJsonAsync(endpoint, SubscriptionDto));
     }
 
@@ -169,6 +170,14 @@ internal class AdminService : DataServiceBase, IAdminService
         var q = BuildQuery(query);
         var endpoint = $"{_subscriptionControllerPath}/get-subscriptions-by-search-params?{q}";
         return await HandleResponse<SubscriptionPagedListDTO>(async () =>
+            await _httpClient.GetAsync(endpoint));
+    }
+
+    public async Task<ApiResponse<string>> GetUserEmailByUserId(string userId)
+    {
+        var q = BuildQuery(nameof(userId), userId);
+        var endpoint = $"{_adminControllerPath}/get-user-email-by-user-id?{q}";
+        return await HandleResponse<string>(async () =>
             await _httpClient.GetAsync(endpoint));
     }
 }

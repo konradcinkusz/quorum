@@ -1,5 +1,6 @@
 ﻿@attribute [Authorize]
 @page "/issue/create-issue/{id?}"
+@using System.Security.Claims;
 @inject IIssueService issueService
 @inject NavigationManager navigationManager
 
@@ -18,13 +19,13 @@
             <div class="row">
                 <div class="col-md-6 mb-4">
                     <label for="title-value" class="form-label">Title</label>
-                    <InputText id="title-value" class="form-control rounded-pill" @bind-Value="@dto.Title" required />
+                    <InputText id="title-value" class="form-control rounded-pill" @bind-Value="@dto.Title" @oninput="@((ChangeEventArgs e)=>{dto.Title = e?.Value?.ToString()??"";})" required />
                     <ValidationMessage For="@(() => dto.Title)" />
                 </div>
 
                 <div class="col-md-6 mb-4">
                     <label for="question-value" class="form-label">Question</label>
-                    <InputText id="question-value" class="form-control rounded-pill" @bind-Value="@dto.Question" required />
+                    <InputTextArea id="question-value" class="form-control rounded-pill" @bind-Value="@dto.Question" @oninput="@((ChangeEventArgs e)=>{dto.Question = e?.Value?.ToString()??"";})" required />
                     <ValidationMessage For="@(() => dto.Question)" />
                 </div>
 
@@ -68,7 +69,13 @@
             </div>
             <div class="col-12">
                 <div class="row d-flex justify-content-center">
-                    <_CustomCard BackgroundColor="@dto.BackgroundColor" Title="@dto.Title" Icon="@dto.Icon" Text="@dto.Question" />
+                    <_CustomIssueCard BackgroundColor="@dto.BackgroundColor"
+                                      Title="@dto.Title" Icon="@dto.Icon"
+                                      Text="@dto.Question"
+                                      ApplicationUserEmail="@email"
+                                      IsVerifyByAdmin="false"
+                                      IssueStatus="@IssueStatusEnum.VisibleOnlyToMe"
+                                      RatingValue="0" />
                 </div>
             </div>
         </div>
@@ -99,6 +106,7 @@
     public string id { get; set; }
 
     private bool isActiveSubscription = false;
+    private string email;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -111,6 +119,8 @@
         {
             isActiveSubscription = subscriptionF;
         }
+
+        email = user.Claims.FirstOrDefault(x => x.Type == "name")?.Value ?? string.Empty;
     }
 
     private IssueCreateDTO dto = new IssueCreateDTO();
@@ -149,7 +159,6 @@
 
         if (result != null)
         {
-            // Redirect to CreateOrEdit page with the returned GUID as the id
             navigationManager.NavigateTo($"/issue/create-issue/{result.Data}");
         }
     }

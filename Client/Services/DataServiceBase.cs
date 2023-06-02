@@ -42,6 +42,24 @@ internal abstract class DataServiceBase
         return q;
     }
 
+    protected NameValueCollection BuildQuery(Dictionary<string, string> parameters)
+    {
+        var q = HttpUtility.ParseQueryString(string.Empty);
+        foreach (var parameter in parameters)
+        {
+            q[parameter.Key] = parameter.Value;
+        }
+        return q;
+    }
+
+    protected NameValueCollection BuildQuery(string parameterName, string parameterValue)
+    {
+        return BuildQuery(new Dictionary<string, string>
+                {
+                    { parameterName, parameterValue },
+                });
+    }
+
     protected async Task<ApiResponse<T>> HandleResponse<T>(Func<Task<HttpResponseMessage>> action)
     {
         var response = await action.Invoke();

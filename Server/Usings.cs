@@ -37,3 +37,4 @@ global using MR.Service.Features.SignaturePoolsFeatures;
 global using MR.Service.Features.Issues.Queries;
 global using MR.Shared;
 global using MR.Service.Features.Issues;
+global using MR.Service.Features.AdminFeatures;

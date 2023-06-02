@@ -1,5 +1,6 @@
 ﻿@inherits BaseAdmin
 @page "/admin/create-issue-by-admin/{id?}"
+@inject NavigationManager navigationManager
 
 <PageTitle>Admin Issue Create or Edit</PageTitle>
 
@@ -16,19 +17,19 @@
             <div class="row">
                 <div class="col-md-6 mb-4">
                     <label for="email-value" class="form-label">Application User Id</label>
-                    <InputText id="email-value" class="form-control rounded-pill" @bind-Value="@dto.ApplicationUserId" required />
+                    <InputText id="email-value" class="form-control rounded-pill" ValueExpression="@(()=>dto.ApplicationUserId)" Value="@dto.ApplicationUserId" ValueChanged="@((string value) => OnApplicationUserIdValueChanged(value))" required />
                     <ValidationMessage For="@(() => dto.ApplicationUserId)" />
                 </div>
 
                 <div class="col-md-6 mb-4">
                     <label for="title-value" class="form-label">Title</label>
-                    <InputText id="title-value" class="form-control rounded-pill" @bind-Value="@dto.Title" required />
+                    <InputText id="title-value" class="form-control rounded-pill" @bind-Value="@dto.Title" @oninput="@((ChangeEventArgs e)=>{dto.Title = e?.Value?.ToString()??"";})" required />
                     <ValidationMessage For="@(() => dto.Title)" />
                 </div>
 
                 <div class="col-md-6 mb-4">
                     <label for="question-value" class="form-label">Question</label>
-                    <InputText id="question-value" class="form-control rounded-pill" @bind-Value="@dto.Question" required />
+                    <InputText id="question-value" class="form-control rounded-pill" @bind-Value="@dto.Question" @oninput="@((ChangeEventArgs e)=>{dto.Question = e?.Value?.ToString()??"";})" required />
                     <ValidationMessage For="@(() => dto.Question)" />
                 </div>
 
@@ -95,7 +96,10 @@
 {
     <_ApiResponse T="Guid" result="result" />
 }
-
+@if (emailResponse != null)
+{
+    <_ApiResponse T="string" result="emailResponse" />
+}
 @code {
     [Parameter]
     public string id { get; set; }
@@ -138,5 +142,33 @@
             dto.IssueId = issueId;
 
         result = await adminService.CreateOrEditIssue(dto);
+
+        if (result != null)
+        {
+            navigationManager.NavigateTo($"/admin/create-issue-by-admin/{result.Data}");
+        }
+    }
+
+    private ApiResponse<string> emailResponse = null;
+    private async Task RefreshEmail()
+    {
+        emailResponse = await adminService.GetUserEmailByUserId(dto.ApplicationUserId);
+        if (emailResponse.Success)
+            dto.ApplicationUserEmail = emailResponse.Data;
+    }
+
+    private async Task OnApplicationUserIdValueChanged(string value)
+    {
+        dto.ApplicationUserId = value;
+        if (Guid.TryParse(value, out Guid id))
+        {
+            emailResponse = await adminService.GetUserEmailByUserId(value);
+            if (emailResponse.Success)
+                dto.ApplicationUserEmail = emailResponse.Data;
+        }
+        else
+        {
+            dto.ApplicationUserEmail = string.Empty;
+        }
     }
 }
