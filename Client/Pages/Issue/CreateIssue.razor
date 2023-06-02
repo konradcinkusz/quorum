@@ -1,6 +1,7 @@
 ﻿@attribute [Authorize]
 @page "/issue/create-issue/{id?}"
 @inject IIssueService issueService
+@inject NavigationManager navigationManager
 
 <PageTitle>Issue Create or Edit</PageTitle>
 
@@ -36,16 +37,41 @@
                     <label for="color-value" class="form-label">Choose color</label>
                     <_ColorPicker SelectedColor="@dto.BackgroundColor" SelectedColorChanged="@HandleColorChanged" />
                 </div>
-
-                <div class="col-md-6 d-grid">
-                    <button type="submit" class="btn btn-primary rounded-pill inactive-subscription-button"
-                            disabled="@(!isActiveSubscription)">
-                        Save Changes
-                    </button>
+                <div class="row">
+                    <div class="col-sm-12 col-md-4 d-grid">
+                        <button type="submit" class="btn btn-primary rounded-pill">
+                            Save Changes
+                        </button>
+                    </div>
+                    @if (!string.IsNullOrEmpty(id))
+                    {
+                        <div class="col-sm-12 col-md-4 d-grid">
+                            <button type="button" @onclick="Publish" class="btn btn-primary rounded-pill inactive-subscription-button"
+                                    disabled="@(!isActiveSubscription)" data-bs-toggle="tooltip" title="@(isActiveSubscription ? string.Empty : "You don't have an active subscription yet")">
+                                Publish
+                            </button>
+                        </div>
+                        <div class="col-sm-12 col-md-4 d-grid">
+                            <button type="button" @onclick="Pay" class="btn btn-primary rounded-pill inactive-subscription-button"
+                                    disabled="@(!isActiveSubscription)" data-bs-toggle="tooltip" title="@(isActiveSubscription ? string.Empty : "You don't have an active subscription yet")">
+                                Pay
+                            </button>
+                        </div>
+                    }
                 </div>
             </div>
         </EditForm>
-
+        <div class="row justify-content-center">
+            <div class="col-12 text-center">
+                <hr />
+                <h5>Preview</h5>
+            </div>
+            <div class="col-12">
+                <div class="row d-flex justify-content-center">
+                    <_CustomCard BackgroundColor="@dto.BackgroundColor" Title="@dto.Title" Icon="@dto.Icon" Text="@dto.Question" />
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -53,11 +79,18 @@
 {
     <_ApiResponse T="Guid" result="result" />
 }
+
+@if (published != null)
+{
+    <_ApiResponse T="bool" result="published" />
+}
+
 <style>
     .inactive-subscription-button {
         background-color: @(!isActiveSubscription ? "grey" : "#007bff");
     }
 </style>
+
 @code {
     [CascadingParameter]
     public Task<AuthenticationState> AuthTask { get; set; }
@@ -86,16 +119,15 @@
     {
         if (!string.IsNullOrEmpty(id) && Guid.TryParse(id, out Guid result))
         {
-            var issues = await issueService.GetIssuesBySearchParams(new() { IssueId = result });
+            var issues = await issueService.GetIssuesBySearchParams(new() { IssueId = result, PaymentOptions = IssuePaymentOptions.WithInitialPayment_OnlyIfCompleted });
             var issue = issues.Data.Items.First();
             dto.Title = issue.Title;
             dto.Question = issue.Question;
             dto.Icon = issue.Icon;
             dto.BackgroundColor = issue.BackgroundColor;
+            dto.InitialPaymnet = issue.InitialPayment;
         }
     }
-
-    private ApiResponse<Guid> result = null;
 
     private void HandleIconChanged(string selectedIcon)
     {
@@ -107,13 +139,33 @@
         dto.BackgroundColor = selectedColor;
     }
 
+    private ApiResponse<Guid> result = null;
     private async Task Create()
     {
         if (!string.IsNullOrEmpty(id) && Guid.TryParse(id, out Guid issueId))
             dto.IssueId = issueId;
-        if (isActiveSubscription)
-            result = await issueService.CreateOrEditIssue(dto);
-        else
-            throw new ApplicationException("You don't have an active sub and you cannot create issue");
+
+        result = await issueService.CreateOrEditIssue(dto);
+
+        if (result != null)
+        {
+            // Redirect to CreateOrEdit page with the returned GUID as the id
+            navigationManager.NavigateTo($"/issue/create-issue/{result.Data}");
+        }
+    }
+
+    private ApiResponse<bool> published = null;
+    private async Task Publish()
+    {
+        if (!string.IsNullOrEmpty(id) && Guid.TryParse(id, out Guid issueId) && isActiveSubscription)
+            published = await issueService.PublishIssue(issueId);
+    }
+
+    private IssuePayDTO issuePayDTO = new IssuePayDTO() { PaymentMethod = "Bank", PaymentValue = 5, ReferenceNumber = "Bank" };
+    private ApiResponse<bool> paid = null;
+    private async Task Pay()
+    {
+        if (!string.IsNullOrEmpty(id) && Guid.TryParse(id, out Guid issueId) && isActiveSubscription)
+            paid = await issueService.PayForAnIssue(issueId, issuePayDTO);
     }
 }

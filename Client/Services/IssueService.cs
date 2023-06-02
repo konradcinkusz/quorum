@@ -4,6 +4,8 @@ public interface IIssueService
 {
     Task<ApiResponse<Guid>> CreateOrEditIssue(IssueCreateDTO issueDTO);
     Task<ApiResponse<IssuePagedListDTO>> GetIssuesBySearchParams(IssueSearchParamsDTO searchParams);
+    Task<ApiResponse<bool>> PublishIssue(Guid issueId);
+    Task<ApiResponse<bool>> PayForAnIssue(Guid issueId, IssuePayDTO issuePayDTO);
 }
 
 internal class IssueService : DataServiceBase, IIssueService
@@ -19,12 +21,26 @@ internal class IssueService : DataServiceBase, IIssueService
             async () => await _httpClient.PostAsJsonAsync(endpoint, issueDTO));
     }
 
+    public async Task<ApiResponse<bool>> PublishIssue(Guid issueId)
+    {
+        var endpoint = $"{_issueControllerPath}/publish-issue/{issueId}";
+        return await HandleResponse<bool>(
+            async () => await _httpClient.PutAsync(endpoint, null));
+    }
+
     public async Task<ApiResponse<IssuePagedListDTO>> GetIssuesBySearchParams
         (IssueSearchParamsDTO searchParams)
     {
         var q = BuildQuery(searchParams);
         var endpoint = $"{_issueControllerPath}/get-issues-by-search-params?{q}";
-        return await HandleResponse<IssuePagedListDTO>(async () =>
-        await _httpClient.GetAsync(endpoint));
+        return await HandleResponse<IssuePagedListDTO>(
+            async () => await _httpClient.GetAsync(endpoint));
+    }
+
+    public async Task<ApiResponse<bool>> PayForAnIssue(Guid issueId, IssuePayDTO issuePayDTO)
+    {
+        var endpoint = $"{_issueControllerPath}/pay-for-an-issue/{issueId}";
+        return await HandleResponse<bool>(
+            async () => await _httpClient.PutAsJsonAsync(endpoint, issuePayDTO));
     }
 }

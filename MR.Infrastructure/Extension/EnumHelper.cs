@@ -6,5 +6,4 @@ public class EnumHelper
     {
         return Enum.GetName(typeof(T), value);
     }
-
 }

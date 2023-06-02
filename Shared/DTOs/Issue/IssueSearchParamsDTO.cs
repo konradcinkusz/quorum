@@ -9,7 +9,7 @@ public class IssueSearchParamsDTO : SearchParamsDTO
     public bool? IsVerifyByAdmin { get; set; }
     public IssueStatusEnum? IssueStatus { get; set; }
     public int? RatingValue { get; set; }
-    public bool? HasInitialPayment { get; set; }
     public int? QuarterYear { get; set; }
     public int? QuarterNumber { get; set; }
+    public IssuePaymentOptions? PaymentOptions { get; set; }
 }

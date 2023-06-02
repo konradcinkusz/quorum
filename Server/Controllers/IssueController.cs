@@ -1,11 +1,13 @@
 ﻿namespace MR.Server.Controllers;
 
+[Authorize]
 public class IssueController : MRBaseController
 {
     public IssueController(IMapper mapper) : base(mapper)
     {
     }
 
+    [AllowAnonymous]
     [HttpGet("get-issues-by-search-params")]
     public async Task<ActionResult<ApiResponse<IssuePagedListDTO>>>
         GetIssuesBySearchParams([FromQuery] IssueSearchParamsDTO searchParams)
@@ -39,7 +41,20 @@ public class IssueController : MRBaseController
         }
     }
 
-    [Authorize]
+    [HttpPut("publish-issue/{id}")]
+    public async Task<ActionResult<ApiResponse<bool>>>
+        PublishIssue([FromQuery] Guid id) => await HandleErrors(async () => await Mediator.Send(new PublishIssueCommand(GetUserId(), id)));
+
+    [HttpPut("pay-for-an-issue/{id}")]
+    public async Task<ActionResult<ApiResponse<bool>>>
+        PayForAnIssue([FromQuery] Guid id, [FromBody] IssuePayDTO issuePayDTO)
+            => await HandleErrors(async () => await Mediator.Send(new PayForAnIssueCommand(GetUserId(), id)
+            {
+                PaymentMethod = issuePayDTO.PaymentMethod,
+                ReferenceNumber = issuePayDTO.ReferenceNumber,
+                PaymentValue = issuePayDTO.PaymentValue,
+            }));
+
     [HttpPost("create-issue")]
     public async Task<ActionResult<ApiResponse<Guid>>>
         CreateOrEditIssue([FromBody] IssueCreateDTO issueDTO)
@@ -55,7 +70,7 @@ public class IssueController : MRBaseController
             BackgroundColor = issueDTO.BackgroundColor,
         });
 
-        return new ApiResponse<Guid> { Data = paymentId };
+        return new ApiResponse<Guid> { Data = paymentId, Message = issueDTO.IssueId != null ? "Edited" : "Created" };
     }
 
     [Authorize(Policy = Policies.RequireAdminRole)]
@@ -72,9 +87,9 @@ public class IssueController : MRBaseController
                 Title = searchParams.Title,
                 Question = searchParams.Question,
                 IsVerifyByAdmin = searchParams.IsVerifyByAdmin,
-                IssueStatus= (IssueStatus?)searchParams.IssueStatus,
+                IssueStatus = (IssueStatus?)searchParams.IssueStatus,
                 RatingValue = searchParams.RatingValue,
-                HasInitialPayment = searchParams.HasInitialPayment,
+                HasInitialPayment = searchParams.PaymentOptions == IssuePaymentOptions.WithInitialPayment,
                 QuarterNumber = searchParams.QuarterNumber,
                 QuarterYear = searchParams.QuarterYear,
             };

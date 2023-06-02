@@ -1,0 +1,22 @@
+﻿.alert {
+    position: relative;
+    padding-right: 40px; /* Add space for the close button */
+}
+
+.close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 5px;
+    background-color: transparent;
+    border: none;
+    font-size: 20px;
+    line-height: 1;
+    color: #000;
+    opacity: 0.5;
+    transition: opacity 0.3s ease;
+}
+
+    .close:hover {
+        opacity: 1;
+    }

@@ -19,24 +19,14 @@ public class CreateOrEditIssueCommand : IRequest<Guid>
 
     public class CreateIssueCommandHandler : CreateOrEditCommandHandlerBase<CreateOrEditIssueCommand, Guid, Issue>
     {
-        private readonly MRUserManager _MRUserManager;
         public CreateIssueCommandHandler(
-            MRUserManager MRUserManager,
             IApplicationDbContext context,
             ILogger<CreateOrEditIssueCommand> logger) : base(context, logger)
         {
-            _MRUserManager = MRUserManager;
         }
 
         protected override async Task<Issue> MakeAsync(CreateOrEditIssueCommand command, CancellationToken cancellationToken)
         {
-            var isActiveSub = await _MRUserManager.HasActiveSubscription(command.CreatedById);
-
-            if(!isActiveSub)
-            {
-                throw new ApplicationException("You don't have an active sub and you cannot create issue.");
-            }
-
             Issue issue;
 
             if (command.IssueId.HasValue)

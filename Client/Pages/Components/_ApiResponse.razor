@@ -2,16 +2,17 @@
 
 @if (result != null)
 {
-    @if (result.Success)
-    {
-        <div class="alert alert-success" role="alert">
+    <div class="alert @(result.Success ? "alert-success" : "alert-danger")" role="alert">
+        <button type="button" class="close" @onclick="CloseApiResponse">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        @if (result.Success)
+        {
             <span>@result.Data</span>
             <span>@result.Message</span>
-        </div>
-    }
-    else
-    {
-        <div class="alert alert-danger" role="alert">
+        }
+        else
+        {
             @if (!string.IsNullOrEmpty(result.Message))
             {
                 <span>@result.Message</span>
@@ -25,11 +26,17 @@
                     }
                 </ul>
             }
-        </div>
-    }
+        }
+        <span>Response Time: @result.ResponseTime</span>
+    </div>
 }
 
 @code {
     [Parameter]
     public ApiResponse<T> result { get; set; }
+
+    private void CloseApiResponse()
+    {
+        result = null;
+    }
 }

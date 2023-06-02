@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-
-namespace MR.Service;
+﻿namespace MR.Service;
 
 public class MRUserManager : UserManager<ApplicationUser>
 {
