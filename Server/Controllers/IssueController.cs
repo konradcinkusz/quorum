@@ -47,7 +47,7 @@ public class IssueController : MRBaseController
 
     [HttpPut("pay-for-an-issue/{id}")]
     public async Task<ActionResult<ApiResponse<bool>>>
-        PayForAnIssue([FromQuery] Guid id, [FromBody] IssuePayDTO issuePayDTO)
+        PayForAnIssue([FromRoute] Guid id, [FromBody] IssuePayDTO issuePayDTO)
             => await HandleErrors(async () => await Mediator.Send(new PayForAnIssueCommand(GetUserId(), id)
             {
                 PaymentMethod = issuePayDTO.PaymentMethod,

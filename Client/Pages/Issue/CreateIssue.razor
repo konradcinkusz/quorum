@@ -52,12 +52,23 @@
                                 Publish
                             </button>
                         </div>
-                        <div class="col-sm-12 col-md-4 d-grid">
-                            <button type="button" @onclick="Pay" class="btn btn-primary rounded-pill inactive-subscription-button"
-                                    disabled="@(!isActiveSubscription)" data-bs-toggle="tooltip" title="@(isActiveSubscription ? string.Empty : "You don't have an active subscription yet")">
-                                Pay
-                            </button>
-                        </div>
+                        @if (dto.InitialPaymnet == null)
+                        {
+                            <div class="col-sm-12 col-md-4 d-grid">
+                                <button type="button" @onclick="Pay" class="btn btn-primary rounded-pill inactive-subscription-button"
+                                        disabled="@(!isActiveSubscription)" data-bs-toggle="tooltip" title="@(isActiveSubscription ? string.Empty : "You don't have an active subscription yet")">
+                                    Pay
+                                </button>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="col-sm-12 col-md-4 d-grid">
+                                <button type="button" class="btn btn-primary rounded-pill disabled">
+                                    Already paid
+                                </button>
+                            </div>
+                        }
                     }
                 </div>
             </div>
@@ -90,6 +101,11 @@
 @if (published != null)
 {
     <_ApiResponse T="bool" result="published" />
+}
+
+@if(dto.InitialPaymnet != null)
+{
+    <ReadPayment Payment="dto.InitialPaymnet"></ReadPayment>
 }
 
 <style>

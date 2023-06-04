@@ -1,6 +1,4 @@
-﻿using System.Threading;
-
-namespace MR.Service.Features.Issues;
+﻿namespace MR.Service.Features.Issues;
 
 public abstract class IssueCommandHandlerBase<TCommand, TResult> : CommandHandlerBase<TCommand, TResult>
     where TCommand : IRequest<TResult>

@@ -21,6 +21,7 @@ public class GetIssuesBySearchParamsQuery : QueryBase, IRequest<PagedList<Issue>
         public override async Task<PagedList<Issue>> Handle(GetIssuesBySearchParamsQuery request, CancellationToken cancellationToken)
         {
             var query = _context.Issues
+                .Include(x=>x.InitialPayment)
                 .Include(x => x.QuarterIssues).ThenInclude(qi => qi.Quarter)
                 .Include(x => x.IssueStatusHistories)
                 .Include(x => x.CreatedBy).AsQueryable();
