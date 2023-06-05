@@ -82,7 +82,6 @@
                     <hr />
                     <h5>Preview</h5>
                 </div>
-                <div class="col-12">
                     <div class="row d-flex justify-content-center">
                         <_CustomIssueCard BackgroundColor="@dto.BackgroundColor"
                                           Title="@dto.Title" Icon="@dto.Icon"
@@ -90,9 +89,9 @@
                                           ApplicationUserEmail="@email"
                                           IsVerifyByAdmin="false"
                                           IssueStatus="@IssueStatusEnum.VisibleOnlyToMe"
-                                          RatingValue="0" />
+                                          RatingValue="0"
+                                          ColsDefinition="col-12"/>
                     </div>
-                </div>
             </div>
         </EditForm>
     </div>

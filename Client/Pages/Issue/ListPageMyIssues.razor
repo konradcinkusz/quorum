@@ -1,0 +1,83 @@
+﻿@attribute [Authorize]
+@inject IIssueService issueService
+@page "/issue/my-issues"
+
+<PageTitle>Yout Issues list</PageTitle>
+
+<AuthorizeView>
+    <Authorized>
+        @if (IssuePagedListDto == null)
+        {
+            <_Loading LoadingText="Ładowanie listy płatności" />
+        }
+        else
+        {
+            <BrowserIssues Refresh="_refresh"
+                       SearchParams="IssueSearchParamsDTO"
+                       TotalPages="IssuePagedListDto.TotalPages"
+                       TotalItems="IssuePagedListDto.TotalItems" />
+            @if (result != null && !result.Success)
+            {
+                <hr />
+                <_ApiResponse T="IssuePagedListDTO" result="result" />
+            }
+            @if (IssuePagedListDto.Items.Count == 0)
+            {
+                <hr />
+                <div class="alert alert-danger" role="alert">
+                    <p><em>Brak danych spełniających kryteria wyszukiwania...</em></p>
+                </div>
+            }
+            else
+            {
+                <HeaderIssues Refresh="_refresh"
+                      SearchParams="IssueSearchParamsDTO" />
+                <div class="content">
+                    <div class="container">
+                        <h4>Click to edit</h4>
+                        <div class="row align-content-center justify-content-center">
+                            @foreach (var dto in IssuePagedListDto.Items)
+                            {
+                                <_CustomIssueCard BackgroundColor="@dto.BackgroundColor"
+                                      Title="@dto.Title" Icon="@dto.Icon"
+                                      Text="@dto.Question"
+                                      ApplicationUserEmail="@dto.ApplicationUserEmail"
+                                      IsVerifyByAdmin="false"
+                                      IssueStatus="@IssueStatusEnum.VisibleOnlyToMe"
+                                      RatingValue="0"
+                                      Id="@dto.Id"
+                                      />
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </Authorized>
+    <NotAuthorized>
+        <div class="m-2 p-2 font-weight-bold" style="background-color:grey">
+            You must be logged as a super admin user at least to see these page
+        </div>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private IssueSearchParamsDTO IssueSearchParamsDTO;
+    private IssuePagedListDTO? IssuePagedListDto;
+
+    private ApiResponse<IssuePagedListDTO> result = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        IssueSearchParamsDTO = new IssueSearchParamsDTO();
+        await _refresh();
+    }
+
+    async Task _refresh()
+    {
+        result = await issueService.GetMyIssuesBySearchParams(IssueSearchParamsDTO);
+        IssuePagedListDto = result.Data;
+        IssueSearchParamsDTO.CurrentPage = IssuePagedListDto.CurrentPage;
+        IssueSearchParamsDTO.PageSize = IssuePagedListDto.PageSize;
+    }
+}

@@ -1,4 +1,8 @@
-﻿namespace MR.Server;
+﻿using MR.Domain.Entities;
+using MR.Persistence.Migrations;
+using MR.Service;
+
+namespace MR.Server;
 
 [Route(Constants.RouteValues.AdvanceAPIRoute)]
 [ApiController]
@@ -42,4 +46,5 @@ public abstract class MRBaseController : ControllerBase
         command.SortColumn = searchParamsDTO.SortColumn;
         command.SortOrder = (Microsoft.Data.SqlClient.SortOrder)searchParamsDTO.SortOrder;
     }
+
 }

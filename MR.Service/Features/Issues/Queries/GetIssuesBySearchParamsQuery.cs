@@ -3,6 +3,7 @@
 public class GetIssuesBySearchParamsQuery : QueryBase, IRequest<PagedList<Issue>>
 {
     public Guid? IssueId { get; set; }
+    public string? CreatedById { get; set; }
     public string? CreatedByEmail { get; set; }
     public string? Title { get; set; }
     public string? Question { get; set; }
@@ -21,7 +22,7 @@ public class GetIssuesBySearchParamsQuery : QueryBase, IRequest<PagedList<Issue>
         public override async Task<PagedList<Issue>> Handle(GetIssuesBySearchParamsQuery request, CancellationToken cancellationToken)
         {
             var query = _context.Issues
-                .Include(x=>x.InitialPayment)
+                .Include(x => x.InitialPayment)
                 .Include(x => x.QuarterIssues).ThenInclude(qi => qi.Quarter)
                 .Include(x => x.IssueStatusHistories)
                 .Include(x => x.CreatedBy).AsQueryable();
@@ -36,6 +37,13 @@ public class GetIssuesBySearchParamsQuery : QueryBase, IRequest<PagedList<Issue>
                 query = query.Where(x => x.CreatedBy != null && !string.IsNullOrEmpty(x.CreatedBy.Email) &&
                             x.CreatedBy.Email.Contains(request.CreatedByEmail));
             }
+
+            if (!string.IsNullOrEmpty(request.CreatedById))
+            {
+                query = query.Where(x => !string.IsNullOrEmpty(x.CreatedById) &&
+                    x.CreatedById == request.CreatedById);
+            }
+
             if (!string.IsNullOrEmpty(request.Title))
             {
                 query = query.Where(x => x.Title != null && x.Title.Contains(request.Title));

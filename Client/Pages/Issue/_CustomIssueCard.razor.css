@@ -20,3 +20,11 @@
     .close:hover {
         opacity: 1;
     }
+
+.black-text {
+    color: black;
+}
+
+.arial-font {
+    font-family: Arial, sans-serif;
+}

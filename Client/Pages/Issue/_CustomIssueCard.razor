@@ -1,20 +1,23 @@
-﻿<div class="col-sm-12 col-md-6 col-lg-4">
+﻿<div class="@ColsDefinition">
     <div class="card border-0 shadow-sm rounded mb-4" style="background-color: @BackgroundColor;">
         <div class="card-body text-center">
             <div class="card-header">
                 <div class="d-flex justify-content-between">
-                    <span class="text-end fw-bold">@RatingValue</span>
+                    <span class="text-end fw-bold black-text">@RatingValue</span>
                 </div>
             </div>
-            <h5 class="card-title mb-0">@Title</h5>
+            <h5 class="card-title mb-0 black-text arial-font">@Title</h5>
             <span class="@IconClass"></span>
-            <p class="card-text">@Text</p>
+            <p class="card-text black-text">@Text</p>
             <div class="card-footer text-muted">
                 <div class="d-flex justify-content-between">
-                    <span class="text-start">@ApplicationUserEmail</span>
+                    <span class="text-start black-text">@ApplicationUserEmail</span>
                     <span class="text-center"><span class="@VerifiedByAdminIcon" /></span>
                 </div>
                 <div class="text-end">
+                    <a href="/issue/edit-issue/@Id" class="btn btn-secondary btn-sm me-2">
+                        Edit
+                    </a>
                     <span class="@GetIssueStatusIcon(IssueStatus)"></span>
                 </div>
             </div>
@@ -23,6 +26,9 @@
 </div>
 
 @code {
+    [Parameter]
+    public string ColsDefinition { get; set; } = "col-sm-12 col-md-6 col-lg-4";
+
     [Parameter]
     public string BackgroundColor { get; set; }
 
@@ -43,6 +49,9 @@
 
     [Parameter]
     public int RatingValue { get; set; }
+    
+    [Parameter]
+    public Guid Id { get; set; }
 
     [Parameter]
     public IssueStatusEnum IssueStatus { get; set; }

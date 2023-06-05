@@ -1,10 +1,58 @@
-﻿namespace MR.Server.Controllers;
+﻿using MR.Service;
+
+namespace MR.Server.Controllers;
 
 [Authorize]
-public class IssueController : MRBaseController
+public sealed class IssueController : MRBaseController
 {
     public IssueController(IMapper mapper) : base(mapper)
     {
+    }
+
+    private async Task<ActionResult<ApiResponse<IssuePagedListDTO>>> ProcessIssueRequest<T>(T command)
+    where T : notnull
+    {
+        try
+        {
+            var result = await Mediator.Send(command) as PagedList<Issue>;
+
+            if (result is null)
+            {
+                // Handle the case when result is null, for example by returning an appropriate error response
+                return new ApiResponse<IssuePagedListDTO>("Failed to process the issue request.", (int)HttpStatusCode.BadRequest);
+            }
+
+            var IssuePoolPagedListDto = new IssuePagedListDTO
+            {
+                Items = _mapper.Map<List<IssueReadDTO>>(result),
+                CurrentPage = result.CurrentPage,
+                PageSize = result.PageSize,
+                TotalItems = result.TotalItems,
+                TotalPages = result.TotalPages
+            };
+
+            return new ApiResponse<IssuePagedListDTO>(IssuePoolPagedListDto);
+        }
+        catch (Exception ex)
+        {
+            return new ApiResponse<IssuePagedListDTO>(new IssuePagedListDTO()) { Message = ex.Message, StatusCode = (int)HttpStatusCode.BadRequest };
+        }
+    }
+
+    private void AddIssueSearchParamsToCommand(GetIssuesBySearchParamsQuery command, IssueSearchParamsDTO searchParams)
+    {
+        command.IssueId = searchParams.IssueId;
+        command.CreatedByEmail = searchParams.CreatedByEmail;
+        command.Title = searchParams.Title;
+        command.Question = searchParams.Question;
+        command.IsVerifyByAdmin = searchParams.IsVerifyByAdmin;
+        command.IssueStatus = (IssueStatus?)searchParams.IssueStatus;
+        command.RatingValue = searchParams.RatingValue;
+        command.HasInitialPayment = searchParams.PaymentOptions != null ? searchParams.PaymentOptions == IssuePaymentOptions.WithInitialPayment : null;
+        command.QuarterNumber = searchParams.QuarterNumber;
+        command.QuarterYear = searchParams.QuarterYear;
+
+        AddSearchParamsToCommand(command, searchParams);
     }
 
     [AllowAnonymous]
@@ -39,6 +87,19 @@ public class IssueController : MRBaseController
         {
             return new ApiResponse<IssuePagedListDTO>(new IssuePagedListDTO()) { Message = ex.Message, StatusCode = (int)HttpStatusCode.BadRequest };
         }
+    }
+
+    [HttpGet("get-my-issues-by-search-params")]
+    public async Task<ActionResult<ApiResponse<IssuePagedListDTO>>>
+        GetMyIssuesBySearchParams([FromQuery] IssueSearchParamsDTO searchParams)
+    {
+        var command = new GetIssuesBySearchParamsQuery();
+        AddIssueSearchParamsToCommand(command, searchParams);
+
+        command.CreatedById = GetUserId();
+        command.CreatedByEmail = string.Empty;
+
+        return await ProcessIssueRequest(command);
     }
 
     [HttpPut("publish-issue/{id}")]
@@ -78,41 +139,9 @@ public class IssueController : MRBaseController
     public async Task<ActionResult<ApiResponse<IssuePagedListDTO>>>
         GetIssuesBySearchParamsAdmin([FromQuery] IssueSearchParamsDTO searchParams)
     {
-        try
-        {
-            var command = new GetIssuesBySearchParamsQuery
-            {
-                IssueId = searchParams.IssueId,
-                CreatedByEmail = searchParams.CreatedByEmail,
-                Title = searchParams.Title,
-                Question = searchParams.Question,
-                IsVerifyByAdmin = searchParams.IsVerifyByAdmin,
-                IssueStatus = (IssueStatus?)searchParams.IssueStatus,
-                RatingValue = searchParams.RatingValue,
-                HasInitialPayment = searchParams.PaymentOptions == IssuePaymentOptions.WithInitialPayment,
-                QuarterNumber = searchParams.QuarterNumber,
-                QuarterYear = searchParams.QuarterYear,
-            };
-
-            AddSearchParamsToCommand(command, searchParams);
-
-            var result = await Mediator.Send(command);
-
-            var IssuePoolPagedListDto = new IssuePagedListDTO
-            {
-                Items = _mapper.Map<List<IssueReadDTO>>(result),
-                CurrentPage = result.CurrentPage,
-                PageSize = result.PageSize,
-                TotalItems = result.TotalItems,
-                TotalPages = result.TotalPages
-            };
-
-            return new ApiResponse<IssuePagedListDTO>(IssuePoolPagedListDto);
-        }
-        catch (Exception ex)
-        {
-            return new ApiResponse<IssuePagedListDTO>(new IssuePagedListDTO()) { Message = ex.Message, StatusCode = (int)HttpStatusCode.BadRequest };
-        }
+        var command = new GetIssuesBySearchParamsQuery();
+        AddIssueSearchParamsToCommand(command, searchParams);
+        return await ProcessIssueRequest(command);
     }
 
     [Authorize(Policy = Policies.RequireAdminRole)]
