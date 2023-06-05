@@ -1,6 +1,5 @@
 ﻿@attribute [Authorize]
 @page "/issue/create-issue/{id?}"
-@using System.Security.Claims;
 @inject IIssueService issueService
 @inject NavigationManager navigationManager
 
@@ -16,91 +15,92 @@
             <DataAnnotationsValidator />
             <ValidationSummary />
 
-            <div class="row">
-                <div class="col-md-6 mb-4">
-                    <label for="title-value" class="form-label">Title</label>
-                    <InputText id="title-value" class="form-control rounded-pill" @bind-Value="@dto.Title" @oninput="@((ChangeEventArgs e)=>{dto.Title = e?.Value?.ToString()??"";})" required />
-                    <ValidationMessage For="@(() => dto.Title)" />
-                </div>
-
-                <div class="col-md-6 mb-4">
-                    <label for="question-value" class="form-label">Question</label>
-                    <InputTextArea id="question-value" class="form-control rounded-pill" @bind-Value="@dto.Question" @oninput="@((ChangeEventArgs e)=>{dto.Question = e?.Value?.ToString()??"";})" required />
-                    <ValidationMessage For="@(() => dto.Question)" />
-                </div>
-
-                <div class="col-md-6 mb-4">
-                    <label for="icon-value" class="form-label">Choose icon</label>
-                    <_IconPicker Icon="@dto.Icon" IconChanged="HandleIconChanged" />
-                </div>
-
-                <div class="col-md-6 mb-4">
-                    <label for="color-value" class="form-label">Choose color</label>
-                    <_ColorPicker SelectedColor="@dto.BackgroundColor" SelectedColorChanged="@HandleColorChanged" />
-                </div>
+            @if (currentPage == 1)
+            {
                 <div class="row">
-                    <div class="col-sm-12 col-md-4 d-grid">
+                    <div class="col-12">
+                        <label for="title-value" class="form-label">Title</label>
+                        <InputText id="title-value" class="form-control rounded-pill" @bind-Value="@dto.Title" @oninput="@((ChangeEventArgs e)=>{dto.Title = e?.Value?.ToString()??"";})" required />
+                        <ValidationMessage For="@(() => dto.Title)" />
+                    </div>
+                </div>
+            }
+            else if (currentPage == 2)
+            {
+                <div class="row">
+                    <div class="col-12">
+                        <label for="question-value" class="form-label">Question</label>
+                        <InputTextArea id="question-value" class="form-control rounded-pill" @bind-Value="@dto.Question" @oninput="@((ChangeEventArgs e)=>{dto.Question = e?.Value?.ToString()??"";})" required />
+                        <ValidationMessage For="@(() => dto.Question)" />
+                    </div>
+                </div>
+            }
+            else if (currentPage == 3)
+            {
+                <div class="row">
+                    <div class="col-12">
+                        <label for="icon-value" class="form-label">Choose icon</label>
+                        <_IconPicker Icon="@dto.Icon" IconChanged="HandleIconChanged" />
+                    </div>
+                </div>
+            }
+            else if (currentPage == 4)
+            {
+                <div class="row">
+                    <div class="col-12">
+                        <label for="color-value" class="form-label">Choose color</label>
+                        <_ColorPicker SelectedColor="@dto.BackgroundColor" SelectedColorChanged="@HandleColorChanged" />
+                    </div>
+                </div>
+            }
+            <div class="row justify-content-center">
+                <div class="col-sm-12 col-md-6 d-grid">
+                    @if (currentPage > 1)
+                    {
+                        <button type="button" class="btn btn-primary rounded-pill" @onclick="PreviousPage">
+                            Previous
+                        </button>
+                    }
+                </div>
+                <div class="col-sm-12 col-md-6 d-grid">
+                    @if (currentPage < 4)
+                    {
+                        <button type="button" class="btn btn-primary rounded-pill" @onclick="NextPage">
+                            Next
+                        </button>
+                    }
+                    else
+                    {
                         <button type="submit" class="btn btn-primary rounded-pill">
                             Save Changes
                         </button>
-                    </div>
-                    @if (!string.IsNullOrEmpty(id))
-                    {
-                        <div class="col-sm-12 col-md-4 d-grid">
-                            <button type="button" @onclick="Publish" class="btn btn-primary rounded-pill inactive-subscription-button"
-                                    disabled="@(!isActiveSubscription)" data-bs-toggle="tooltip" title="@(isActiveSubscription ? string.Empty : "You don't have an active subscription yet")">
-                                Publish
-                            </button>
-                        </div>
-                        @if (dto.InitialPaymnet == null)
-                        {
-                            <div class="col-sm-12 col-md-4 d-grid">
-                                <button type="button" @onclick="Pay" class="btn btn-primary rounded-pill inactive-subscription-button"
-                                        disabled="@(!isActiveSubscription)" data-bs-toggle="tooltip" title="@(isActiveSubscription ? string.Empty : "You don't have an active subscription yet")">
-                                    Pay
-                                </button>
-                            </div>
-                        }
-                        else
-                        {
-                            <div class="col-sm-12 col-md-4 d-grid">
-                                <button type="button" class="btn btn-primary rounded-pill disabled">
-                                    Already paid
-                                </button>
-                            </div>
-                        }
                     }
                 </div>
             </div>
-        </EditForm>
-        <div class="row justify-content-center">
-            <div class="col-12 text-center">
-                <hr />
-                <h5>Preview</h5>
-            </div>
-            <div class="col-12">
-                <div class="row d-flex justify-content-center">
-                    <_CustomIssueCard BackgroundColor="@dto.BackgroundColor"
-                                      Title="@dto.Title" Icon="@dto.Icon"
-                                      Text="@dto.Question"
-                                      ApplicationUserEmail="@email"
-                                      IsVerifyByAdmin="false"
-                                      IssueStatus="@IssueStatusEnum.VisibleOnlyToMe"
-                                      RatingValue="0" />
+            <div class="row justify-content-center">
+                <div class="col-12 text-center">
+                    <hr />
+                    <h5>Preview</h5>
+                </div>
+                <div class="col-12">
+                    <div class="row d-flex justify-content-center">
+                        <_CustomIssueCard BackgroundColor="@dto.BackgroundColor"
+                                          Title="@dto.Title" Icon="@dto.Icon"
+                                          Text="@dto.Question"
+                                          ApplicationUserEmail="@email"
+                                          IsVerifyByAdmin="false"
+                                          IssueStatus="@IssueStatusEnum.VisibleOnlyToMe"
+                                          RatingValue="0" />
+                    </div>
                 </div>
             </div>
-        </div>
+        </EditForm>
     </div>
 </div>
 
 @if (result != null)
 {
     <_ApiResponse T="Guid" result="result" />
-}
-
-@if (published != null)
-{
-    <_ApiResponse T="bool" result="published" />
 }
 
 @if(dto.InitialPaymnet != null)
@@ -175,22 +175,25 @@
 
         if (result != null)
         {
-            navigationManager.NavigateTo($"/issue/create-issue/{result.Data}");
+            navigationManager.NavigateTo($"/issue/edit-issue/{result.Data}");
         }
     }
 
-    private ApiResponse<bool> published = null;
-    private async Task Publish()
+    private int currentPage = 1;
+
+    private void NextPage()
     {
-        if (!string.IsNullOrEmpty(id) && Guid.TryParse(id, out Guid issueId) && isActiveSubscription)
-            published = await issueService.PublishIssue(issueId);
+        if (currentPage < 4)
+        {
+            currentPage++;
+        }
     }
 
-    private IssuePayDTO issuePayDTO = new IssuePayDTO() { PaymentMethod = "Bank", PaymentValue = 5, ReferenceNumber = "Bank" };
-    private ApiResponse<bool> paid = null;
-    private async Task Pay()
+    private void PreviousPage()
     {
-        if (!string.IsNullOrEmpty(id) && Guid.TryParse(id, out Guid issueId) && isActiveSubscription)
-            paid = await issueService.PayForAnIssue(issueId, issuePayDTO);
+        if (currentPage > 1)
+        {
+            currentPage--;
+        }
     }
 }
