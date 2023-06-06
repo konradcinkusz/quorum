@@ -8,7 +8,7 @@ public class GetIssuesBySearchParamsQuery : QueryBase, IRequest<PagedList<Issue>
     public string? Title { get; set; }
     public string? Question { get; set; }
     public bool? IsVerifyByAdmin { get; set; }
-    public IssueStatus? IssueStatus { get; set; }
+    public IssueVisibility? IssueVisibility { get; set; }
     public int? RatingValue { get; set; }
     public bool? HasInitialPayment { get; set; }
     public int? QuarterYear { get; set; }
@@ -24,7 +24,7 @@ public class GetIssuesBySearchParamsQuery : QueryBase, IRequest<PagedList<Issue>
             var query = _context.Issues
                 .Include(x => x.InitialPayment)
                 .Include(x => x.QuarterIssues).ThenInclude(qi => qi.Quarter)
-                .Include(x => x.IssueStatusHistories)
+                .Include(x => x.IssueVisibilityHistories)
                 .Include(x => x.CreatedBy).AsQueryable();
 
             if (request.IssueId.HasValue)
@@ -59,9 +59,9 @@ public class GetIssuesBySearchParamsQuery : QueryBase, IRequest<PagedList<Issue>
                 query = query.Where(x => x.IsVerifyByAdmin == request.IsVerifyByAdmin.Value);
             }
 
-            if (request.IssueStatus.HasValue)
+            if (request.IssueVisibility.HasValue)
             {
-                query = query.Where(x => x.IssueStatus == request.IssueStatus.Value);
+                query = query.Where(x => x.IssueVisibility == request.IssueVisibility.Value);
             }
 
             if (request.RatingValue.HasValue)

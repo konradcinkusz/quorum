@@ -46,7 +46,7 @@ public sealed class IssueController : MRBaseController
         command.Title = searchParams.Title;
         command.Question = searchParams.Question;
         command.IsVerifyByAdmin = searchParams.IsVerifyByAdmin;
-        command.IssueStatus = (IssueStatus?)searchParams.IssueStatus;
+        command.IssueVisibility = (IssueVisibility?)searchParams.IssueVisibility;
         command.RatingValue = searchParams.RatingValue;
         command.HasInitialPayment = searchParams.PaymentOptions != null ? searchParams.PaymentOptions == IssuePaymentOptions.WithInitialPayment : null;
         command.QuarterNumber = searchParams.QuarterNumber;
@@ -124,7 +124,8 @@ public sealed class IssueController : MRBaseController
         {
             IssueId = issueDTO.IssueId,
             CreatedById = GetUserId(),
-            IssueStatus = IssueStatus.VisibleOnlyToMe,
+            IssueVisibility = IssueVisibility.VisibleOnlyToMe,
+            IssueProcess = IssueProcess.InCreation,
             Question = issueDTO.Question,
             Title = issueDTO.Title,
             Icon = issueDTO.Icon,
@@ -153,7 +154,7 @@ public sealed class IssueController : MRBaseController
         {
             IssueId = issueDTO.IssueId,
             CreatedById = string.IsNullOrEmpty(issueDTO.ApplicationUserId) ? GetUserId() : issueDTO.ApplicationUserId,
-            IssueStatus = (IssueStatus)issueDTO.IssueStatus,
+            IssueVisibility = (IssueVisibility)issueDTO.IssueVisibility,
             IsVerifyByAdmin = issueDTO.IsVerifyByAdmin,
             RatingValue = issueDTO.RatingValue,
             Question = issueDTO.Question,

@@ -13,7 +13,7 @@
             <p class="form-control-plaintext" id="Quarter-id">@IssueDTO.Question.Truncate(10)</p>
         </div>
         <div class="col-sm-2">
-            <p class="form-control-plaintext" id="Quarter-IssueStatus">@IssueDTO.IssueStatus</p>
+            <p class="form-control-plaintext" id="Quarter-IssueVisibility">@IssueDTO.IssueVisibility</p>
         </div>
         <div class="col-sm-2">
             <p class="form-control-plaintext" id="Quarter-createdat">@IssueDTO.CreatedAt</p>
@@ -32,6 +32,9 @@
         <dl class="row mb-3">
             <dt class="col-sm-3">Id</dt>
             <dd class="col-sm-9">@IssueDTO.Id</dd>
+
+            <dt class="col-sm-3">IssueProcess</dt>
+            <dd class="col-sm-9">@IssueDTO.IssueProcess</dd>
 
             <dt class="col-sm-3">ApplicationUser Id</dt>
             <dd class="col-sm-9">@IssueDTO.ApplicationUserId</dd>
@@ -84,7 +87,7 @@
                             @foreach (var history in IssueDTO.IssueStatusHistories)
                             {
                                 <tr>
-                                    <td>@history.IssueStatus</td>
+                                    <td>@history.IssueVisibility</td>
                                     <td>@history.CreatedAt.ToString("g", CultureInfo.InvariantCulture)</td>
                                 </tr>
                             }

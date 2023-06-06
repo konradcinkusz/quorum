@@ -1,6 +1,6 @@
-﻿namespace MR.Shared.DTOs.Issue;
+﻿namespace MR.Domain.Enums;
 
-public enum IssueProcessEnum
+public enum IssueProcess
 {
     InCreation,
     Created,

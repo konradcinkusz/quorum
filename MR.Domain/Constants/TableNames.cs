@@ -6,7 +6,8 @@ public class TableNames
     public const string MReferenda = "MReferenda";
     public const string ImageDatas = "ImageDatas";
     public const string Issues = "Issues";
-    public const string IssueStatusHistories = "IssueStatusHistories";
+    public const string IssueVisibilityHistory = "IssueVisibilityHistory";
+    public const string IssueProcessingHistory = "IssueProcessingHistory";
     public const string Newses = "Newses";
     public const string SignaturePools = "SignaturePools";
     public const string SignatureHistories = "SignatureHistories";

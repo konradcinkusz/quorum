@@ -13,7 +13,9 @@ public class Issue : BaseEntity<Guid>
     public string Question { get; set; }
     public bool IsVerifyByAdmin { get; set; } = false;
     //bazujac na tym statusie ustawiamy widocznosc
-    public IssueStatus IssueStatus { get; set; } = IssueStatus.NotVisible;
+    public IssueVisibility IssueVisibility { get; set; } = IssueVisibility.NotVisible;
+    //bazujac na tym statusie ustawiamy widocznosc
+    public IssueProcess IssueProcess { get; set; } = IssueProcess.InCreation;
     //Rating value na podstawie którego okreslamy miejsce w top10
     public int RatingValue { get; set; } = 0;
     public Payment? InitialPayment { get; set; }
@@ -27,6 +29,9 @@ public class Issue : BaseEntity<Guid>
     [InverseProperty(nameof(Signature.Issue))]
     public ICollection<Signature> Signatures { get; set; }
 
-    [InverseProperty(nameof(IssueStatusHistory.Issue))]
-    public ICollection<IssueStatusHistory> IssueStatusHistories { get; set; }
+    [InverseProperty(nameof(IssueVisibilityHistory.Issue))]
+    public ICollection<IssueVisibilityHistory> IssueVisibilityHistories { get; set; }
+
+    [InverseProperty(nameof(IssueProcessingHistory.Issue))]
+    public ICollection<IssueProcessingHistory> IssueProcessingHistories { get; set; }
 }

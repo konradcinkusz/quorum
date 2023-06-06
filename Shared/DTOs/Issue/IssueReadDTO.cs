@@ -7,10 +7,11 @@ public class IssueReadDTO : BaseDTO
     public string Title { get; set; }
     public string Question { get; set; }
     public bool IsVerifyByAdmin { get; set; } = false;
-    public IssueStatusEnum IssueStatus { get; set; } = IssueStatusEnum.NotVisible;
+    public IssueVisibilityEnum IssueVisibility { get; set; } = IssueVisibilityEnum.NotVisible;
+    public IssueProcessEnum IssueProcess { get; set; } = IssueProcessEnum.InCreation;
     public int RatingValue { get; set; } = 0;
     public PaymentDTO? InitialPayment { get; set; }
     public string? Icon { get; set; }
     public string? BackgroundColor { get; set; }
-    public List<IssueStatusHistoryDTO> IssueStatusHistories { get; set; }
+    public List<IssueVisibilityHistoryDTO> IssueStatusHistories { get; set; }
 }

@@ -41,14 +41,14 @@
 
                 <div class="col-md-6 mb-4">
                     <label for="status-value" class="form-label">Issue Status</label>
-                    <select id="status-value" class="form-select rounded-pill" @bind="@dto.IssueStatus" required>
+                    <select id="status-value" class="form-select rounded-pill" @bind="@dto.IssueVisibility" required>
                         <option value="">-- Select Issue Status --</option>
-                        @foreach (var status in Enum.GetValues(typeof(IssueStatusEnum)))
+                        @foreach (var status in Enum.GetValues(typeof(IssueVisibilityEnum)))
                         {
                             <option value="@status">@status</option>
                         }
                     </select>
-                    <ValidationMessage For="@(() => dto.IssueStatus)" />
+                    <ValidationMessage For="@(() => dto.IssueVisibility)" />
                 </div>
 
                 <div class="col-md-6 mb-4">
@@ -84,7 +84,7 @@
                                       Text="@dto.Question"
                                       ApplicationUserEmail="@dto.ApplicationUserEmail"
                                       IsVerifyByAdmin="@dto.IsVerifyByAdmin"
-                                      IssueStatus="@dto.IssueStatus"
+                                      IssueVisibility="@dto.IssueVisibility"
                                       RatingValue="@dto.RatingValue" />
                 </div>
             </div>
@@ -113,7 +113,7 @@
             var issues = await adminService.GetIssuesBySearchParams(new() { IssueId = result });
             var issue = issues.Data.Items.First();
             dto.Title = issue.Title;
-            dto.IssueStatus = issue.IssueStatus;
+            dto.IssueVisibility = issue.IssueVisibility;
             dto.ApplicationUserId = issue.ApplicationUserId;
             dto.ApplicationUserEmail = issue.ApplicationUserEmail;
             dto.Question = issue.Question;

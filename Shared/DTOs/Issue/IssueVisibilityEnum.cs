@@ -1,6 +1,6 @@
 ﻿namespace MR.Shared.DTOs.Issue;
 
-public enum IssueStatusEnum
+public enum IssueVisibilityEnum
 {
     NotVisible,
     VisibleOnlyToMe,

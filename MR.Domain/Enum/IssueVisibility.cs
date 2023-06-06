@@ -1,6 +1,6 @@
 ﻿namespace MR.Domain.Enums;
 
-public enum IssueStatus
+public enum IssueVisibility
 {
     NotVisible,
     VisibleOnlyToMe,

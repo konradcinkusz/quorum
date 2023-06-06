@@ -35,10 +35,10 @@
                         </select>
                     </div>
                     <div class="col-md-3 col-sm-12">
-                        <label for="issueStatus" class="text-white">Issue Status</label>
-                        <select id="issueStatus" class="form-control rounded-pill" @bind="SearchParams.IssueStatus" @bind:event="onchange">
+                        <label for="IssueVisibility" class="text-white">Issue Status</label>
+                        <select id="IssueVisibility" class="form-control rounded-pill" @bind="SearchParams.IssueVisibility" @bind:event="onchange">
                             <option value="">-- Select Issue Status --</option>
-                            @foreach (var status in Enum.GetValues(typeof(IssueStatusEnum)))
+                            @foreach (var status in Enum.GetValues(typeof(IssueVisibilityEnum)))
                             {
                                 <option value="@status">@status</option>
                             }
@@ -80,7 +80,7 @@
         SearchParams.Title = null;
         SearchParams.Question = null;
         SearchParams.IsVerifyByAdmin = null;
-        SearchParams.IssueStatus = null;
+        SearchParams.IssueVisibility = null;
         SearchParams.RatingValue = null;
         SearchParams.QuarterYear = null;
         SearchParams.QuarterNumber = null;

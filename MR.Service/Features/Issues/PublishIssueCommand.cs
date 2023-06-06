@@ -41,7 +41,7 @@ public class PublishIssueCommand : IRequest<bool>, IIssueCommandData
                 throw new ApplicationException("No current quarter has been initialized yet. Contact with Admin");
             }
             
-            issue.IssueStatus = IssueStatus.VisibleForAll;
+            issue.IssueVisibility = IssueVisibility.VisibleForAll;
 
             issue.QuarterIssues.Add(new QuarterIssue { IssueId = issue.Id, QuarterId = quarter.Id });
 

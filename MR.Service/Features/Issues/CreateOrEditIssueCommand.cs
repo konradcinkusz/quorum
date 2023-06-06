@@ -10,7 +10,8 @@ public class CreateOrEditIssueCommand : IRequest<Guid>
     public string Question { get; set; }
     public bool IsVerifyByAdmin { get; set; } = false;
     //bazujac na tym statusie ustawiamy widocznosc
-    public IssueStatus IssueStatus { get; set; } = IssueStatus.NotVisible;
+    public IssueVisibility IssueVisibility { get; set; } = IssueVisibility.NotVisible;
+    public IssueProcess IssueProcess { get; set; } = IssueProcess.InCreation;
     public string? Icon { get; set; }
     public string? BackgroundColor { get; set; }
     public int RatingValue { get; set; }
@@ -39,7 +40,7 @@ public class CreateOrEditIssueCommand : IRequest<Guid>
                 issue.CreatedById = command.CreatedById;
             }
 
-            issue.IssueStatusHistories = new List<IssueStatusHistory> { new() { IssueStatus = command.IssueStatus } };
+            issue.IssueVisibilityHistories = new List<IssueVisibilityHistory> { new() { IssueVisibility = command.IssueVisibility } };
 
             return issue;
         }

@@ -7,7 +7,7 @@ public class IssueSearchParamsDTO : SearchParamsDTO
     public string? Title { get; set; }
     public string? Question { get; set; }
     public bool? IsVerifyByAdmin { get; set; }
-    public IssueStatusEnum? IssueStatus { get; set; }
+    public IssueVisibilityEnum? IssueVisibility { get; set; }
     public int? RatingValue { get; set; }
     public int? QuarterYear { get; set; }
     public int? QuarterNumber { get; set; }
