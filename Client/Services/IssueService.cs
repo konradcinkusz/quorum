@@ -1,8 +1,12 @@
-﻿namespace MR.Client.Services;
+﻿using MR.Shared.DTOs.Issue;
+
+namespace MR.Client.Services;
 
 public interface IIssueService
 {
-    Task<ApiResponse<Guid>> CreateOrEditIssue(IssueCreateDTO issueDTO);
+    Task<ApiResponse<Guid>> EditIssue(Guid issueId, IssueCreateDTO issueDTO);
+    Task<ApiResponse<Guid>> CreateIssue(IssueCreateDTO issueDTO);
+    Task<ApiResponse<Guid>> ChangeIssueProcessStatus(Guid issueId, IssueProcessEnum newIssueProcessStatus);
     Task<ApiResponse<IssuePagedListDTO>> GetIssuesBySearchParams(IssueSearchParamsDTO searchParams);
     Task<ApiResponse<IssuePagedListDTO>> GetMyIssuesBySearchParams(IssueSearchParamsDTO searchParams);
     Task<ApiResponse<bool>> PublishIssue(Guid issueId);
@@ -15,7 +19,7 @@ internal class IssueService : DataServiceBase, IIssueService
     {
     }
 
-    public async Task<ApiResponse<Guid>> CreateOrEditIssue(IssueCreateDTO issueDTO)
+    public async Task<ApiResponse<Guid>> CreateIssue(IssueCreateDTO issueDTO)
     {
         var endpoint = $"{_issueControllerPath}/create-issue";
         return await HandleResponse<Guid>(
@@ -51,5 +55,19 @@ internal class IssueService : DataServiceBase, IIssueService
         var endpoint = $"{_issueControllerPath}/get-my-issues-by-search-params?{q}";
         return await HandleResponse<IssuePagedListDTO>(
             async () => await _httpClient.GetAsync(endpoint));
+    }
+
+    public async Task<ApiResponse<Guid>> ChangeIssueProcessStatus(Guid issueId, IssueProcessEnum newIssueProcessStatus)
+    {
+        var endpoint = $"{_issueControllerPath}/change-issue-process-status/{issueId}";
+        return await HandleResponse<Guid>(
+            async () => await _httpClient.PutAsJsonAsync(endpoint, newIssueProcessStatus));
+    }
+
+    public async Task<ApiResponse<Guid>> EditIssue(Guid issueId, IssueCreateDTO issueDTO)
+    {
+        var endpoint = $"{_issueControllerPath}/edit-issue/{issueId}";
+        return await HandleResponse<Guid>(
+            async () => await _httpClient.PutAsJsonAsync(endpoint, issueDTO));
     }
 }

@@ -5,6 +5,7 @@ public class IssueProfile : Profile
     public IssueProfile()
     {
         CreateMap<IssueVisibilityHistory,  IssueVisibilityHistoryDTO>();
+        CreateMap<IssueProcessingHistory, IssueProcessingHistoryDTO>();
 
         CreateMap<Issue, IssueAdminCreateDTO>()
             .ForMember(dest => dest.InitialPayment, opt => opt.MapFrom(src => src.InitialPayment))

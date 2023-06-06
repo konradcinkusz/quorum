@@ -13,5 +13,6 @@ public class IssueReadDTO : BaseDTO
     public PaymentDTO? InitialPayment { get; set; }
     public string? Icon { get; set; }
     public string? BackgroundColor { get; set; }
-    public List<IssueVisibilityHistoryDTO> IssueStatusHistories { get; set; }
+    public List<IssueVisibilityHistoryDTO> IssueVisibilityHistories { get; set; }
+    public List<IssueProcessingHistoryDTO> IssueProcessingHistories { get; set; }
 }

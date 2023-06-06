@@ -116,13 +116,43 @@ public sealed class IssueController : MRBaseController
                 PaymentValue = issuePayDTO.PaymentValue,
             }));
 
-    [HttpPost("create-issue")]
+    [HttpPut("change-issue-process-status/{id}")]
     public async Task<ActionResult<ApiResponse<Guid>>>
-        CreateOrEditIssue([FromBody] IssueCreateDTO issueDTO)
+        ChangeIssueProcessStatus([FromRoute] Guid id, [FromBody] IssueProcessEnum issueProcessEnum)
     {
         var paymentId = await Mediator.Send(new CreateOrEditIssueCommand
         {
-            IssueId = issueDTO.IssueId,
+            IssueId = id,
+            CreatedById = GetUserId(),
+            IssueProcess = (IssueProcess)issueProcessEnum
+        });
+
+        return new ApiResponse<Guid> { Data = paymentId, Message = $"Edited, new status: {issueProcessEnum}" };
+    }
+
+    [HttpPut("edit-issue/{id}")]
+    public async Task<ActionResult<ApiResponse<Guid>>>
+        EditIssue([FromRoute] Guid id, [FromBody] IssueCreateDTO issueDTO)
+    {
+        var paymentId = await Mediator.Send(new CreateOrEditIssueCommand
+        {
+            IssueId = id,
+            CreatedById = GetUserId(),
+            Question = issueDTO.Question,
+            Title = issueDTO.Title,
+            Icon = issueDTO.Icon,
+            BackgroundColor = issueDTO.BackgroundColor,
+        });
+
+        return new ApiResponse<Guid> { Data = paymentId, Message = "Edited" };
+    }
+
+    [HttpPost("create-issue")]
+    public async Task<ActionResult<ApiResponse<Guid>>>
+        CreateIssue([FromBody] IssueCreateDTO issueDTO)
+    {
+        var paymentId = await Mediator.Send(new CreateOrEditIssueCommand
+        {
             CreatedById = GetUserId(),
             IssueVisibility = IssueVisibility.VisibleOnlyToMe,
             IssueProcess = IssueProcess.InCreation,
@@ -132,7 +162,7 @@ public sealed class IssueController : MRBaseController
             BackgroundColor = issueDTO.BackgroundColor,
         });
 
-        return new ApiResponse<Guid> { Data = paymentId, Message = issueDTO.IssueId != null ? "Edited" : "Created" };
+        return new ApiResponse<Guid> { Data = paymentId, Message = "Created" };
     }
 
     [Authorize(Policy = Policies.RequireAdminRole)]
@@ -155,6 +185,7 @@ public sealed class IssueController : MRBaseController
             IssueId = issueDTO.IssueId,
             CreatedById = string.IsNullOrEmpty(issueDTO.ApplicationUserId) ? GetUserId() : issueDTO.ApplicationUserId,
             IssueVisibility = (IssueVisibility)issueDTO.IssueVisibility,
+            IssueProcess = (IssueProcess)issueDTO.IssueProcessEnum,
             IsVerifyByAdmin = issueDTO.IsVerifyByAdmin,
             RatingValue = issueDTO.RatingValue,
             Question = issueDTO.Question,

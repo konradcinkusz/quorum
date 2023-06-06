@@ -169,13 +169,17 @@
     private async Task Create()
     {
         if (!string.IsNullOrEmpty(id) && Guid.TryParse(id, out Guid issueId))
-            dto.IssueId = issueId;
-
-        result = await issueService.CreateOrEditIssue(dto);
-
-        if (result != null)
         {
-            navigationManager.NavigateTo($"/issue/edit-issue/{result.Data}");
+            result = await issueService.EditIssue(issueId, dto);
+
+            if (result != null)
+            {
+                navigationManager.NavigateTo($"/issue/edit-issue/{result.Data}");
+            }
+        }
+        else
+        {
+            result = new ApiResponse<Guid>() { Success = false, Message = "Problem with EditIssue page, Id doesn't match Guid!" };
         }
     }
 

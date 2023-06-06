@@ -25,6 +25,7 @@ public class GetIssuesBySearchParamsQuery : QueryBase, IRequest<PagedList<Issue>
                 .Include(x => x.InitialPayment)
                 .Include(x => x.QuarterIssues).ThenInclude(qi => qi.Quarter)
                 .Include(x => x.IssueVisibilityHistories)
+                .Include(x => x.IssueProcessingHistories)
                 .Include(x => x.CreatedBy).AsQueryable();
 
             if (request.IssueId.HasValue)

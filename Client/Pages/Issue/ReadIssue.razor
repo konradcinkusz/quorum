@@ -74,7 +74,7 @@
 
             <dt class="col-sm-3">Issue Status History:</dt>
             <dd class="col-sm-9">
-                @if (IssueDTO.IssueStatusHistories != null && IssueDTO.IssueStatusHistories.Any())
+                @if (IssueDTO.IssueVisibilityHistories != null && IssueDTO.IssueVisibilityHistories.Any())
                 {
                     <table class="table">
                         <thead>
@@ -84,7 +84,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var history in IssueDTO.IssueStatusHistories)
+                            @foreach (var history in IssueDTO.IssueVisibilityHistories)
                             {
                                 <tr>
                                     <td>@history.IssueVisibility</td>
@@ -97,6 +97,34 @@
                 else
                 {
                     <_Info Description="No issue status history available." />
+                }
+            </dd>
+
+            <dt class="col-sm-3">Issue Status History:</dt>
+            <dd class="col-sm-9">
+                @if (IssueDTO.IssueProcessingHistories != null && IssueDTO.IssueProcessingHistories.Any())
+                {
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>IssueProcess</th>
+                                <th>Process Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var history in IssueDTO.IssueProcessingHistories)
+                            {
+                                <tr>
+                                    <td>@history.IssueProcess</td>
+                                    <td>@history.CreatedAt.ToString("g", CultureInfo.InvariantCulture)</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <_Info Description="No issue process history available." />
                 }
             </dd>
         </dl>

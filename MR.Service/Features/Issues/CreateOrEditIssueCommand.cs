@@ -2,7 +2,6 @@
 
 public class CreateOrEditIssueCommand : IRequest<Guid>
 {
-    //nullable
     public string CreatedById { get; set; }
 
     //not null
@@ -10,8 +9,8 @@ public class CreateOrEditIssueCommand : IRequest<Guid>
     public string Question { get; set; }
     public bool IsVerifyByAdmin { get; set; } = false;
     //bazujac na tym statusie ustawiamy widocznosc
-    public IssueVisibility IssueVisibility { get; set; } = IssueVisibility.NotVisible;
-    public IssueProcess IssueProcess { get; set; } = IssueProcess.InCreation;
+    public IssueVisibility? IssueVisibility { get; set; }
+    public IssueProcess? IssueProcess { get; set; }
     public string? Icon { get; set; }
     public string? BackgroundColor { get; set; }
     public int RatingValue { get; set; }
@@ -40,7 +39,15 @@ public class CreateOrEditIssueCommand : IRequest<Guid>
                 issue.CreatedById = command.CreatedById;
             }
 
-            issue.IssueVisibilityHistories = new List<IssueVisibilityHistory> { new() { IssueVisibility = command.IssueVisibility } };
+            if (command.IssueVisibility.HasValue)
+            {
+                issue.IssueVisibilityHistories = new List<IssueVisibilityHistory> { new() { IssueVisibility = command.IssueVisibility.Value } };
+            }
+
+            if (command.IssueProcess.HasValue)
+            {
+                issue.IssueProcessingHistories = new List<IssueProcessingHistory> { new() { IssueProcess = command.IssueProcess.Value } };
+            }
 
             return issue;
         }
