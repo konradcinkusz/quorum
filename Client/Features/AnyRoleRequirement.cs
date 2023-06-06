@@ -21,7 +21,7 @@ public class AnyRoleAuthorizationHandler : AuthorizationHandler<AnyRoleRequireme
         }
 
         // Check if user is a member of any of the specified roles
-        if (requirement.Roles.Any(role => context.User.HasClaim(c => c.Type == "role" && Extensions.ExtractStringList(c.Value).Any(d => d == role))))
+        if (requirement.Roles.Any(role => context.User.HasClaim(c => c.Type == "role" && StringExt.ExtractStringList(c.Value).Any(d => d == role))))
         {
             context.Succeed(requirement);
         }

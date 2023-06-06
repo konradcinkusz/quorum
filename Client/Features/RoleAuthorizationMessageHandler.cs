@@ -14,7 +14,7 @@ public class RoleAuthorizationMessageHandler : DelegatingHandler
         var authState = await _authStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
 
-        if (user.Identity.IsAuthenticated && !user.HasClaim(c => c.Type == "role" && Extensions.ExtractStringList(c.Value).Any(d => d == "Admin")))
+        if (user.Identity.IsAuthenticated && !user.HasClaim(c => c.Type == "role" && StringExt.ExtractStringList(c.Value).Any(d => d == "Admin")))
         {
             return new HttpResponseMessage(HttpStatusCode.Forbidden);
         }

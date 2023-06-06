@@ -73,9 +73,19 @@
     [Parameter]
     public int TotalItems { get; set; } = 0;
 
-    async Task ClearQuery()
+    private async Task ClearQuery()
     {
-        SearchParams.CreatedByEmail = string.Empty;
+        SearchParams.IssueId = null;
+        SearchParams.CreatedByEmail = null;
+        SearchParams.Title = null;
+        SearchParams.Question = null;
+        SearchParams.IsVerifyByAdmin = null;
+        SearchParams.IssueStatus = null;
+        SearchParams.RatingValue = null;
+        SearchParams.QuarterYear = null;
+        SearchParams.QuarterNumber = null;
+        SearchParams.PaymentOptions = null;
+
         await Refresh.InvokeAsync();
     }
 
