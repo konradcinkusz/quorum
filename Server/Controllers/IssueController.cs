@@ -72,7 +72,7 @@ public sealed class IssueController : MRBaseController
 
             var result = await Mediator.Send(command);
 
-            var IssuePoolPagedListDto = new IssuePagedListDTO
+            var IssuesPagedListDto = new IssuePagedListDTO
             {
                 Items = _mapper.Map<List<IssueReadDTO>>(result),
                 CurrentPage = result.CurrentPage,
@@ -81,7 +81,7 @@ public sealed class IssueController : MRBaseController
                 TotalPages = result.TotalPages
             };
 
-            return new ApiResponse<IssuePagedListDTO>(IssuePoolPagedListDto);
+            return new ApiResponse<IssuePagedListDTO>(IssuesPagedListDto);
         }
         catch (Exception ex)
         {

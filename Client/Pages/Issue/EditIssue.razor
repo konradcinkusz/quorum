@@ -108,6 +108,11 @@
     <ReadPayment Payment="dto.InitialPaymnet"></ReadPayment>
 }
 
+@if (paid != null)
+{
+    <_ApiResponse T="bool" result="paid" />
+}
+
 <style>
     .inactive-subscription-button {
         background-color: @(!isActiveSubscription ? "grey" : "#007bff");

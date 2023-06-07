@@ -7,11 +7,13 @@ public class PayForAnIssueCommand : IRequest<bool>, IIssueCommandData
     public string? PaymentMethod { get; set; }
     public string? ReferenceNumber { get; set; }
     public decimal? PaymentValue { get; set; }
+
     public PayForAnIssueCommand(string createdById, Guid issueId)
     {
         CreatedById = createdById;
         IssueId = issueId;
     }
+
     public class PayForAnIssueCommandHandler : IssueCommandHandlerBase<PayForAnIssueCommand, bool>
     {
         public PayForAnIssueCommandHandler(
@@ -28,6 +30,11 @@ public class PayForAnIssueCommand : IRequest<bool>, IIssueCommandData
                 throw new ApplicationException("You have already inititalized payment.");
             }
 
+            if (issue.IssueProcess != IssueProcess.Created)
+            {
+                throw new ApplicationException("Only issues with Created status can be paid.");
+            }
+
             var paymentValue = request.PaymentValue.HasValue ? request.PaymentValue.Value : 0;
 
             issue.InitialPayment = new Payment
@@ -39,6 +46,9 @@ public class PayForAnIssueCommand : IRequest<bool>, IIssueCommandData
                 ReferenceNumber = request.ReferenceNumber,
                 PaymentStatusHistories = new List<PaymentStatusHistory> { new PaymentStatusHistory { PaymentStatus = PaymentStatus.New } }
             };
+
+            issue.IssueProcess = IssueProcess.PaymentInProgress;
+            issue.IssueProcessingHistories = new List<IssueProcessingHistory>() { new IssueProcessingHistory { IssueProcess = IssueProcess.PaymentInitialized }, new IssueProcessingHistory { IssueProcess = IssueProcess.PaymentInProgress } };
 
             var sum = await _context.SaveChangesAsync(cancellationToken);
 

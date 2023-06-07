@@ -1,8 +1,4 @@
-﻿using MR.Domain.Entities;
-using MR.Persistence.Migrations;
-using MR.Service;
-
-namespace MR.Server;
+﻿namespace MR.Server;
 
 [Route(Constants.RouteValues.AdvanceAPIRoute)]
 [ApiController]

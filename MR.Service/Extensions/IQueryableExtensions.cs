@@ -1,6 +1,6 @@
 ﻿namespace MR.Service.Extensions;
 
-public static class IQueryableExtensions
+internal static class IQueryableExtensions
 {
     public static IOrderedQueryable<T> OrderBy<T>(this IQueryable<T> source, string propertyName)
     {
