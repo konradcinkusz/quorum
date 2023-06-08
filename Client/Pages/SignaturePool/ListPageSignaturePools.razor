@@ -60,7 +60,7 @@
 
     async Task _refresh()
     {
-        result = await adminService.GetSignaturePools(SignaturePoolsSearchParamsDTO);
+        result = await adminService.GetSignaturePoolsBySearchParams(SignaturePoolsSearchParamsDTO);
         SignaturePoolPagedListDto = result.Data;
         SignaturePoolsSearchParamsDTO.CurrentPage = SignaturePoolPagedListDto.CurrentPage;
         SignaturePoolsSearchParamsDTO.PageSize = SignaturePoolPagedListDto.PageSize;

@@ -1,4 +1,4 @@
-﻿namespace MR.Service.Features.Issues.Queries;
+﻿namespace MR.Service.Features.Issues;
 
 public class GetIssuesBySearchParamsQuery : QueryBase, IRequest<PagedList<Issue>>
 {

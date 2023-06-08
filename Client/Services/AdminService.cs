@@ -12,7 +12,7 @@ public interface IAdminService
     Task<ApiResponse<string>> CreateOrEditSubscription(SubscriptionCreateForUserDTO SubscriptionDto);
     Task<ApiResponse<Guid>> InitQuarter(InitQuarterDTO quarter);
     Task<ApiResponse<QuarterPagedListDTO>> GetQuarters(QuarterSearchParamsDTO searchParams);
-    Task<ApiResponse<SignaturePoolsPagedListDTO>> GetSignaturePools(SignaturePoolsSearchParamsDTO searchParams);
+    Task<ApiResponse<SignaturePoolsPagedListDTO>> GetSignaturePoolsBySearchParams(SignaturePoolsSearchParamsDTO searchParams);
     Task<ApiResponse<bool>> UnpinSignatureFromIssue(Guid signatureId);
     Task<ApiResponse<bool>> RemoveSignature(Guid signatureId);
     Task<ApiResponse<bool>> AddSignatureToSignaturePool(Guid signaturePoolId);
@@ -87,39 +87,29 @@ internal class AdminService : DataServiceBase, IAdminService
         return result ?? throw new Exception("Deserialized response is null.");
     }
 
-    public async Task<ApiResponse<SignaturePoolsPagedListDTO>> GetSignaturePools(SignaturePoolsSearchParamsDTO searchParams)
+    public async Task<ApiResponse<SignaturePoolsPagedListDTO>> GetSignaturePoolsBySearchParams(SignaturePoolsSearchParamsDTO searchParams)
     {
         var q = BuildQuery(searchParams);
-
-        var response = await _httpClient.GetAsync($"{_signaturePoolControllerPath}/GetSignaturePoolsBySearchParams?{q}");
-
-        response.EnsureSuccessStatusCode();
-
-        var content = await response.Content.ReadAsStringAsync();
-
-        var result = JsonSerializer.Deserialize<ApiResponse<SignaturePoolsPagedListDTO>>(content, new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        });
-
-        return result ?? throw new Exception("Deserialized response is null.");
+        var endpoint = $"{_signaturePoolControllerPath}/get-signature-pools-by-search-params?{q}";
+        return await HandleResponse<SignaturePoolsPagedListDTO>(async () =>
+        await _httpClient.GetAsync(endpoint));
     }
 
     public async Task<ApiResponse<bool>> UnpinSignatureFromIssue(Guid signatureId)
     {
-        var endpoint = $"{_signaturePoolControllerPath}/UnpinSignatureFromIssue";
+        var endpoint = $"{_signaturePoolControllerPath}/unpin-signature-from-issue";
         return await HandleResponse<bool>(async () => await _httpClient.PostAsJsonAsync(endpoint, signatureId));
     }
 
     public async Task<ApiResponse<bool>> RemoveSignature(Guid signatureId)
     {
-        var endpoint = $"{_signaturePoolControllerPath}/RemoveSignature";
+        var endpoint = $"{_signaturePoolControllerPath}/remove-signature";
         return await HandleResponse<bool>(async () => await _httpClient.PostAsJsonAsync(endpoint, signatureId));
     }
 
     public async Task<ApiResponse<bool>> AddSignatureToSignaturePool(Guid signaturePoolId)
     {
-        var endpoint = $"{_signaturePoolControllerPath}/AddSignatureToSignaturePool";
+        var endpoint = $"{_signaturePoolControllerPath}/add-signature-to-signature-pool";
         return await HandleResponse<bool>(async () => await _httpClient.PostAsJsonAsync(endpoint, signaturePoolId));
     }
 
