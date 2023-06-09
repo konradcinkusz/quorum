@@ -24,6 +24,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{F7DD1815-B
 		docs\DropAllTablesInSchema.txt = docs\DropAllTablesInSchema.txt
 		docs\EFCommands.txt = docs\EFCommands.txt
 		docs\stripe.txt = docs\stripe.txt
+		docs\WhatDTODataAnnotationsCanIUse.md = docs\WhatDTODataAnnotationsCanIUse.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SQLs", "SQLs", "{AA60878F-D492-421A-8654-D79AAF1C6495}"

@@ -4,3 +4,4 @@ global using MR.Shared.DTOs.Payment;
 global using MR.Shared.DTOs.Issue;
 global using MR.Shared.DTOs.SignaturePools;
 global using System.Net;
+global using System.ComponentModel.DataAnnotations;

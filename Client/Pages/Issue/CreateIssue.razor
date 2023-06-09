@@ -3,11 +3,11 @@
 @inject IIssueService issueService
 @inject NavigationManager navigationManager
 
-<PageTitle>Issue Create or Edit</PageTitle>
+<PageTitle>Add new Issue</PageTitle>
 
 <div class="card shadow rounded-3">
     <div class="card-header bg-primary text-white py-3 rounded-3">
-        <h5 class="card-title mb-0">Create or Edit Issue</h5>
+        <h5 class="card-title mb-0 text-center">Add new Issue</h5>
     </div>
 
     <div class="card-body">
@@ -53,6 +53,7 @@
                     </div>
                 </div>
             }
+
             <div class="row justify-content-center">
                 <div class="col-sm-12 col-md-6 d-grid">
                     @if (currentPage > 1)
@@ -77,6 +78,18 @@
                     }
                 </div>
             </div>
+
+            <div class="row justify-content-center">
+                <div class="col-12">
+                    <div class="progress mt-4">
+                        <div class="progress-bar" role="progressbar" style="width: @(currentPage * 25)%;"
+                             aria-valuenow="@currentPage" aria-valuemin="1" aria-valuemax="4">
+                            @($"{(currentPage * 25)}% Complete")
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="row justify-content-center">
                 <div class="col-12 text-center">
                     <hr />
@@ -93,6 +106,7 @@
                                       ColsDefinition="col-12" />
                 </div>
             </div>
+
         </EditForm>
     </div>
 </div>
