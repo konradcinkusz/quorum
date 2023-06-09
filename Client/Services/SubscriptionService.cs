@@ -2,7 +2,7 @@
 
 public interface ISubscriptionService
 {
-    Task<ApiResponse<SubscriptionReadDTO>> GetSubscription();
+    Task<ApiResponse<SubscriptionReadDTO>> GetMySubscription();
     Task<ApiResponse<bool>> BuySubscription();
     Task<ApiResponse<bool>> RejectSubscription();
     Task<ApiResponse<bool>> UnsubscribeSubscription();
@@ -21,9 +21,9 @@ internal class SubscriptionService : DataServiceBase, ISubscriptionService
                     await _httpClient.PostAsync(endpoint, null));
     }
 
-    public async Task<ApiResponse<SubscriptionReadDTO>> GetSubscription()
+    public async Task<ApiResponse<SubscriptionReadDTO>> GetMySubscription()
     {
-        var endpoint = $"{_subscriptionControllerPath}/get-subscription";
+        var endpoint = $"{_subscriptionControllerPath}/get-my-subscription";
         return await HandleResponse<SubscriptionReadDTO>(async () =>
                     await _httpClient.GetAsync(endpoint));
     }

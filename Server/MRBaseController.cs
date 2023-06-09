@@ -23,7 +23,7 @@ public abstract class MRBaseController : ControllerBase
         try
         {
             T result = await action.Invoke();
-            return new ApiResponse<T>(result) { Message = message};
+            return new ApiResponse<T>(result) { Message = message };
         }
         catch (Exception ex)
         {

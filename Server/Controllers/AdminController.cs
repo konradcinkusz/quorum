@@ -37,7 +37,8 @@ public class AdminController : MRBaseController
     }
 
     [HttpGet("get-user-email-by-user-id")]
-    public async Task<ActionResult<ApiResponse<string>>> GetUserEmailByUserId([FromQuery] string userId) => await HandleErrors(async () => await Mediator.Send(new GetUserEmailByUserIdCommand(userId)));
+    public async Task<ActionResult<ApiResponse<string>>> GetUserEmailByUserId([FromQuery] string userId) 
+        => await HandleErrors(async () => await Mediator.Send(new GetUserEmailByUserIdCommand(userId)));
 
     [HttpGet("get-admin-logs-by-query")]
     public async Task<ActionResult<ApiResponse<AdminLogPagedListDTO>>> GetAdminLogsByQuery([FromQuery] AdminLogSearchParamsDTO query)

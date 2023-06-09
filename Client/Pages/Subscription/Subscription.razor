@@ -15,26 +15,27 @@
                 </div>
             </div>
         }
-        else if (subscriptionReadDTO.Begin == null && subscriptionReadDTO.End == null)
+        else if (!result.Success)
         {
-            @if (subscriptionReadDTO.PaymentStatus == PaymentStatusEnum.Pending)
-            {
-                <_HelperReadActiveSubscription SubscriptionReadDTO="@subscriptionReadDTO"
-                                       Infos="@(new List<string> {"You have bought subscription and we are waiting for your payment.",
-                    "Transfer any amount to the account: XXX XXX, providing your PESEL number in the title. After the transfer, you need to wait for up to 3 days for payment approval. Once the payment is approved, the annual subscription is automatically accepted."})" />
-
-                <_HelperRejectUnsubscribe Action="Reject" />
-            }
-            else
-            {
-                <_HelperReadActiveSubscription SubscriptionReadDTO="@subscriptionReadDTO"
-                                       Infos="@(new List<string> {"You have bought subscription but something went wrong with payment acceptation, contact administrator."})" />
-            }
+            <_ApiResponse result="result" />
         }
-        else if (subscriptionReadDTO.IsActive && subscriptionReadDTO.PaymentStatus == PaymentStatusEnum.Completed)
+        else if (subscriptionReadDTO.SubscriptionViewStatusEnum == SubscriptionViewStatusEnum.SubBoughtAndWaitingForPayment)
         {
             <_HelperReadActiveSubscription SubscriptionReadDTO="@subscriptionReadDTO"
-                                       Infos="@(new List<string> {"You have an active subscription. If you still see InActive in header, refresh your page."})" />
+                                           Infos="@(new List<string> {"You have bought subscription and we are waiting for your payment.",
+                    "Transfer any amount to the account: XXX XXX, providing your PESEL number in the title. After the transfer, you need to wait for up to 3 days for payment approval. Once the payment is approved, the annual subscription is automatically accepted."})" />
+
+            <_HelperRejectUnsubscribe Action="Reject" />
+        }
+        else if (subscriptionReadDTO.SubscriptionViewStatusEnum == SubscriptionViewStatusEnum.SubBoughtButSomethingHappendWithAPayment)
+        {
+            <_HelperReadActiveSubscription SubscriptionReadDTO="@subscriptionReadDTO"
+                                           Infos="@(new List<string> {"You have bought subscription but something went wrong with payment acceptation, contact administrator."})" />
+        }
+        else if (subscriptionReadDTO.SubscriptionViewStatusEnum == SubscriptionViewStatusEnum.YouHaveAnActiveSub)
+        {
+            <_HelperReadActiveSubscription SubscriptionReadDTO="@subscriptionReadDTO"
+                                           Infos="@(new List<string> {"You have an active subscription. If you still see InActive in header, refresh your page."})" />
             @if (subscriptionReadDTO.Begin != null && subscriptionReadDTO.End != null)
             {
                 <div class="subscription-period">
@@ -42,19 +43,19 @@
                 </div>
             }
         }
-        else if (!subscriptionReadDTO.IsActive && subscriptionReadDTO.PaymentStatus == PaymentStatusEnum.Accepted)
+        else if (subscriptionReadDTO.SubscriptionViewStatusEnum == SubscriptionViewStatusEnum.PaymentHasBeenAcceptedWaitingForAdminActivation)
         {
             <_HelperReadActiveSubscription SubscriptionReadDTO="@subscriptionReadDTO"
-                                       Infos="@(new List<string> {"Payment has been accepted. Waiting for admin activation."})" />
+                                           Infos="@(new List<string> {"Payment has been accepted. Waiting for admin activation."})" />
         }
-        else
+        else if (subscriptionReadDTO.SubscriptionViewStatusEnum == SubscriptionViewStatusEnum.YouDontHaveActiveSub || subscriptionReadDTO.SubscriptionViewStatusEnum == SubscriptionViewStatusEnum.NoPaymentYouHaveToBuySubscription)
         {
             @if (appUserResult == null)
             {
                 <div class="inactive-subscription-info">
                     <span>You do not have an active subscription.</span>
                     <button class="buy-subscription-button" @onclick="Buy">Buy subscription</button>
-                </div>       
+                </div>
                 <_CustomCard BackgroundColor="#6495ED" Title="Subscription" Icon="oi-book" Text="With an active subscription, you gain access to all active issues within a quarter, rather than being limited to just the top 10. Additionally, you have the ability to add your signature to an issue using the signature pull feature, and you can create your own issues." />
 
             }
@@ -64,6 +65,10 @@
                     <_ApiResponse result="appUserResult" />
                 </div>
             }
+        }
+        else
+        {
+            <_Info BackgroundColor="red" TextColor="Something happend contact admin" />
         }
     </div>
 </div>
@@ -88,8 +93,9 @@
     {
         if (delay_miliseconds > 0)
             await Task.Delay(delay_miliseconds); // Delay for delay seconds
-        result = await subscriptionService.GetSubscription();
-        subscriptionReadDTO = result?.Data;
+        result = await subscriptionService.GetMySubscription();
+        if (result != null && result.Data != null)
+            subscriptionReadDTO = result.Data;
     }
 
     private async Task Reject()

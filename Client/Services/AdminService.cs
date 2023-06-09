@@ -43,7 +43,7 @@ internal class AdminService : DataServiceBase, IAdminService
 
     public async Task<ApiResponse<string>> CreateOrEditSubscription(SubscriptionCreateForUserDTO SubscriptionDto)
     {
-        var endpoint = $"{_subscriptionControllerPath}/CreateOrEditSubscription";
+        var endpoint = $"{_subscriptionControllerPath}/create-or-edit-subscription";
         return await HandleResponse<string>(async () =>
             await _httpClient.PostAsJsonAsync(endpoint, SubscriptionDto));
     }

@@ -36,37 +36,60 @@ public class SubscriptionController : MRBaseController
         return response;
     }
 
-    [HttpGet("get-subscription")]
-    public async Task<ActionResult<ApiResponse<SubscriptionReadDTO>>> GetSubscription()
+    [HttpGet("get-my-subscription")]
+    public async Task<ActionResult<ApiResponse<SubscriptionReadDTO>>> GetMySubscription()
     {
-        var commandResult = await Mediator.Send(new GetSubscriptionsBySearchParamsQuery
+        var response = new ApiResponse<SubscriptionReadDTO>
         {
-            ApplicationUserId = GetUserId()
-        });
+            Data = new SubscriptionReadDTO()
+        };
+        try
+        {
+            var subscription = await Mediator.Send(new GetMySubscription(GetUserId()));
 
-        if (commandResult == null || !commandResult.Any())
-        {
-            return new ApiResponse<SubscriptionReadDTO>
+            var lastPayment = subscription.SubscriptionPayments
+                .Select(x => x.Payment)
+                .OrderByDescending(x => x?.CreatedAt)
+                .FirstOrDefault();
+
+            var sub = _mapper.Map<SubscriptionReadDTO>(subscription);
+            sub.PaymentStatus = (PaymentStatusEnum?)lastPayment?.PaymentStatus;
+            sub.PaymentDate = lastPayment?.CreatedAt;
+
+            response.Data = sub;
+            if (lastPayment == null)
             {
-                Success = false,
-                StatusCode = (int)HttpStatusCode.NotFound
-            };
+                sub.SubscriptionViewStatusEnum = SubscriptionViewStatusEnum.NoPaymentYouHaveToBuySubscription;
+            }
+            else if (!sub.Begin.HasValue && !sub.End.HasValue)
+            {
+                if (lastPayment.PaymentStatus == PaymentStatus.Pending)
+                {
+                    sub.SubscriptionViewStatusEnum = SubscriptionViewStatusEnum.SubBoughtAndWaitingForPayment;
+                }
+                else
+                {
+                    sub.SubscriptionViewStatusEnum = SubscriptionViewStatusEnum.SubBoughtButSomethingHappendWithAPayment;
+                }
+            }
+            else if (sub.IsActive && lastPayment.PaymentStatus == PaymentStatus.Completed)
+            {
+                sub.SubscriptionViewStatusEnum = SubscriptionViewStatusEnum.YouHaveAnActiveSub;
+            }
+            else if (!sub.IsActive && lastPayment.PaymentStatus == PaymentStatus.Accepted)
+            {
+                sub.SubscriptionViewStatusEnum = SubscriptionViewStatusEnum.PaymentHasBeenAcceptedWaitingForAdminActivation;
+            }
+            response.Data = sub;
+        }
+        catch (Exception ex)
+        {
+            response.Errors.Add(ex.Message);
+            response.Success = false;
+            response.StatusCode = (int)HttpStatusCode.BadRequest;
         }
 
-        var subscription = commandResult.FirstOrDefault();
-        var lastPayment = subscription?.SubscriptionPayments
-            .Select(x => x.Payment)
-            .OrderByDescending(x => x?.CreatedAt)
-            .FirstOrDefault();
-
-        var subscriptionDto = _mapper.Map<SubscriptionReadDTO>(subscription);
-        subscriptionDto.PaymentStatus = (PaymentStatusEnum?)lastPayment?.PaymentStatus;
-        subscriptionDto.PaymentDate = lastPayment?.CreatedAt;
-
-        return new ApiResponse<SubscriptionReadDTO>
-        {
-            Data = subscriptionDto
-        };
+        return response;
     }
 
     [HttpPost("buy-subscription")]
@@ -111,7 +134,7 @@ public class SubscriptionController : MRBaseController
     }
 
     [Authorize(Policy = Policies.RequireAdminRole)]
-    [HttpPost("CreateOrEditSubscription")]
+    [HttpPost("create-or-edit-subscription")]
     public async Task<ActionResult<ApiResponse<string>>> CreateOrEditSubscription(SubscriptionCreateForUserDTO subscriptionDto)
     {
         var subId = await Mediator.Send(new CreateSubscriptionCommand(subscriptionDto.ApplicationUserId)
@@ -155,8 +178,8 @@ public class SubscriptionController : MRBaseController
     [HttpPost("reject-subscription")]
     public async Task<ActionResult<ApiResponse<bool>>> RejectSubscription()
     {
-        var result =await Mediator.Send(new RejectSubscriptionCommand(GetUserId()));
-        if(result)
+        var result = await Mediator.Send(new RejectSubscriptionCommand(GetUserId()));
+        if (result)
             return new ApiResponse<bool>(result) { Success = true, Message = "Succesfully rejected", StatusCode = (int)HttpStatusCode.Accepted };
         return new ApiResponse<bool>(result) { Success = false, Message = "Problem with rejected", StatusCode = (int)HttpStatusCode.BadRequest };
     }
