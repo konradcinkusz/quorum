@@ -1,0 +1,79 @@
+﻿@typeparam TValue
+
+<div class="col-md-6 mb-4">
+    <label for="@Id" class="form-label">@Label</label>
+
+    @if (typeof(TValue) == typeof(string))
+    {
+        <InputText id="@Id" class="form-control rounded-pill" @bind-Value="@ValueAsString" required />
+    }
+    else if (typeof(TValue) == typeof(DateTime) || typeof(TValue) == typeof(DateTime?))
+    {
+        <InputDate id="@Id" class="form-control rounded-pill" @bind-Value="@ValueAsDateTime" />
+    }
+    else if (typeof(TValue) == typeof(int) || typeof(TValue) == typeof(decimal) || typeof(TValue) == typeof(double))
+    {
+        <InputNumber id="@Id" class="form-control rounded-pill" @bind-Value="@ValueAsNumeric" />
+    }
+    else
+    {
+        <p>Input type not supported for TValue type: @typeof(TValue)</p>
+    }
+
+    <ValidationMessage For="@ValueExpression" TValue="TValue" />
+</div>
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+
+    [Parameter]
+    public string Label { get; set; }
+
+    [Parameter]
+    public TValue Value { get; set; }
+
+    [Parameter]
+    public EventCallback<TValue> ValueChanged { get; set; }
+
+    private Expression<Func<TValue>> ValueExpression => () => Value;
+
+    private string ValueAsString
+    {
+        get => Value?.ToString();
+        set
+        {
+            if (typeof(TValue) == typeof(string))
+            {
+                Value = (TValue)(object)value;
+                ValueChanged.InvokeAsync(Value);
+            }
+        }
+    }
+
+    private DateTime? ValueAsDateTime
+    {
+        get => Value as DateTime?;
+        set
+        {
+            if (typeof(TValue) == typeof(DateTime))
+            {
+                Value = (TValue)(object)value;
+                ValueChanged.InvokeAsync(Value);
+            }
+        }
+    }
+
+    private decimal? ValueAsNumeric
+    {
+        get => Convert.ToDecimal(Value);
+        set
+        {
+            if (typeof(TValue) == typeof(int) || typeof(TValue) == typeof(decimal) || typeof(TValue) == typeof(double))
+            {
+                Value = (TValue)(object)value;
+                ValueChanged.InvokeAsync(Value);
+            }
+        }
+    }
+}
