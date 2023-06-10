@@ -7,9 +7,9 @@
     {
         <InputText id="@Id" class="form-control rounded-pill" @bind-Value="@ValueAsString" required />
     }
-    else if (typeof(TValue) == typeof(DateTime) || typeof(TValue) == typeof(DateTime?))
+    else if (typeof(TValue) == typeof(DateTime) || Nullable.GetUnderlyingType(typeof(TValue)) == typeof(DateTime))
     {
-        <InputDate id="@Id" class="form-control rounded-pill" @bind-Value="@ValueAsDateTime" />
+        <InputDate id="@Id" class="form-control rounded-pill" @bind-Value="@ValueAsNullableDateTime" />
     }
     else if (typeof(TValue) == typeof(int) || typeof(TValue) == typeof(decimal) || typeof(TValue) == typeof(double))
     {
@@ -51,12 +51,12 @@
         }
     }
 
-    private DateTime? ValueAsDateTime
+    private DateTime? ValueAsNullableDateTime
     {
         get => Value as DateTime?;
         set
         {
-            if (typeof(TValue) == typeof(DateTime))
+            if (typeof(TValue) == typeof(DateTime) || Nullable.GetUnderlyingType(typeof(TValue)) == typeof(DateTime))
             {
                 Value = (TValue)(object)value;
                 ValueChanged.InvokeAsync(Value);

@@ -1,5 +1,6 @@
 ﻿@inherits BaseAdmin
 @page "/admin/create-subscription/{id?}"
+@inject NavigationManager NavigationManager
 
 <div class="card shadow rounded-3">
     <div class="card-header bg-primary text-white py-3 rounded-3">
@@ -10,32 +11,22 @@
         <EditForm Model="@Subscription" OnValidSubmit="@CreateSubscription">
             <DataAnnotationsValidator />
             <ValidationSummary />
-
             <div class="row">
-                <div class="col-md-6 mb-4">
-                    <label for="application-user-id" class="form-label">Application User Id</label>
-                    <InputText id="application-user-id" class="form-control rounded-pill" @bind-Value="@Subscription.ApplicationUserId" required />
-                    <ValidationMessage For="@(() => Subscription.ApplicationUserId)" />
-                </div>
-
-                <div class="col-md-6 mb-4">
-                    <label for="begin" class="form-label">Begin</label>
-                    <InputDate id="begin" class="form-control rounded-pill" @bind-Value="@Subscription.Begin" />
-                    <ValidationMessage For="@(() => Subscription.Begin)" />
-                </div>
-
-                <div class="col-md-6 mb-4">
-                    <label for="end" class="form-label">End</label>
-                    <InputDate id="end" class="form-control rounded-pill" @bind-Value="@Subscription.End" />
-                    <ValidationMessage For="@(() => Subscription.End)" />
-                </div>
-
+                <_FormField TValue="string" Id="Name" Label="Name" Value="@Subscription.ApplicationUserId" ValueChanged="@((string value) => Subscription.ApplicationUserId = value)" />
+                <_FormField TValue="DateTime?" Id="Begin" Label="Begin" Value="@Subscription.Begin" ValueChanged="@((DateTime? value) => Subscription.Begin = value)" />
+                <_FormField TValue="DateTime?" Id="End" Label="End" Value="@Subscription.End" ValueChanged="@((DateTime? value) => Subscription.End = value)" />
                 <div class="col-md-12 d-grid">
                     <button type="submit" class="btn btn-primary rounded-pill">Create Subscription</button>
                 </div>
             </div>
         </EditForm>
     </div>
+    @if (!string.IsNullOrEmpty(id))
+    {
+        <div class="card-footer">
+            <button class="btn btn-primary btn-sm" type="button" @onclick="GoBack">Go back</button>
+        </div>
+    }
 </div>
 @if (result != null)
 {
@@ -54,7 +45,7 @@
     {
         if (!string.IsNullOrEmpty(id))
         {
-            var subs = await adminService.GetSubscriptionsBySearchParams(new() { Id = id });
+            var subs = await adminService.GetSubscriptionsBySearchParams(new() { ApplicationUserId = id });
             var sub = subs.Data.Items.First();
             Subscription.End = sub.End;
             Subscription.Begin = sub.Begin;
@@ -66,5 +57,15 @@
     private async Task CreateSubscription()
     {
         result = await adminService.CreateOrEditSubscription(Subscription);
+    }
+
+    private async Task GoBack()
+    {
+        // Retrieve the returnUrl query parameter
+        var uri = new Uri(NavigationManager.Uri);
+        var returnUrl = System.Web.HttpUtility.ParseQueryString(uri.Query).Get("returnUrl");
+
+        // Redirect to the previous page
+        NavigationManager.NavigateTo(returnUrl);
     }
 }

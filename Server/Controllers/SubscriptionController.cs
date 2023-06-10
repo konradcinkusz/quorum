@@ -119,6 +119,7 @@ public class SubscriptionController : MRBaseController
     {
         var command = new GetSubscriptionsBySearchParamsQuery
         {
+            ApplicationUserId = searchParams.ApplicationUserId,
             ApplicationUserEmail = searchParams.ApplicationUserEmail,
             Begin = searchParams.Begin,
             End = searchParams.End,

@@ -1,4 +1,5 @@
 ﻿@inherits Read
+@inject NavigationManager NavigationManager
 
 <div class="card m-1 p-1">
     <div class="row mb-3">
@@ -16,7 +17,7 @@
         </div>
         <div class="col-sm-3">
             <div class="btn-group my-2" role="group">
-                <a href="/admin/create-subscription/@SubscriptionDTO.ApplicationUserId" class="btn btn-secondary btn-sm me-2">Edit</a>
+                <a href="/admin/create-subscription/@SubscriptionDTO.ApplicationUserId?returnUrl=@Uri.EscapeDataString(NavigationManager.Uri)" class="btn btn-secondary btn-sm me-2">Edit</a>
                 <button class="btn btn-primary btn-sm" type="button" @onclick="ToggleDetails">@ShowDetailsButtonText</button>
             </div>
         </div>
