@@ -9,6 +9,6 @@ public class IssueAdminCreateDTO : IssueCreateDTO
     public bool IsVerifyByAdmin { get; set; } = false;
     public int RatingValue { get; set; } = 0;
     public IssueVisibilityEnum IssueVisibility { get; set; }
-    public IssueProcessEnum IssueProcessEnum { get; set; }
+    public IssueProcessEnum IssueProcess { get; set; }
     public PaymentDTO? InitialPayment { get; set; }
 }

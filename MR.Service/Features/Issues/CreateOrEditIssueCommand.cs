@@ -39,13 +39,15 @@ public class CreateOrEditIssueCommand : IRequest<Guid>
                 issue.CreatedById = command.CreatedById;
             }
 
-            if (command.IssueVisibility.HasValue)
+            if (command.IssueVisibility.HasValue && issue.IssueVisibility != command.IssueVisibility.Value)
             {
+                issue.IssueVisibility = command.IssueVisibility.Value;
                 issue.IssueVisibilityHistories = new List<IssueVisibilityHistory> { new() { IssueVisibility = command.IssueVisibility.Value } };
             }
 
-            if (command.IssueProcess.HasValue)
+            if (command.IssueProcess.HasValue && issue.IssueProcess != command.IssueProcess.Value)
             {
+                issue.IssueProcess = command.IssueProcess.Value;
                 issue.IssueProcessingHistories = new List<IssueProcessingHistory> { new() { IssueProcess = command.IssueProcess.Value } };
             }
 

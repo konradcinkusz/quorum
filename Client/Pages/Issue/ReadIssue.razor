@@ -1,26 +1,28 @@
-﻿<div class="card m-1 p-1">
+﻿@inherits Read
+
+<div class="card m-1 p-1">
     <div class="row mb-3">
         <div class="col-sm-1">
-            <p class="form-control-plaintext" id="Quarter-id">@IssueDTO.RatingValue</p>
+            <p class="form-control-plaintext" id="Quarter-id">@dto.RatingValue</p>
         </div>
         <div class="col-sm-2">
-            <p class="form-control-plaintext" id="Quarter-id">@IssueDTO.ApplicationUserEmail</p>
+            <p class="form-control-plaintext" id="Quarter-id">@dto.ApplicationUserEmail</p>
         </div>
         <div class="col-sm-1">
-            <p class="form-control-plaintext" id="Quarter-id">@IssueDTO.Title.Truncate(5)</p>
+            <p class="form-control-plaintext" id="Quarter-id">@dto.Title.Truncate(5)</p>
         </div>
         <div class="col-sm-2">
-            <p class="form-control-plaintext" id="Quarter-id">@IssueDTO.Question.Truncate(10)</p>
+            <p class="form-control-plaintext" id="Quarter-id">@dto.Question.Truncate(10)</p>
         </div>
         <div class="col-sm-2">
-            <p class="form-control-plaintext" id="Quarter-IssueVisibility">@IssueDTO.IssueVisibility</p>
+            <p class="form-control-plaintext" id="Quarter-IssueVisibility">@dto.IssueVisibility</p>
         </div>
         <div class="col-sm-2">
-            <p class="form-control-plaintext" id="Quarter-createdat">@IssueDTO.CreatedAt</p>
+            <p class="form-control-plaintext" id="Quarter-createdat">@dto.CreatedAt</p>
         </div>
         <div class="col-sm-2">
             <div class="btn-group my-2" role="group">
-                <a href="/admin/create-issue-by-admin/@IssueDTO.Id" class="btn btn-secondary btn-sm me-2">Edit</a>
+                <a href="/admin/create-issue-by-admin/@dto.Id" class="btn btn-secondary btn-sm me-2">Edit</a>
                 <button class="btn btn-primary btn-sm" type="button" @onclick="ToggleDetails">@ShowDetailsButtonText</button>
             </div>
         </div>
@@ -31,27 +33,27 @@
         <h5>Details</h5>
         <dl class="row mb-3">
             <dt class="col-sm-3">Id</dt>
-            <dd class="col-sm-9">@IssueDTO.Id</dd>
+            <dd class="col-sm-9">@dto.Id</dd>
 
             <dt class="col-sm-3">IssueProcess</dt>
-            <dd class="col-sm-9">@IssueDTO.IssueProcess</dd>
+            <dd class="col-sm-9">@dto.IssueProcess</dd>
 
             <dt class="col-sm-3">ApplicationUser Id</dt>
-            <dd class="col-sm-9">@IssueDTO.ApplicationUserId</dd>
+            <dd class="col-sm-9">@dto.ApplicationUserId</dd>
 
             <dt class="col-sm-3">Full title</dt>
-            <dd class="col-sm-9">@IssueDTO.Title</dd>
+            <dd class="col-sm-9">@dto.Title</dd>
 
             <dt class="col-sm-3">Full question</dt>
-            <dd class="col-sm-9">@IssueDTO.Question</dd>
+            <dd class="col-sm-9">@dto.Question</dd>
 
-            @if (IssueDTO.InitialPayment != null)
+            @if (dto.InitialPayment != null)
             {
                 <dt class="col-sm-3">InitialPayment</dt>
-                <dd class="col-sm-9">@IssueDTO.InitialPayment.PaymentValuePLN</dd>
+                <dd class="col-sm-9">@dto.InitialPayment.PaymentValuePLN</dd>
 
                 <dt class="col-sm-3">InitialPayment user</dt>
-                <dd class="col-sm-9">@IssueDTO.InitialPayment.ApplicationUserEmail</dd>
+                <dd class="col-sm-9">@dto.InitialPayment.ApplicationUserEmail</dd>
             }
             @*
             <dt class="col-sm-3">Quarters</dt>
@@ -74,7 +76,7 @@
 
             <dt class="col-sm-3">Issue Status History:</dt>
             <dd class="col-sm-9">
-                @if (IssueDTO.IssueVisibilityHistories != null && IssueDTO.IssueVisibilityHistories.Any())
+                @if (dto.IssueVisibilityHistories != null && dto.IssueVisibilityHistories.Any())
                 {
                     <table class="table">
                         <thead>
@@ -84,7 +86,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var history in IssueDTO.IssueVisibilityHistories)
+                            @foreach (var history in dto.IssueVisibilityHistories)
                             {
                                 <tr>
                                     <td>@history.IssueVisibility</td>
@@ -100,9 +102,9 @@
                 }
             </dd>
 
-            <dt class="col-sm-3">Issue Status History:</dt>
+            <dt class="col-sm-3">Issue Process History:</dt>
             <dd class="col-sm-9">
-                @if (IssueDTO.IssueProcessingHistories != null && IssueDTO.IssueProcessingHistories.Any())
+                @if (dto.IssueProcessingHistories != null && dto.IssueProcessingHistories.Any())
                 {
                     <table class="table">
                         <thead>
@@ -112,7 +114,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var history in IssueDTO.IssueProcessingHistories)
+                            @foreach (var history in dto.IssueProcessingHistories)
                             {
                                 <tr>
                                     <td>@history.IssueProcess</td>
@@ -128,41 +130,27 @@
                 }
             </dd>
         </dl>
+
         <div class="row justify-content-center">
-            <h5>Preview</h5>
-            <_CustomCard BackgroundColor="@IssueDTO.BackgroundColor" Title="@IssueDTO.Title" Icon="@IssueDTO.Icon" Text="@IssueDTO.Question" />
+            <div class="col-12 text-center">
+                <hr />
+                <h5>Preview</h5>
+            </div>
+            <div class="row d-flex justify-content-center">
+                <_CustomIssueCard BackgroundColor="@dto.BackgroundColor"
+                                  Title="@dto.Title" Icon="@dto.Icon"
+                                  Text="@dto.Question"
+                                  ApplicationUserEmail="@dto.ApplicationUserEmail"
+                                  IsVerifyByAdmin="false"
+                                  IssueVisibility="@IssueVisibilityEnum.VisibleOnlyToMe"
+                                  RatingValue="0"
+                                  ColsDefinition="col-12" />
+            </div>
         </div>
-        <hr />
     </div>
 </div>
 
 @code {
     [Parameter]
-    public IssueReadDTO IssueDTO { get; set; }
-
-    [Parameter]
-    public string ShowDetailsButtonText { get; set; } = "Show Details";
-
-    [Parameter]
-    public string GetDetailsButtonText { get; set; } = "Get Details";
-
-    private string DetailsCssClass => showDetails ? "d-block" : "d-none";
-
-    private bool showDetails = false;
-
-    private void ToggleDetails()
-    {
-        showDetails = !showDetails;
-
-        if (showDetails)
-        {
-            GetDetailsButtonText = "Hide Details";
-            ShowDetailsButtonText = GetDetailsButtonText;
-        }
-        else
-        {
-            GetDetailsButtonText = "Get Details";
-            ShowDetailsButtonText = GetDetailsButtonText;
-        }
-    }
+    public IssueReadDTO dto { get; set; }
 }

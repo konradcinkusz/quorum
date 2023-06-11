@@ -35,4 +35,14 @@ public class ApiResponse<T>
         Errors = errors;
         StatusCode = statusCode;
     }
+
+    public static ApiResponse<T> CreatedApiResponse(T id)
+    {
+        return new ApiResponse<T>(id) { Message = "Created", StatusCode = (int)HttpStatusCode.Created, Success = true };
+    }
+
+    public static ApiResponse<T> BadRequestApiResponse(T id)
+    {
+        return new ApiResponse<T>(id) { Message = "Something wen wrong", StatusCode = (int)HttpStatusCode.BadRequest, Success = false };
+    }
 }

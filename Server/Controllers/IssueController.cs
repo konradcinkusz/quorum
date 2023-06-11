@@ -149,9 +149,10 @@ public sealed class IssueController : MRBaseController
     public async Task<ActionResult<ApiResponse<Guid>>>
         CreateIssue([FromBody] IssueCreateDTO issueDTO)
     {
-        var paymentId = await Mediator.Send(new CreateOrEditIssueCommand
+        var userId = GetUserId();
+        var id = await Mediator.Send(new CreateOrEditIssueCommand
         {
-            CreatedById = GetUserId(),
+            CreatedById = userId,
             IssueVisibility = IssueVisibility.VisibleOnlyToMe,
             IssueProcess = IssueProcess.InCreation,
             Question = issueDTO.Question,
@@ -159,8 +160,13 @@ public sealed class IssueController : MRBaseController
             Icon = issueDTO.Icon,
             BackgroundColor = issueDTO.BackgroundColor,
         });
-
-        return new ApiResponse<Guid> { Data = paymentId, Message = "Created" };
+        if (id != Guid.Empty)
+        {
+            var createdStatus = await Mediator.Send(new IssueCreatedStatusChangeCommand(id, userId));
+            if (createdStatus)
+                return ApiResponse<Guid>.CreatedApiResponse(id);
+        }
+        return ApiResponse<Guid>.BadRequestApiResponse(Guid.Empty);
     }
 
     [Authorize(Policy = Policies.RequireAdminRole)]
@@ -183,7 +189,7 @@ public sealed class IssueController : MRBaseController
             IssueId = issueDTO.IssueId,
             CreatedById = string.IsNullOrEmpty(issueDTO.ApplicationUserId) ? GetUserId() : issueDTO.ApplicationUserId,
             IssueVisibility = (IssueVisibility)issueDTO.IssueVisibility,
-            IssueProcess = (IssueProcess)issueDTO.IssueProcessEnum,
+            IssueProcess = (IssueProcess)issueDTO.IssueProcess,
             IsVerifyByAdmin = issueDTO.IsVerifyByAdmin,
             RatingValue = issueDTO.RatingValue,
             Question = issueDTO.Question,

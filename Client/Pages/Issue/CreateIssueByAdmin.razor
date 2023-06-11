@@ -67,6 +67,18 @@
                     <_ColorPicker SelectedColor="@dto.BackgroundColor" SelectedColorChanged="@HandleColorChanged" />
                 </div>
 
+                <div class="col-md-6 mb-4">
+                    <label for="process-value" class="form-label">Issue Processing Status</label>
+                    <select id="process-value" class="form-select rounded-pill" @bind="@dto.IssueProcess" required>
+                        <option value="">-- Select Issue process --</option>
+                        @foreach (var status in Enum.GetValues(typeof(IssueProcessEnum)))
+                        {
+                            <option value="@status">@status</option>
+                        }
+                    </select>
+                    <ValidationMessage For="@(() => dto.IssueProcess)" />
+                </div>
+
                 <div class="col-md-6 d-grid">
                     <button type="submit" class="btn btn-primary rounded-pill">Save Changes</button>
                 </div>
@@ -121,6 +133,7 @@
             dto.RatingValue = issue.RatingValue;
             dto.Icon = issue.Icon;
             dto.BackgroundColor = issue.BackgroundColor;
+            dto.IssueProcess = issue.IssueProcess;
         }
     }
 

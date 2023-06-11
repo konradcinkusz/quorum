@@ -19,13 +19,13 @@
                     <span class="text-end fw-bold black-text fs-6">@RatingValue</span>
                 </div>
             </div>
-            <div class="card-footer text-muted mt-3">
+            <div class="card-footer text-muted">
                 @FooterContent
             </div>
         </div>
     </div>
     <div>
-        <div class="d-flex justify-content-between">
+        <div class="d-flex justify-content-center m-3">
             @if (Id != Guid.Empty)
             {
                 <a href="/issue/edit-issue/@Id.ToString()" class="btn btn-secondary btn-sm me-2">
