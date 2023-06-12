@@ -66,3 +66,10 @@
         overflow-y: auto;
     }
 }
+
+.nav-divider {
+    border: none;
+    height: 1px;
+    background-color: #e0e0e0;
+    margin: 10px 0;
+}

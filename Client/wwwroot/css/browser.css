@@ -1,6 +1,5 @@
 ﻿.domain-search {
-    margin: 20px;
-    padding: 0 0 20px;
+    margin: 10px;
 }
 
 .bg-green {
@@ -92,4 +91,8 @@ dd.separator-line {
     border-bottom: 1px solid #ddd;
     margin-bottom: 10px;
     padding-bottom: 10px;
+}
+
+.row-spacing .row {
+    margin-bottom: 10px;
 }
