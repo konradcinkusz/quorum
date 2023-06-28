@@ -64,16 +64,17 @@
         }
     }
 
-    private decimal? ValueAsNumeric
+    private TValue ValueAsNumeric
     {
-        get => Convert.ToDecimal(Value);
+        get => Value;
         set
         {
             if (typeof(TValue) == typeof(int) || typeof(TValue) == typeof(decimal) || typeof(TValue) == typeof(double))
             {
-                Value = (TValue)(object)value;
-                ValueChanged.InvokeAsync(Value);
+                Value = value;
+                ValueChanged.InvokeAsync(value);
             }
         }
     }
+
 }

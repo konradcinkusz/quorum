@@ -1,6 +1,6 @@
 ﻿namespace MR.Service.Features.Issues;
 
-public class CreateOrEditIssueCommand : IRequest<Guid>
+public class CreateIssueCommand : IRequest<Guid>
 {
     public string CreatedById { get; set; }
 
@@ -17,15 +17,15 @@ public class CreateOrEditIssueCommand : IRequest<Guid>
 
     public Guid? IssueId { get; set; }
 
-    public class CreateIssueCommandHandler : CreateOrEditCommandHandlerBase<CreateOrEditIssueCommand, Guid, Issue>
+    internal class CreateIssueCommandHandler : CreateCommandHandlerBase<CreateIssueCommand, Guid, Issue>
     {
         public CreateIssueCommandHandler(
             IApplicationDbContext context,
-            ILogger<CreateOrEditIssueCommand> logger) : base(context, logger)
+            ILogger<CreateIssueCommand> logger) : base(context, logger)
         {
         }
 
-        protected override async Task<Issue> MakeAsync(CreateOrEditIssueCommand command, CancellationToken cancellationToken)
+        protected override async Task<Issue> MakeAsync(CreateIssueCommand command, CancellationToken cancellationToken)
         {
             Issue issue;
 

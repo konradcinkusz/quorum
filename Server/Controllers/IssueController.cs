@@ -102,7 +102,7 @@ public sealed class IssueController : MRBaseController
 
     [HttpPut("publish-issue/{id}")]
     public async Task<ActionResult<ApiResponse<bool>>>
-        PublishIssue([FromQuery] Guid id) => await HandleErrors(async () => await Mediator.Send(new PublishIssueCommand(GetUserId(), id)));
+        PublishIssue([FromRoute] Guid id) => await HandleErrors(async () => await Mediator.Send(new PublishIssueCommand(GetUserId(), id)));
 
     [HttpPut("pay-for-an-issue/{id}")]
     public async Task<ActionResult<ApiResponse<bool>>>
@@ -118,7 +118,7 @@ public sealed class IssueController : MRBaseController
     public async Task<ActionResult<ApiResponse<Guid>>>
         ChangeIssueProcessStatus([FromRoute] Guid id, [FromBody] IssueProcessEnum issueProcessEnum)
     {
-        var paymentId = await Mediator.Send(new CreateOrEditIssueCommand
+        var paymentId = await Mediator.Send(new CreateIssueCommand
         {
             IssueId = id,
             CreatedById = GetUserId(),
@@ -132,7 +132,7 @@ public sealed class IssueController : MRBaseController
     public async Task<ActionResult<ApiResponse<Guid>>>
         EditIssue([FromRoute] Guid id, [FromBody] IssueCreateDTO issueDTO)
     {
-        var paymentId = await Mediator.Send(new CreateOrEditIssueCommand
+        var paymentId = await Mediator.Send(new CreateIssueCommand
         {
             IssueId = id,
             CreatedById = GetUserId(),
@@ -150,7 +150,7 @@ public sealed class IssueController : MRBaseController
         CreateIssue([FromBody] IssueCreateDTO issueDTO)
     {
         var userId = GetUserId();
-        var id = await Mediator.Send(new CreateOrEditIssueCommand
+        var id = await Mediator.Send(new CreateIssueCommand
         {
             CreatedById = userId,
             IssueVisibility = IssueVisibility.VisibleOnlyToMe,
@@ -182,22 +182,44 @@ public sealed class IssueController : MRBaseController
     [Authorize(Policy = Policies.RequireAdminRole)]
     [HttpPost("create-issue-by-admin")]
     public async Task<ActionResult<ApiResponse<Guid>>>
-        CreateOrEditIssueByAdmin([FromBody] IssueAdminCreateDTO issueDTO)
+        CreateOrEditIssueByAdmin([FromBody] IssueAdminCreateDTO dto)
     {
-        var paymentId = await Mediator.Send(new CreateOrEditIssueCommand
+        var id = await Mediator.Send(new CreateIssueCommand
         {
-            IssueId = issueDTO.IssueId,
-            CreatedById = string.IsNullOrEmpty(issueDTO.ApplicationUserId) ? GetUserId() : issueDTO.ApplicationUserId,
-            IssueVisibility = (IssueVisibility)issueDTO.IssueVisibility,
-            IssueProcess = (IssueProcess)issueDTO.IssueProcess,
-            IsVerifyByAdmin = issueDTO.IsVerifyByAdmin,
-            RatingValue = issueDTO.RatingValue,
-            Question = issueDTO.Question,
-            Title = issueDTO.Title,
-            Icon = issueDTO.Icon,
-            BackgroundColor = issueDTO.BackgroundColor,
+            IssueId = dto.IssueId,
+            CreatedById = string.IsNullOrEmpty(dto.ApplicationUserId) ? GetUserId() : dto.ApplicationUserId,
+            IssueVisibility = (IssueVisibility)dto.IssueVisibility,
+            IssueProcess = (IssueProcess)dto.IssueProcess,
+            IsVerifyByAdmin = dto.IsVerifyByAdmin,
+            RatingValue = dto.RatingValue,
+            Question = dto.Question,
+            Title = dto.Title,
+            Icon = dto.Icon,
+            BackgroundColor = dto.BackgroundColor,
         });
 
-        return new ApiResponse<Guid> { Data = paymentId };
+        return new ApiResponse<Guid> { Data = id };
+    }
+
+    [Authorize(Policy = Policies.RequireAdminRole)]
+    [HttpPut("edit-issue-by-admin/{id}")]
+    public async Task<ActionResult<ApiResponse<Guid>>> EditIssueByAdmin([FromRoute] Guid id, [FromBody] IssueAdminCreateDTO dto)
+    {
+        if (dto.IssueId.HasValue)
+        {
+            var idR = await Mediator.Send(new EditIssueCommand(dto.IssueId.Value)
+            {
+                IssueVisibility = (IssueVisibility)dto.IssueVisibility,
+                IssueProcess = (IssueProcess)dto.IssueProcess,
+                IsVerifyByAdmin = dto.IsVerifyByAdmin,
+                RatingValue = dto.RatingValue,
+                Question = dto.Question,
+                Title = dto.Title,
+                Icon = dto.Icon,
+                BackgroundColor = dto.BackgroundColor,
+            });
+            return new ApiResponse<Guid> { Data = idR };
+        }
+        return new ApiResponse<Guid>() { Success = false };
     }
 }

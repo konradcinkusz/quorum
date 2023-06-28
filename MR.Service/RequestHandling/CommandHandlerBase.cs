@@ -1,4 +1,4 @@
-﻿namespace MR.Service.Features;
+﻿namespace MR.Service.RequestHandling;
 
 public abstract class CommandHandlerBase<TCommand, TResult> : IRequestHandler<TCommand, TResult>
     where TCommand : IRequest<TResult>

@@ -1,11 +1,11 @@
-﻿namespace MR.Service.Features;
+﻿namespace MR.Service.RequestHandling;
 
-public abstract class CreateOrEditCommandHandlerBase<TCommand, TResult, TCreate> : CommandHandlerBase<TCommand, TResult>
+public abstract class CreateCommandHandlerBase<TCommand, TResult, TCreate> : CommandHandlerBase<TCommand, TResult>
     where TCommand : IRequest<TResult>
     where TCreate : BaseEntity<TResult>
     where TResult : IEquatable<TResult>
 {
-    public CreateOrEditCommandHandlerBase(IApplicationDbContext context, ILogger<TCommand> logger) : base(context, logger)
+    public CreateCommandHandlerBase(IApplicationDbContext context, ILogger<TCommand> logger) : base(context, logger)
     {
     }
 
