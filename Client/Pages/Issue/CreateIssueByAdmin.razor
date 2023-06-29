@@ -1,5 +1,5 @@
 ﻿@inherits BaseAdmin
-@page "/admin/create-issue-by-admin/{id?}"
+@page "/admin/create-issue-by-admin"
 @inject NavigationManager navigationManager
 
 <PageTitle>Admin Issue Create or Edit</PageTitle>
@@ -113,29 +113,7 @@
     <_ApiResponse T="string" result="emailResponse" />
 }
 @code {
-    [Parameter]
-    public string id { get; set; }
-
     private IssueAdminCreateDTO dto = new IssueAdminCreateDTO();
-
-    protected override async Task OnInitializedAsync()
-    {
-        if (!string.IsNullOrEmpty(id) && Guid.TryParse(id, out Guid result))
-        {
-            var issues = await adminService.GetIssuesBySearchParams(new() { IssueId = result });
-            var issue = issues.Data.Items.First();
-            dto.Title = issue.Title;
-            dto.IssueVisibility = issue.IssueVisibility;
-            dto.ApplicationUserId = issue.ApplicationUserId;
-            dto.ApplicationUserEmail = issue.ApplicationUserEmail;
-            dto.Question = issue.Question;
-            dto.IsVerifyByAdmin = issue.IsVerifyByAdmin;
-            dto.RatingValue = issue.RatingValue;
-            dto.Icon = issue.Icon;
-            dto.BackgroundColor = issue.BackgroundColor;
-            dto.IssueProcess = issue.IssueProcess;
-        }
-    }
 
     private ApiResponse<Guid> result = null;
 
@@ -151,9 +129,6 @@
 
     private async Task Create()
     {
-        if (!string.IsNullOrEmpty(id) && Guid.TryParse(id, out Guid issueId))
-            dto.IssueId = issueId;
-
         result = await adminService.CreateOrEditIssue(dto);
 
         if (result != null)

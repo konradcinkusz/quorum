@@ -12,7 +12,6 @@ public sealed class AdminIssueController : MRBaseController
     {
         var id = await Mediator.Send(new CreateIssueCommand
         {
-            IssueId = dto.IssueId,
             CreatedById = string.IsNullOrEmpty(dto.ApplicationUserId) ? GetUserId() : dto.ApplicationUserId,
             IssueVisibility = (IssueVisibility)dto.IssueVisibility,
             IssueProcess = (IssueProcess)dto.IssueProcess,
@@ -30,22 +29,18 @@ public sealed class AdminIssueController : MRBaseController
     [HttpPut("edit-issue-by-admin/{id}")]
     public async Task<ActionResult<ApiResponse<Guid>>> EditIssueByAdmin([FromRoute] Guid id, [FromBody] IssueAdminCreateDTO dto)
     {
-        if (dto.IssueId.HasValue)
+        var idR = await Mediator.Send(new EditIssueCommand(id)
         {
-            var idR = await Mediator.Send(new EditIssueCommand(dto.IssueId.Value)
-            {
-                IssueVisibility = (IssueVisibility)dto.IssueVisibility,
-                IssueProcess = (IssueProcess)dto.IssueProcess,
-                IsVerifyByAdmin = dto.IsVerifyByAdmin,
-                RatingValue = dto.RatingValue,
-                Question = dto.Question,
-                Title = dto.Title,
-                Icon = dto.Icon,
-                BackgroundColor = dto.BackgroundColor,
-            });
-            return new ApiResponse<Guid> { Data = idR };
-        }
-        return new ApiResponse<Guid>() { Success = false };
+            IssueVisibility = (IssueVisibility)dto.IssueVisibility,
+            IssueProcess = (IssueProcess)dto.IssueProcess,
+            IsVerifyByAdmin = dto.IsVerifyByAdmin,
+            RatingValue = dto.RatingValue,
+            Question = dto.Question,
+            Title = dto.Title,
+            Icon = dto.Icon,
+            BackgroundColor = dto.BackgroundColor,
+        });
+        return new ApiResponse<Guid> { Data = idR };
     }
 
     [HttpGet("get-issues-by-search-params-admin")]

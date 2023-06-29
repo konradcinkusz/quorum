@@ -5,8 +5,8 @@ public interface IIssueService
     Task<ApiResponse<Guid>> EditIssue(Guid issueId, IssueCreateDTO issueDTO);
     Task<ApiResponse<Guid>> CreateIssue(IssueCreateDTO issueDTO);
     Task<ApiResponse<Guid>> ChangeIssueProcessStatus(Guid issueId, IssueProcessEnum newIssueProcessStatus);
-    Task<ApiResponse<IssuePagedListDTO>> GetIssuesBySearchParams(IssueSearchParamsDTO searchParams);
-    Task<ApiResponse<IssuePagedListDTO>> GetMyIssuesBySearchParams(IssueSearchParamsDTO searchParams);
+    Task<ApiResponse<PagedListDto<IssueReadDTO>>> GetIssuesBySearchParams(IssueSearchParamsDTO searchParams);
+    Task<ApiResponse<PagedListDto<IssueReadDTO>>> GetMyIssuesBySearchParams(IssueSearchParamsDTO searchParams);
     Task<ApiResponse<bool>> PublishIssue(Guid issueId);
     Task<ApiResponse<bool>> PayForAnIssue(Guid issueId, IssuePayDTO issuePayDTO);
 }
@@ -31,12 +31,12 @@ internal class IssueService : DataServiceBase, IIssueService
             async () => await _httpClient.PutAsync(endpoint, null));
     }
 
-    public async Task<ApiResponse<IssuePagedListDTO>> GetIssuesBySearchParams
+    public async Task<ApiResponse<PagedListDto<IssueReadDTO>>> GetIssuesBySearchParams
         (IssueSearchParamsDTO searchParams)
     {
         var q = BuildQuery(searchParams);
         var endpoint = $"{_issueControllerPath}/get-issues-by-search-params?{q}";
-        return await HandleResponse<IssuePagedListDTO>(
+        return await HandleResponse<PagedListDto<IssueReadDTO>>(
             async () => await _httpClient.GetAsync(endpoint));
     }
 
@@ -46,12 +46,12 @@ internal class IssueService : DataServiceBase, IIssueService
         return await HandleResponse<bool>(
             async () => await _httpClient.PutAsJsonAsync(endpoint, issuePayDTO));
     }
-    public async Task<ApiResponse<IssuePagedListDTO>> GetMyIssuesBySearchParams
+    public async Task<ApiResponse<PagedListDto<IssueReadDTO>>> GetMyIssuesBySearchParams
         (IssueSearchParamsDTO searchParams)
     {
         var q = BuildQuery(searchParams);
         var endpoint = $"{_issueControllerPath}/get-my-issues-by-search-params?{q}";
-        return await HandleResponse<IssuePagedListDTO>(
+        return await HandleResponse<PagedListDto<IssueReadDTO>>(
             async () => await _httpClient.GetAsync(endpoint));
     }
 

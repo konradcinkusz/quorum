@@ -9,7 +9,7 @@ public sealed class IssueController : MRBaseController
 
     [AllowAnonymous]
     [HttpGet("get-issues-by-search-params")]
-    public async Task<ActionResult<ApiResponse<IssuePagedListDTO>>>
+    public async Task<ActionResult<ApiResponse<PagedListDto<IssueReadDTO>>>>
         GetIssuesBySearchParams([FromQuery] IssueSearchParamsDTO searchParams)
     {
         try
@@ -24,7 +24,7 @@ public sealed class IssueController : MRBaseController
 
             var result = await Mediator.Send(command);
 
-            var IssuesPagedListDto = new IssuePagedListDTO
+            var IssuesPagedListDto = new PagedListDto<IssueReadDTO>
             {
                 Items = _mapper.Map<List<IssueReadDTO>>(result),
                 CurrentPage = result.CurrentPage,
@@ -33,11 +33,11 @@ public sealed class IssueController : MRBaseController
                 TotalPages = result.TotalPages
             };
 
-            return new ApiResponse<IssuePagedListDTO>(IssuesPagedListDto);
+            return new ApiResponse<PagedListDto<IssueReadDTO>>(IssuesPagedListDto);
         }
         catch (Exception ex)
         {
-            return new ApiResponse<IssuePagedListDTO>(new IssuePagedListDTO()) { Message = ex.Message, StatusCode = (int)HttpStatusCode.BadRequest };
+            return new ApiResponse<PagedListDto<IssueReadDTO>>(new PagedListDto<IssueReadDTO>()) { Message = ex.Message, StatusCode = (int)HttpStatusCode.BadRequest };
         }
     }
 

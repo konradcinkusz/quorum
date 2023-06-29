@@ -19,7 +19,7 @@
             @if (result != null && !result.Success)
             {
                 <hr />
-                <_ApiResponse T="IssuePagedListDTO" result="result" />
+                <_ApiResponse T="PagedListDto<IssueReadDTO>" result="result" />
             }
             @if (IssuePagedListDto.Items.Count == 0)
             {
@@ -62,9 +62,9 @@
 
 @code {
     private IssueSearchParamsDTO IssueSearchParamsDTO;
-    private IssuePagedListDTO? IssuePagedListDto;
+    private PagedListDto<IssueReadDTO>? IssuePagedListDto;
 
-    private ApiResponse<IssuePagedListDTO> result = null;
+    private ApiResponse<PagedListDto<IssueReadDTO>> result = null;
 
     protected override async Task OnInitializedAsync()
     {

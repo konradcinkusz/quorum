@@ -1,9 +1,7 @@
 ﻿namespace MR.Shared.DTOs.Issue;
 
-public class IssueCreateDTO : BaseDTO
+public class IssueCreateDTO
 {
-    public Guid? IssueId { get; set; }
-
     [Required(ErrorMessage = "Please enter a title.")]
     [StringLength(50, MinimumLength = 5, ErrorMessage = "Title must be between 5 and 50 characters.")]
     public string Title { get; set; }
