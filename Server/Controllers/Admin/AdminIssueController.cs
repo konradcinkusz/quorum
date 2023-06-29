@@ -42,6 +42,10 @@ public sealed class AdminIssueController : MRBaseController
         return new ApiResponse<Guid> { Data = idR };
     }
 
+    [HttpPut("verify-issue/{id}")]
+    public async Task<ActionResult<ApiResponse<bool>>> VerifyIssue(Guid id, bool confirmed)
+        => await HandleErrors(async () => await Mediator.Send(new VerifyByAdminCommand(id, confirmed)));
+
     [HttpGet("get-issues-by-search-params-admin")]
     public async Task<ActionResult<ApiResponse<PagedListDto<IssueReadDTO>>>> GetIssuesBySearchParamsAdmin([FromQuery] IssueSearchParamsDTO searchParams)
     {
@@ -49,4 +53,8 @@ public sealed class AdminIssueController : MRBaseController
         IssueSearchParams.AddIssueSearchParamsToCommand(command, searchParams);
         return await ProcessPagedRequest<GetIssuesBySearchParamsQuery, IssueReadDTO, Issue>(command);
     }
+
+    [HttpPost("add-signature-to-signature-pool")]
+    public async Task<ActionResult<ApiResponse<bool>>> AddSignatureToSignaturePool([FromBody] Guid signaturePoolDTO)
+        => await HandleErrors(async () => await Mediator.Send(new AddSignatureToSignaturePoolCommand { SignaturePoolId = signaturePoolDTO }), "Adding new signature to the pool");
 }

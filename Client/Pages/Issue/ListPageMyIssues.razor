@@ -12,10 +12,6 @@
         }
         else
         {
-            <BrowserIssues Refresh="_refresh"
-                       SearchParams="IssueSearchParamsDTO"
-                       TotalPages="IssuePagedListDto.TotalPages"
-                       TotalItems="IssuePagedListDto.TotalItems" />
             @if (result != null && !result.Success)
             {
                 <hr />
@@ -30,8 +26,6 @@
             }
             else
             {
-                <HeaderIssues Refresh="_refresh"
-                      SearchParams="IssueSearchParamsDTO" />
                 <div class="content">
                     <div class="container">
                         <div class="row align-content-center justify-content-center">

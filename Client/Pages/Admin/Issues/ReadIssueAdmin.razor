@@ -1,0 +1,188 @@
+﻿@inherits Read
+@inject IAdminService adminService
+
+<div class="card m-1 p-1">
+    <div class="row mb-3">
+        <div class="col-sm-1">
+            <p class="form-control-plaintext" id="Quarter-id">@dto.RatingValue</p>
+        </div>
+        <div class="col-sm-2">
+            <p class="form-control-plaintext" id="Quarter-id">@dto.ApplicationUserEmail</p>
+        </div>
+        <div class="col-sm-1">
+            <p class="form-control-plaintext" id="Quarter-id">@dto.Title.Truncate(5)</p>
+        </div>
+        <div class="col-sm-2">
+            <p class="form-control-plaintext" id="Quarter-id">@dto.Question.Truncate(10)</p>
+        </div>
+        <div class="col-sm-2">
+            <p class="form-control-plaintext" id="Quarter-IssueVisibility">@dto.IssueVisibility</p>
+        </div>
+        <div class="col-sm-2">
+            <p class="form-control-plaintext" id="Quarter-createdat">@dto.CreatedAt</p>
+        </div>
+        <div class="col-sm-2">
+            <div class="btn-group my-2" role="group">
+                <a href="/admin/create-issue-by-admin/@dto.Id" class="btn btn-secondary btn-sm me-2">Edit</a>
+                <button class="btn btn-primary btn-sm" type="button" @onclick="ToggleDetails">@ShowDetailsButtonText</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="@DetailsCssClass">
+        <hr />
+        <h5>Details</h5>
+        <dl class="row mb-3">
+            <dt class="col-sm-3">Id</dt>
+            <dd class="col-sm-9">@dto.Id</dd>
+
+            <dt class="col-sm-3">IssueProcess</dt>
+            <dd class="col-sm-9">@dto.IssueProcess</dd>
+
+            <dt class="col-sm-3">ApplicationUser Id</dt>
+            <dd class="col-sm-9">@dto.ApplicationUserId</dd>
+
+            <dt class="col-sm-3">Full title</dt>
+            <dd class="col-sm-9">@dto.Title</dd>
+
+            <dt class="col-sm-3">Full question</dt>
+            <dd class="col-sm-9">@dto.Question</dd>
+
+            @if (dto.InitialPayment != null)
+            {
+                <dt class="col-sm-3">InitialPayment</dt>
+                <dd class="col-sm-9">@dto.InitialPayment.PaymentValuePLN</dd>
+
+                <dt class="col-sm-3">InitialPayment user</dt>
+                <dd class="col-sm-9">@dto.InitialPayment.ApplicationUserEmail</dd>
+            }
+            @*
+            <dt class="col-sm-3">Quarters</dt>
+            <dd class="col-sm-9 separator-line">@IssueDTO.QuarterDTOs.Count()</dd>
+
+            @foreach (var quarter in IssueDTO.QuarterDTOs)
+            {
+            <dt class="col-sm-3">Quarter Y-M</dt>
+            <dd class="col-sm-9">@quarter.Year - @quarter.Month</dd>
+            }
+
+            <dt class="col-sm-3">Signatures</dt>
+            <dd class="col-sm-9 separator-line">@IssueDTO.SignatureDTOs.Count()</dd>
+
+            @foreach (var signature in IssueDTO.SignatureDTOs)
+            {
+            <dt class="col-sm-3">Signature ID</dt>
+            <dd class="col-sm-9">@signature.Id</dd>
+            }*@
+
+            <dt class="col-sm-3">Issue Status History:</dt>
+            <dd class="col-sm-9">
+                @if (dto.IssueVisibilityHistories != null && dto.IssueVisibilityHistories.Any())
+                {
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>IssueDTO Status</th>
+                                <th>Status Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var history in dto.IssueVisibilityHistories)
+                            {
+                                <tr>
+                                    <td>@history.IssueVisibility</td>
+                                    <td>@history.CreatedAt.ToString("g", CultureInfo.InvariantCulture)</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <_Info Description="No issue status history available." />
+                }
+            </dd>
+
+            <dt class="col-sm-3">Issue Process History:</dt>
+            <dd class="col-sm-9">
+                @if (dto.IssueProcessingHistories != null && dto.IssueProcessingHistories.Any())
+                {
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>IssueProcess</th>
+                                <th>Process Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var history in dto.IssueProcessingHistories)
+                            {
+                                <tr>
+                                    <td>@history.IssueProcess</td>
+                                    <td>@history.CreatedAt.ToString("g", CultureInfo.InvariantCulture)</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <_Info Description="No issue process history available." />
+                }
+            </dd>
+        </dl>
+
+        <div class="row justify-content-center">
+            <div class="col-12 text-center">
+                <hr />
+                <h5>Preview</h5>
+            </div>
+            <div class="row d-flex justify-content-center">
+                <_CustomIssueCard BackgroundColor="@dto.BackgroundColor"
+                                  Title="@dto.Title" Icon="@dto.Icon"
+                                  Text="@dto.Question"
+                                  ApplicationUserEmail="@dto.ApplicationUserEmail"
+                                  IsVerifyByAdmin="false"
+                                  IssueVisibility="@IssueVisibilityEnum.VisibleOnlyToMe"
+                                  RatingValue="0"
+                                  ColsDefinition="col-12" />
+            </div>
+        </div>
+
+        <div class="col-sm-12">
+            <div class="center-align">
+                <input id="confirmationCheckbox" type="checkbox" @bind="confirmationCheckboxChecked" />
+                <label for="confirmationCheckbox">Confirmed</label>
+            </div>
+            <button class="btn btn-primary btn-sm" @onclick="Verify">
+                @(confirmationCheckboxChecked ? "Verify" : "Reject")
+            </button>
+        </div>
+        @if (result != null)
+        {
+            <hr />
+            <_ApiResponse T="bool" result="result" />
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public IssueReadDTO dto { get; set; }
+
+    [Parameter]
+    public EventCallback Refresh { get; set; }
+
+    private bool confirmationCheckboxChecked;
+
+    private ApiResponse<bool> result = null;
+
+    private async Task Verify()
+    {
+        if (confirmationCheckboxChecked)
+        {
+            result = await adminService.VerifyIssue(dto.Id, confirmationCheckboxChecked);
+            await Refresh.InvokeAsync();
+        }
+    }
+}

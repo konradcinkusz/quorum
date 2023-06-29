@@ -19,6 +19,7 @@ public interface IAdminService
     Task<ApiResponse<PagedListDto<IssueReadDTO>>> GetIssuesBySearchParams(IssueSearchParamsDTO searchParams);
     Task<ApiResponse<Guid>> CreateIssue(IssueAdminCreateDTO issueDTO);
     Task<ApiResponse<string>> GetUserEmailByUserId(string userId);
+    Task<ApiResponse<bool>> VerifyIssue(Guid issueId, bool confirmed);
 }
 
 internal class AdminService : DataServiceBase, IAdminService
@@ -103,8 +104,8 @@ internal class AdminService : DataServiceBase, IAdminService
 
     public async Task<ApiResponse<bool>> RemoveSignature(Guid signatureId)
     {
-        var endpoint = $"{_signaturePoolControllerPath}/remove-signature";
-        return await HandleResponse<bool>(async () => await _httpClient.PostAsJsonAsync(endpoint, signatureId));
+        var endpoint = $"{_signaturePoolControllerPath}/remove-signature?signatureId={signatureId}";
+        return await HandleResponse<bool>(async () => await _httpClient.DeleteAsync(endpoint));
     }
 
     public async Task<ApiResponse<bool>> AddSignatureToSignaturePool(Guid signaturePoolId)
@@ -166,7 +167,13 @@ internal class AdminService : DataServiceBase, IAdminService
     {
         var q = BuildQuery(nameof(userId), userId);
         var endpoint = $"{_adminControllerPath}/get-user-email-by-user-id?{q}";
-        return await HandleResponse<string>(async () =>
-            await _httpClient.GetAsync(endpoint));
+        return await HandleResponse<string>(async () => await _httpClient.GetAsync(endpoint));
     }
+
+    public async Task<ApiResponse<bool>> VerifyIssue(Guid issueId, bool confirmed)
+    {
+        var endpoint = $"{_adminIssueControllerPath}/verify-issue/{issueId}";
+        return await HandleResponse<bool>(async () => await _httpClient.PutAsJsonAsync(endpoint, confirmed));
+    }
+
 }
