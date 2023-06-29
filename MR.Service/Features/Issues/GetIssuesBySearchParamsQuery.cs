@@ -1,4 +1,6 @@
-﻿namespace MR.Service.Features.Issues;
+﻿using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+
+namespace MR.Service.Features.Issues;
 
 public class GetIssuesBySearchParamsQuery : QueryBase, IRequest<PagedList<Issue>>
 {

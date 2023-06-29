@@ -1,24 +1,22 @@
 ﻿namespace MR.Service.Features.Issues;
 
-public class IssueCreatedStatusChangeCommand : IRequest<bool>, IIssueCommandData
+public class IssueCreatedStatusChangeCommand : IRequest<bool>
 {
     public Guid IssueId { get; }
-    public string CreatedById { get; }
 
-    public IssueCreatedStatusChangeCommand(Guid issueId, string createdById)
+    public IssueCreatedStatusChangeCommand(Guid issueId)
     {
         IssueId = issueId;
-        CreatedById = createdById;
     }
-    public class IssueCreatedStatusChangeCommandHandler : IssueCommandHandlerBase<IssueCreatedStatusChangeCommand, bool>
+    internal class IssueCreatedStatusChangeCommandHandler : CommandHandlerBase<IssueCreatedStatusChangeCommand, bool>
     {
-        public IssueCreatedStatusChangeCommandHandler(MRUserManager MRUserManager, IApplicationDbContext context, ILogger<IssueCreatedStatusChangeCommand> logger) : base(MRUserManager, context, logger)
+        public IssueCreatedStatusChangeCommandHandler(IApplicationDbContext context, ILogger<IssueCreatedStatusChangeCommand> logger) : base(context, logger)
         {
         }
 
         public override async Task<bool> Handle(IssueCreatedStatusChangeCommand request, CancellationToken cancellationToken)
         {
-            var issue = await CheckBasicConditions(request, cancellationToken);
+            var issue = await _context.Issues.FirstAsync(x => x.Id == request.IssueId, cancellationToken);
 
             if (issue.IssueProcess != IssueProcess.InCreation)
             {

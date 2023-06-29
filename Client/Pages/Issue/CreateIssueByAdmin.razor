@@ -129,11 +129,11 @@
 
     private async Task Create()
     {
-        result = await adminService.CreateOrEditIssue(dto);
+        result = await adminService.CreateIssue(dto);
 
         if (result != null)
         {
-            navigationManager.NavigateTo($"/admin/create-issue-by-admin/{result.Data}");
+            navigationManager.NavigateTo($"/issue/edit-issue/{result.Data}");
         }
     }
 

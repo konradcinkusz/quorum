@@ -16,7 +16,6 @@ public sealed class AdminIssueController : MRBaseController
             IssueVisibility = (IssueVisibility)dto.IssueVisibility,
             IssueProcess = (IssueProcess)dto.IssueProcess,
             IsVerifyByAdmin = dto.IsVerifyByAdmin,
-            RatingValue = dto.RatingValue,
             Question = dto.Question,
             Title = dto.Title,
             Icon = dto.Icon,

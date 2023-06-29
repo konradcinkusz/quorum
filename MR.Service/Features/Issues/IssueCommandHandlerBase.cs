@@ -17,7 +17,7 @@ public abstract class IssueCommandHandlerBase<TCommand, TResult> : CommandHandle
         _MRUserManager = MRUserManager;
     }
 
-    protected async Task<Issue> CheckBasicConditions(IIssueCommandData request, CancellationToken cancellationToken)
+    protected async Task<Issue> CheckBasicConditionsAndReturnIssue(IIssueCommandData request, CancellationToken cancellationToken)
     {
         var isActiveSub = await _MRUserManager.HasActiveSubscription(request.CreatedById);
 

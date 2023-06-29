@@ -4,9 +4,9 @@ public interface IIssueService
 {
     Task<ApiResponse<Guid>> EditIssue(Guid issueId, IssueCreateDTO issueDTO);
     Task<ApiResponse<Guid>> CreateIssue(IssueCreateDTO issueDTO);
-    Task<ApiResponse<Guid>> ChangeIssueProcessStatus(Guid issueId, IssueProcessEnum newIssueProcessStatus);
     Task<ApiResponse<PagedListDto<IssueReadDTO>>> GetIssuesBySearchParams(IssueSearchParamsDTO searchParams);
     Task<ApiResponse<PagedListDto<IssueReadDTO>>> GetMyIssuesBySearchParams(IssueSearchParamsDTO searchParams);
+    Task<ApiResponse<IssueReadDTO>> GetIssueByIdForEdit(Guid id);
     Task<ApiResponse<bool>> PublishIssue(Guid issueId);
     Task<ApiResponse<bool>> PayForAnIssue(Guid issueId, IssuePayDTO issuePayDTO);
 }
@@ -55,17 +55,16 @@ internal class IssueService : DataServiceBase, IIssueService
             async () => await _httpClient.GetAsync(endpoint));
     }
 
-    public async Task<ApiResponse<Guid>> ChangeIssueProcessStatus(Guid issueId, IssueProcessEnum newIssueProcessStatus)
-    {
-        var endpoint = $"{_issueControllerPath}/change-issue-process-status/{issueId}";
-        return await HandleResponse<Guid>(
-            async () => await _httpClient.PutAsJsonAsync(endpoint, newIssueProcessStatus));
-    }
-
     public async Task<ApiResponse<Guid>> EditIssue(Guid issueId, IssueCreateDTO issueDTO)
     {
         var endpoint = $"{_issueControllerPath}/edit-issue/{issueId}";
         return await HandleResponse<Guid>(
             async () => await _httpClient.PutAsJsonAsync(endpoint, issueDTO));
+    }
+
+    public async Task<ApiResponse<IssueReadDTO>> GetIssueByIdForEdit(Guid id)
+    {
+        var endpoint = $"{_issueControllerPath}/get-issue-by-id-for-edit?id={id}";
+        return await HandleResponse<IssueReadDTO>(async () => await _httpClient.GetAsync(endpoint));
     }
 }

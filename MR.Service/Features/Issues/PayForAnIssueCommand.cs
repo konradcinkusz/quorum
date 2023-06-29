@@ -23,7 +23,7 @@ public class PayForAnIssueCommand : IRequest<bool>, IIssueCommandData
 
         public override async Task<bool> Handle(PayForAnIssueCommand request, CancellationToken cancellationToken)
         {
-            var issue = await CheckBasicConditions(request, cancellationToken);
+            var issue = await CheckBasicConditionsAndReturnIssue(request, cancellationToken);
 
             if (issue.InitialPayment != null)
             {

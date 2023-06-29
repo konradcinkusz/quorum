@@ -29,7 +29,7 @@
     </div>
 
     <div class="card-body">
-        <EditForm Model="@dto" OnValidSubmit="@Create">
+        <EditForm Model="@dto" OnValidSubmit="@Create" disabled="@(!canBeEdited)">
             <DataAnnotationsValidator />
             <ValidationSummary />
 
@@ -113,6 +113,11 @@
     <_ApiResponse T="bool" result="paid" />
 }
 
+@if(issueReadDTO != null)
+{
+    <ReadIssue dto="issueReadDTO" />
+}
+
 <style>
     .inactive-subscription-button {
         background-color: @(!isActiveSubscription ? "grey" : "#007bff");
@@ -128,6 +133,8 @@
 
     private bool isActiveSubscription = false;
     private string email;
+
+    private bool canBeEdited = false;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -145,18 +152,20 @@
     }
 
     private IssueCreateDTO dto = new IssueCreateDTO();
-
+    private IssueReadDTO issueReadDTO = new IssueReadDTO();
     protected override async Task OnInitializedAsync()
     {
         if (!string.IsNullOrEmpty(id) && Guid.TryParse(id, out Guid result))
         {
-            var issues = await issueService.GetIssuesBySearchParams(new() { IssueId = result, PaymentOptions = IssuePaymentOptions.WithInitialPayment_OnlyIfCompleted });
-            var issue = issues.Data.Items.First();
-            dto.Title = issue.Title;
-            dto.Question = issue.Question;
-            dto.Icon = issue.Icon;
-            dto.BackgroundColor = issue.BackgroundColor;
-            dto.InitialPaymnet = issue.InitialPayment;
+            var issueResponse = await issueService.GetIssueByIdForEdit(result);
+            issueReadDTO = issueResponse.Data;
+            dto.Title = issueReadDTO.Title;
+            dto.Question = issueReadDTO.Question;
+            dto.Icon = issueReadDTO.Icon;
+            dto.BackgroundColor = issueReadDTO.BackgroundColor;
+            dto.InitialPaymnet = issueReadDTO.InitialPayment;
+
+            canBeEdited = issueReadDTO.IssueProcess == IssueProcessEnum.InCreation || issueReadDTO.IssueProcess == IssueProcessEnum.Created;
         }
     }
 

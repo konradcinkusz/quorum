@@ -20,7 +20,7 @@ public class PublishIssueCommand : IRequest<bool>, IIssueCommandData
 
         public override async Task<bool> Handle(PublishIssueCommand request, CancellationToken cancellationToken)
         {
-            var issue = await CheckBasicConditions(request, cancellationToken);
+            var issue = await CheckBasicConditionsAndReturnIssue(request, cancellationToken);
 
             if (issue.InitialPayment == null || issue.InitialPayment.PaymentStatus != PaymentStatus.Completed)
             {

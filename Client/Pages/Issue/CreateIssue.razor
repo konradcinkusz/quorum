@@ -162,19 +162,7 @@
     }
 
     private ApiResponse<Guid> result = null;
-    private async Task Create()
-    {
-        result = await issueService.CreateIssue(dto);
-
-        if (result != null)
-        {
-            result = await issueService.ChangeIssueProcessStatus(result.Data, IssueProcessEnum.Created);
-            if (result != null)
-            {
-                navigationManager.NavigateTo($"/issue/edit-issue/{result.Data}");
-            }
-        }
-    }
+    private async Task Create() => result = await issueService.CreateIssue(dto);
 
     private int currentPage = 1;
 

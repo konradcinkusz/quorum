@@ -17,7 +17,7 @@ public interface IAdminService
     Task<ApiResponse<bool>> RemoveSignature(Guid signatureId);
     Task<ApiResponse<bool>> AddSignatureToSignaturePool(Guid signaturePoolId);
     Task<ApiResponse<PagedListDto<IssueReadDTO>>> GetIssuesBySearchParams(IssueSearchParamsDTO searchParams);
-    Task<ApiResponse<Guid>> CreateOrEditIssue(IssueAdminCreateDTO issueDTO);
+    Task<ApiResponse<Guid>> CreateIssue(IssueAdminCreateDTO issueDTO);
     Task<ApiResponse<string>> GetUserEmailByUserId(string userId);
 }
 
@@ -121,11 +121,10 @@ internal class AdminService : DataServiceBase, IAdminService
         await _httpClient.GetAsync(endpoint));
     }
 
-    public async Task<ApiResponse<Guid>> CreateOrEditIssue(IssueAdminCreateDTO issueDTO)
+    public async Task<ApiResponse<Guid>> CreateIssue(IssueAdminCreateDTO issueDTO)
     {
         var endpoint = $"{_adminIssueControllerPath}/create-issue-by-admin";
-        return await HandleResponse<Guid>(
-            async () => await _httpClient.PostAsJsonAsync(endpoint, issueDTO));
+        return await HandleResponse<Guid>(async () => await _httpClient.PostAsJsonAsync(endpoint, issueDTO));
     }
 
     public async Task<ApiResponse<SubscriptionPagedListDTO>> GetSubscriptionsThatCouldBeActivate()

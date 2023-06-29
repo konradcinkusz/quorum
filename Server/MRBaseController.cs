@@ -31,7 +31,21 @@ public abstract class MRBaseController : ControllerBase
             return errorResponse;
         }
     }
-
+    //D = DTO
+    protected async Task<ActionResult<ApiResponse<D>>> HandleErrors<T, D>(Func<Task<T>> action, string message = "")
+    {
+        try
+        {
+            T result = await action.Invoke();
+            var item = _mapper.Map<D>(result);
+            return new ApiResponse<D>(item) { Message = message };
+        }
+        catch (Exception ex)
+        {
+            var errorResponse = new ApiResponse<D>(new List<string> { ex.Message }, (int)HttpStatusCode.BadRequest);
+            return errorResponse;
+        }
+    }
     protected void AddSearchParamsToCommand<T>(T command, SearchParamsDTO searchParamsDTO) where T : QueryBase
     {
         command.SearchParams = new SearchParams

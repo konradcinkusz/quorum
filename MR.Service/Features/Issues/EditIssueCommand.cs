@@ -15,9 +15,10 @@ public class EditIssueCommand : IRequest<Guid>
     {
         Id = id;
     }
-    internal class EditIssueCommandHandler : EditCommandHandlerBase<CreateIssueCommand, Guid, Issue>
+
+    public class EditIssueCommandHandler : EditCommandHandlerBase<EditIssueCommand, Guid, Issue>
     {
-        public EditIssueCommandHandler(IApplicationDbContext context, ILogger<CreateIssueCommand> logger) : base(context, logger)
+        public EditIssueCommandHandler(IApplicationDbContext context, ILogger<EditIssueCommand> logger) : base(context, logger)
         {
         }
     }
