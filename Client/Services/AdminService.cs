@@ -116,14 +116,14 @@ internal class AdminService : DataServiceBase, IAdminService
     public async Task<ApiResponse<IssuePagedListDTO>> GetIssuesBySearchParams(IssueSearchParamsDTO searchParams)
     {
         var q = BuildQuery(searchParams);
-        var endpoint = $"{_issueControllerPath}/get-issues-by-search-params-admin?{q}";
+        var endpoint = $"{_adminIssueControllerPath}/get-issues-by-search-params-admin?{q}";
         return await HandleResponse<IssuePagedListDTO>(async () =>
         await _httpClient.GetAsync(endpoint));
     }
 
     public async Task<ApiResponse<Guid>> CreateOrEditIssue(IssueAdminCreateDTO issueDTO)
     {
-        var endpoint = $"{_issueControllerPath}/create-issue-by-admin";
+        var endpoint = $"{_adminIssueControllerPath}/create-issue-by-admin";
         return await HandleResponse<Guid>(
             async () => await _httpClient.PostAsJsonAsync(endpoint, issueDTO));
     }

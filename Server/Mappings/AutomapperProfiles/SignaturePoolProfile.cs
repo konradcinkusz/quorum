@@ -1,4 +1,4 @@
-﻿namespace MR.Server.Mappings;
+﻿namespace MR.Server.Mappings.AutomapperProfiles;
 
 public class SignaturePoolProfile : Profile
 {

@@ -43,4 +43,33 @@ public abstract class MRBaseController : ControllerBase
         command.SortOrder = (Microsoft.Data.SqlClient.SortOrder)searchParamsDTO.SortOrder;
     }
 
+    protected virtual async Task<ActionResult<ApiResponse<PagedListDto<D>>>> ProcessPagedRequest<T, D, E>(T command) where T : notnull where D : class
+    {
+        try
+        {
+            var result = await Mediator.Send(command) as PagedList<E>;
+
+            if (result is null)
+            {
+                // Handle the case when result is null, for example by returning an appropriate error response
+                return new ApiResponse<PagedListDto<D>>("Failed to process the issue request.", (int)HttpStatusCode.BadRequest);
+            }
+
+            var IssuePoolPagedListDto = new PagedListDto<D>
+            {
+                Items = _mapper.Map<List<D>>(result),
+                CurrentPage = result.CurrentPage,
+                PageSize = result.PageSize,
+                TotalItems = result.TotalItems,
+                TotalPages = result.TotalPages
+            };
+
+            return new ApiResponse<PagedListDto<D>>(IssuePoolPagedListDto);
+        }
+        catch (Exception ex)
+        {
+            return new ApiResponse<PagedListDto<D>>(new PagedListDto<D>()) { Message = ex.Message, StatusCode = (int)HttpStatusCode.BadRequest };
+        }
+    }
+
 }

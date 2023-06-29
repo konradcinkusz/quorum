@@ -1,6 +1,4 @@
-﻿using MR.Shared.DTOs.Issue;
-
-namespace MR.Client.Services;
+﻿namespace MR.Client.Services;
 
 public interface IIssueService
 {

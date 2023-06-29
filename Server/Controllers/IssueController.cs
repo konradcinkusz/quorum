@@ -7,52 +7,6 @@ public sealed class IssueController : MRBaseController
     {
     }
 
-    private async Task<ActionResult<ApiResponse<IssuePagedListDTO>>> ProcessIssueRequest<T>(T command)
-    where T : notnull
-    {
-        try
-        {
-            var result = await Mediator.Send(command) as PagedList<Issue>;
-
-            if (result is null)
-            {
-                // Handle the case when result is null, for example by returning an appropriate error response
-                return new ApiResponse<IssuePagedListDTO>("Failed to process the issue request.", (int)HttpStatusCode.BadRequest);
-            }
-
-            var IssuePoolPagedListDto = new IssuePagedListDTO
-            {
-                Items = _mapper.Map<List<IssueReadDTO>>(result),
-                CurrentPage = result.CurrentPage,
-                PageSize = result.PageSize,
-                TotalItems = result.TotalItems,
-                TotalPages = result.TotalPages
-            };
-
-            return new ApiResponse<IssuePagedListDTO>(IssuePoolPagedListDto);
-        }
-        catch (Exception ex)
-        {
-            return new ApiResponse<IssuePagedListDTO>(new IssuePagedListDTO()) { Message = ex.Message, StatusCode = (int)HttpStatusCode.BadRequest };
-        }
-    }
-
-    private void AddIssueSearchParamsToCommand(GetIssuesBySearchParamsQuery command, IssueSearchParamsDTO searchParams)
-    {
-        command.IssueId = searchParams.IssueId;
-        command.CreatedByEmail = searchParams.CreatedByEmail;
-        command.Title = searchParams.Title;
-        command.Question = searchParams.Question;
-        command.IsVerifyByAdmin = searchParams.IsVerifyByAdmin;
-        command.IssueVisibility = (IssueVisibility?)searchParams.IssueVisibility;
-        command.RatingValue = searchParams.RatingValue;
-        command.HasInitialPayment = searchParams.PaymentOptions != null ? searchParams.PaymentOptions == IssuePaymentOptions.WithInitialPayment : null;
-        command.QuarterNumber = searchParams.QuarterNumber;
-        command.QuarterYear = searchParams.QuarterYear;
-
-        AddSearchParamsToCommand(command, searchParams);
-    }
-
     [AllowAnonymous]
     [HttpGet("get-issues-by-search-params")]
     public async Task<ActionResult<ApiResponse<IssuePagedListDTO>>>
@@ -88,16 +42,15 @@ public sealed class IssueController : MRBaseController
     }
 
     [HttpGet("get-my-issues-by-search-params")]
-    public async Task<ActionResult<ApiResponse<IssuePagedListDTO>>>
-        GetMyIssuesBySearchParams([FromQuery] IssueSearchParamsDTO searchParams)
+    public async Task<ActionResult<ApiResponse<PagedListDto<IssueReadDTO>>>> GetMyIssuesBySearchParams([FromQuery] IssueSearchParamsDTO searchParams)
     {
         var command = new GetIssuesBySearchParamsQuery();
-        AddIssueSearchParamsToCommand(command, searchParams);
+        IssueSearchParams.AddIssueSearchParamsToCommand(command, searchParams);
 
         command.CreatedById = GetUserId();
         command.CreatedByEmail = string.Empty;
 
-        return await ProcessIssueRequest(command);
+        return await ProcessPagedRequest<GetIssuesBySearchParamsQuery, IssueReadDTO, Issue>(command);
     }
 
     [HttpPut("publish-issue/{id}")]
@@ -167,59 +120,5 @@ public sealed class IssueController : MRBaseController
                 return ApiResponse<Guid>.CreatedApiResponse(id);
         }
         return ApiResponse<Guid>.BadRequestApiResponse(Guid.Empty);
-    }
-
-    [Authorize(Policy = Policies.RequireAdminRole)]
-    [HttpGet("get-issues-by-search-params-admin")]
-    public async Task<ActionResult<ApiResponse<IssuePagedListDTO>>>
-        GetIssuesBySearchParamsAdmin([FromQuery] IssueSearchParamsDTO searchParams)
-    {
-        var command = new GetIssuesBySearchParamsQuery();
-        AddIssueSearchParamsToCommand(command, searchParams);
-        return await ProcessIssueRequest(command);
-    }
-
-    [Authorize(Policy = Policies.RequireAdminRole)]
-    [HttpPost("create-issue-by-admin")]
-    public async Task<ActionResult<ApiResponse<Guid>>>
-        CreateOrEditIssueByAdmin([FromBody] IssueAdminCreateDTO dto)
-    {
-        var id = await Mediator.Send(new CreateIssueCommand
-        {
-            IssueId = dto.IssueId,
-            CreatedById = string.IsNullOrEmpty(dto.ApplicationUserId) ? GetUserId() : dto.ApplicationUserId,
-            IssueVisibility = (IssueVisibility)dto.IssueVisibility,
-            IssueProcess = (IssueProcess)dto.IssueProcess,
-            IsVerifyByAdmin = dto.IsVerifyByAdmin,
-            RatingValue = dto.RatingValue,
-            Question = dto.Question,
-            Title = dto.Title,
-            Icon = dto.Icon,
-            BackgroundColor = dto.BackgroundColor,
-        });
-
-        return new ApiResponse<Guid> { Data = id };
-    }
-
-    [Authorize(Policy = Policies.RequireAdminRole)]
-    [HttpPut("edit-issue-by-admin/{id}")]
-    public async Task<ActionResult<ApiResponse<Guid>>> EditIssueByAdmin([FromRoute] Guid id, [FromBody] IssueAdminCreateDTO dto)
-    {
-        if (dto.IssueId.HasValue)
-        {
-            var idR = await Mediator.Send(new EditIssueCommand(dto.IssueId.Value)
-            {
-                IssueVisibility = (IssueVisibility)dto.IssueVisibility,
-                IssueProcess = (IssueProcess)dto.IssueProcess,
-                IsVerifyByAdmin = dto.IsVerifyByAdmin,
-                RatingValue = dto.RatingValue,
-                Question = dto.Question,
-                Title = dto.Title,
-                Icon = dto.Icon,
-                BackgroundColor = dto.BackgroundColor,
-            });
-            return new ApiResponse<Guid> { Data = idR };
-        }
-        return new ApiResponse<Guid>() { Success = false };
     }
 }

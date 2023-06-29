@@ -1,4 +1,4 @@
-﻿namespace MR.Server.Controllers;
+﻿namespace MR.Server.Controllers.Admin;
 
 [Authorize(Policy = Policies.RequireAdminRole)]
 public class AdminController : MRBaseController
@@ -37,7 +37,7 @@ public class AdminController : MRBaseController
     }
 
     [HttpGet("get-user-email-by-user-id")]
-    public async Task<ActionResult<ApiResponse<string>>> GetUserEmailByUserId([FromQuery] string userId) 
+    public async Task<ActionResult<ApiResponse<string>>> GetUserEmailByUserId([FromQuery] string userId)
         => await HandleErrors(async () => await Mediator.Send(new GetUserEmailByUserIdCommand(userId)));
 
     [HttpGet("get-admin-logs-by-query")]

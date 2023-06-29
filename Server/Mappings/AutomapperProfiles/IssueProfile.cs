@@ -1,10 +1,10 @@
-﻿namespace MR.Server.Mappings;
+﻿namespace MR.Server.Mappings.AutomapperProfiles;
 
 public class IssueProfile : Profile
 {
     public IssueProfile()
     {
-        CreateMap<IssueVisibilityHistory,  IssueVisibilityHistoryDTO>();
+        CreateMap<IssueVisibilityHistory, IssueVisibilityHistoryDTO>();
         CreateMap<IssueProcessingHistory, IssueProcessingHistoryDTO>();
 
         CreateMap<Issue, IssueAdminCreateDTO>()
