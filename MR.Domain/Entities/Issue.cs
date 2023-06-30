@@ -3,12 +3,9 @@
 [Table(TableNames.Issues, Schema = SchemasNames.MRBasics)]
 public class Issue : BaseEntity<Guid>
 {
-    //nullable
     [ForeignKey(nameof(CreatedBy))]
     public string? CreatedById { get; set; }
     public ApplicationUser? CreatedBy { get; set; }
-
-    //not null
     public string Title { get; set; }
     public string Question { get; set; }
     public bool IsVerifyByAdmin { get; set; } = false;
@@ -18,7 +15,11 @@ public class Issue : BaseEntity<Guid>
     public IssueProcess IssueProcess { get; set; } = IssueProcess.InCreation;
     //Rating value na podstawie którego okreslamy miejsce w top10
     public int RatingValue { get; set; } = 0;
+
+    [ForeignKey(nameof(InitialPayment))]
+    public Guid? InitialPaymentId { get; set; }
     public Payment? InitialPayment { get; set; }
+    
     public string? Icon { get; set; }
     public string? BackgroundColor { get; set; }
 

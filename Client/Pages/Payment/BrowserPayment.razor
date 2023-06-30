@@ -6,7 +6,6 @@
             <div class="col-md-12">
                 <div class="row g-3 mt-2">
                     <div class="col-md-9 col-sm-12">
-                        <label for="userEmail" class="text-white">User email</label>
                         <input type="search" id="userEmail" class="form-control rounded-pill" placeholder="Enter user email..." @bind-value="SearchParams.ApplicationUserEmail" @bind-value:event="oninput">
                     </div>
                     <div class="col-md-3 col-sm-12 text-end">
@@ -16,28 +15,31 @@
                 </div>
                 <div class="row g-3">
                     <div class="col-md-9 col-sm-9">
-                        <label for="paymentId" class="text-white">Payment Id (full or just a part)</label>
                         <input type="search" id="paymentId" class="form-control rounded-pill" placeholder="Enter part of payment ID" @bind-value="SearchParams.PaymentId" @bind-value:event="oninput">
+                    </div>
+                    <div class="col-md-3 col-sm-12">
+                        <select id="isVerifyByAdmin" class="form-control rounded-pill" @onchange="OnSelectChange">
+                            <option value="">-- only initial payment --</option>
+                            <option value="true">Yes</option>
+                            <option value="false">No</option>
+                        </select>
                     </div>
                 </div>
                 <div class="row g-3">
                     <div class="col-md-3 col-sm-12">
-                        <label for="minValue" class="text-white">Minimum value</label>
                         <input type="number" id="minValue" class="form-control rounded-pill" placeholder="Enter minimum value..." @bind-value="SearchParams.MinPaymentValuePLN" @bind-value:event="oninput">
                     </div>
                     <div class="col-md-3 col-sm-12">
-                        <label for="maxValue" class="text-white">Maximum value</label>
                         <input type="number" id="maxValue" class="form-control rounded-pill" placeholder="Enter maximum value..." @bind-value="SearchParams.MaxPaymentValuePLN" @bind-value:event="oninput">
                     </div>
                 </div>
+                <div class="row g-3">
+                    <_Paging QueryBase="SearchParams"
+                             RefreshList="async () => await Refresh.InvokeAsync()"
+                             TotalPages="TotalPages"
+                             TotalItems="TotalItems"></_Paging>
+                </div>
             </div>
-        </div>
-        <br />
-        <div class="row">
-            <_Paging QueryBase="SearchParams"
-                     RefreshList="async () => await Refresh.InvokeAsync()"
-                     TotalPages="TotalPages"
-                     TotalItems="TotalItems"></_Paging>
         </div>
     </div>
 </div>
@@ -58,5 +60,23 @@
         SearchParams.MaxPaymentValuePLN = null;
         SearchParams.ApplicationUserEmail = null;
         await Refresh.InvokeAsync();
+    }
+
+    public bool? OnlyInitialPayment
+    {
+        get => SearchParams.OnlyInitialPayment;
+        set => SearchParams.OnlyInitialPayment = value;
+    }
+
+    private void OnSelectChange(ChangeEventArgs e)
+    {
+        if (bool.TryParse(e.Value?.ToString(), out bool result))
+        {
+            OnlyInitialPayment = result;
+        }
+        else
+        {
+            OnlyInitialPayment = null;
+        }
     }
 }

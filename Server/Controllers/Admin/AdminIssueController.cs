@@ -50,7 +50,7 @@ public sealed class AdminIssueController : MRBaseController
     public async Task<ActionResult<ApiResponse<PagedListDto<IssueReadDTO>>>> GetIssuesBySearchParamsAdmin([FromQuery] IssueSearchParamsDTO searchParams)
     {
         var command = new GetIssuesBySearchParamsQuery();
-        IssueSearchParams.AddIssueSearchParamsToCommand(command, searchParams);
+        SearchParamsExtension.AddIssueSearchParamsToCommand(command, searchParams);
         return await ProcessPagedRequest<GetIssuesBySearchParamsQuery, IssueReadDTO, Issue>(command);
     }
 

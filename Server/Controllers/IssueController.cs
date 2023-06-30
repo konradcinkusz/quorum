@@ -48,7 +48,7 @@ public sealed class IssueController : MRBaseController
     public async Task<ActionResult<ApiResponse<PagedListDto<IssueReadDTO>>>> GetMyIssuesBySearchParams([FromQuery] IssueSearchParamsDTO searchParams)
     {
         var command = new GetIssuesBySearchParamsQuery();
-        IssueSearchParams.AddIssueSearchParamsToCommand(command, searchParams);
+        SearchParamsExtension.AddIssueSearchParamsToCommand(command, searchParams);
 
         command.CreatedById = GetUserId();
         command.CreatedByEmail = string.Empty;

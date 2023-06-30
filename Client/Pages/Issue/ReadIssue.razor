@@ -132,19 +132,16 @@
         </dl>
 
         <div class="row justify-content-center">
-            <div class="col-12 text-center">
-                <hr />
-                <h5>Preview</h5>
-            </div>
-            <div class="row d-flex justify-content-center">
-                <_CustomIssueCard BackgroundColor="@dto.BackgroundColor"
-                                  Title="@dto.Title" Icon="@dto.Icon"
-                                  Text="@dto.Question"
-                                  ApplicationUserEmail="@dto.ApplicationUserEmail"
-                                  IsVerifyByAdmin="false"
-                                  IssueVisibility="@IssueVisibilityEnum.VisibleOnlyToMe"
-                                  RatingValue="0"
-                                  ColsDefinition="col-12" />
+            <div class="col-12 mt-5">
+                <div class="row d-flex justify-content-center">
+                    <_CustomIssueCard BackgroundColor="@dto.BackgroundColor"
+                                      Title="@dto.Title" Icon="@dto.Icon"
+                                      Text="@dto.Question"
+                                      ApplicationUserEmail="@dto.ApplicationUserEmail"
+                                      IsVerifyByAdmin="false"
+                                      IssueVisibility="@dto.IssueVisibility"
+                                      RatingValue="@dto.RatingValue" />
+                </div>
             </div>
         </div>
     </div>

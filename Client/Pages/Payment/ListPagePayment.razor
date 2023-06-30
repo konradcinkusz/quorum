@@ -22,8 +22,6 @@
             }
             else
             {
-                <br />
-                <br />
                 <HeaderPayment Refresh="_refresh"
                        SearchParams="PaymentSearchParamsDTO"></HeaderPayment>
                 <div class="content">
@@ -46,7 +44,7 @@
 
 @code {
     PaymentSearchParamsDTO PaymentSearchParamsDTO;
-    PaymentPagedListDTO? PaymentPagedListDto;
+    PagedListDto<PaymentDTO>? PaymentPagedListDto;
 
     protected override async Task OnInitializedAsync()
     {
@@ -56,7 +54,8 @@
 
     async Task _refresh()
     {
-        PaymentPagedListDto = await paymentService.GetPayments(PaymentSearchParamsDTO);
+        var response = await paymentService.GetPaymentsBySearchParams(PaymentSearchParamsDTO);
+        PaymentPagedListDto = response.Data;
         PaymentSearchParamsDTO.CurrentPage = PaymentPagedListDto.CurrentPage;
         PaymentSearchParamsDTO.PageSize = PaymentPagedListDto.PageSize;
     }

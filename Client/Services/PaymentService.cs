@@ -5,7 +5,7 @@ public interface IPaymentService
     Task<string> CreatePayment(PaymentCreateDTO paymentDto);
     Task<PaymentDTO> GetPayment(Guid id);
     Task<string> UpdatePayment(PaymentUpdateDTO paymentUpdateDTO);
-    Task<PaymentPagedListDTO> GetPayments(PaymentSearchParamsDTO query);
+    Task<ApiResponse<PagedListDto<PaymentDTO>>> GetPaymentsBySearchParams(PaymentSearchParamsDTO searchParams);
     Task<ApiResponse<bool>> AcceptPayment(Guid paymentId);
 }
 
@@ -45,27 +45,16 @@ internal class PaymentService : DataServiceBase, IPaymentService
         return paymentDto;
     }
 
-    public async Task<PaymentPagedListDTO> GetPayments(PaymentSearchParamsDTO query)
+    public async Task<ApiResponse<PagedListDto<PaymentDTO>>> GetPaymentsBySearchParams(PaymentSearchParamsDTO query)
     {
         var q = BuildQuery(query);
-
-        var response = await _httpClient.GetAsync($"{_paymentControllerPath}/GetPaymentsByQuery?{q}");
-
-        response.EnsureSuccessStatusCode();
-
-        var content = await response.Content.ReadAsStringAsync();
-
-        var result = JsonSerializer.Deserialize<PaymentPagedListDTO>(content, new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        });
-
-        return result ?? throw new Exception("Deserialized response is null.");
+        var endpoint = $"{_paymentControllerPath}/get-payments-by-search-params?{q}";
+        return await HandleResponse<PagedListDto<PaymentDTO>>(async () => await _httpClient.GetAsync(endpoint));
     }
 
     public async Task<string> UpdatePayment(PaymentUpdateDTO paymentUpdateDTO)
     {
-        var response = await _httpClient.PutAsJsonAsync($"{_paymentControllerPath}/EditPayment/{paymentUpdateDTO.Id}", paymentUpdateDTO);
+        var response = await _httpClient.PutAsJsonAsync($"{_paymentControllerPath}/edit-payment/{paymentUpdateDTO.Id}", paymentUpdateDTO);
         if (!response.IsSuccessStatusCode)
         {
             throw new ApplicationException(await response.Content.ReadAsStringAsync());

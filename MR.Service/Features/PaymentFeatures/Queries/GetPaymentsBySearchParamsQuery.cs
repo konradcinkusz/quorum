@@ -9,6 +9,7 @@ public class GetPaymentsBySearchParamsQuery : QueryBase, IRequest<PagedList<Paym
     public string? ReferenceNumber { get; set; }
     public decimal? MinPaymentValuePLN { get; set; }
     public decimal? MaxPaymentValuePLN { get; set; }
+    public bool? OnlyInitialPayment { get; set; }
 
     public class GetPaymentsByQueryHandler : CommandQueryHandlerBase<GetPaymentsBySearchParamsQuery, PagedList<Payment>>
     {
@@ -18,11 +19,24 @@ public class GetPaymentsBySearchParamsQuery : QueryBase, IRequest<PagedList<Paym
 
         public override async Task<PagedList<Payment>> Handle(GetPaymentsBySearchParamsQuery request, CancellationToken cancellationToken)
         {
-            var query = _context.Payments
+            IQueryable<Payment> query = _context.Payments
+                .Include(x => x.RelatedIssue)
                 .Include(x => x.PaymentStatusHistories)
                 .Include(x => x.ApplicationUser).AsQueryable();
 
             query = ApplyUserFilter(query, request);
+
+            if (request.OnlyInitialPayment.HasValue)
+            {
+                if (request.OnlyInitialPayment.Value)
+                {
+                    query = query.Where(x => x.RelatedIssue != null);
+                }
+                else
+                {
+                    query = query.Where(x => x.RelatedIssue == null);
+                }
+            }
 
             if (request.PaymentId.HasValue && request.PaymentId.Value != Guid.Empty)
             {

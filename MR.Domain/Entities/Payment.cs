@@ -18,6 +18,9 @@ public class Payment : BaseEntity<Guid>
     public ICollection<SubscriptionPayment> SubscriptionPayments { get; set; }
     [InverseProperty(nameof(Payment_Log.Payment))]
     public ICollection<Payment_Log> Payment_Logs { get; set; }
+
+    [InverseProperty(nameof(Issue.InitialPayment))]
+    public Issue? RelatedIssue { get; set; }
 }
 
 

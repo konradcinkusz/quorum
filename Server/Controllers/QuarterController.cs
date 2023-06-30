@@ -7,45 +7,15 @@ public class QuarterController : MRBaseController
     {
     }
 
-    [HttpGet(nameof(GetQuartersBySearchParams))]
-    public async Task<ActionResult<ApiResponse<QuarterPagedListDTO>>>
-        GetQuartersBySearchParams([FromQuery] QuarterSearchParamsDTO searchParams)
+    [HttpGet("get-quarters-by-search-params")]
+    public async Task<ActionResult<ApiResponse<PagedListDto<QuarterDTO>>>> GetQuartersBySearchParams([FromQuery] QuarterSearchParamsDTO searchParams)
     {
-        try
-        {
-            var result = await Mediator.Send(new GetQuartersBySearchParamsQuery
-            {
-                QuarterNumber = searchParams.Quarter,
-                Year =  searchParams.Year,
-                Begin = searchParams.Begin,
-                End = searchParams.End,
-                SearchParams = new SearchParams
-                {
-                    CurrentPage = searchParams.CurrentPage,
-                    PageSize = searchParams.PageSize
-                },
-                SortColumn = searchParams.SortColumn,
-                SortOrder = (Microsoft.Data.SqlClient.SortOrder)searchParams.SortOrder
-            });
-
-            var quarterPagedListDto = new QuarterPagedListDTO
-            {
-                Items = _mapper.Map<List<QuarterDTO>>(result),
-                CurrentPage = result.CurrentPage,
-                PageSize = result.PageSize,
-                TotalItems = result.TotalItems,
-                TotalPages = result.TotalPages
-            };
-
-            return new ApiResponse<QuarterPagedListDTO>(quarterPagedListDto);
-        }
-        catch (Exception ex)
-        {
-            return new ApiResponse<QuarterPagedListDTO>(new QuarterPagedListDTO()) { Message = ex.Message, StatusCode = (int)HttpStatusCode.BadRequest };
-        }
+        var command = new GetQuartersBySearchParamsQuery();
+        SearchParamsExtension.AddQuarterSearchParamsToCommand(command, searchParams);
+        return await ProcessPagedRequest<GetQuartersBySearchParamsQuery, QuarterDTO, Quarter>(command);
     }
 
-    [HttpPost(nameof(InitQuarter))]
+    [HttpPost("init-quarter")]
     public async Task<ActionResult<ApiResponse<Guid>>> InitQuarter([FromBody] InitQuarterDTO initQuarterDTO)
     {
         try

@@ -51,7 +51,7 @@ internal class AdminService : DataServiceBase, IAdminService
 
     public async Task<ApiResponse<Guid>> InitQuarter(InitQuarterDTO quarter)
     {
-        var endpoint = $"{_quarterControllerPath}/InitQuarter";
+        var endpoint = $"{_quarterControllerPath}/init-quarter";
 
         var response = await _httpClient.PostAsJsonAsync(endpoint, quarter);
 
@@ -74,7 +74,7 @@ internal class AdminService : DataServiceBase, IAdminService
     {
         var q = BuildQuery(searchParams);
 
-        var response = await _httpClient.GetAsync($"{_quarterControllerPath}/GetQuartersBySearchParams?{q}");
+        var response = await _httpClient.GetAsync($"{_quarterControllerPath}/get-quarters-by-search-params?{q}");
 
         response.EnsureSuccessStatusCode();
 

@@ -1,6 +1,8 @@
-﻿namespace MR.Server.Mappings.SearchParamsMapping;
+﻿using MR.Persistence.Migrations;
 
-public static class IssueSearchParams
+namespace MR.Server.Mappings.SearchParamsMapping;
+
+public static class SearchParamsExtension
 {
     public static void AddSearchParamsToCommand<T>(T command, SearchParamsDTO searchParamsDTO) where T : QueryBase
     {
@@ -25,6 +27,28 @@ public static class IssueSearchParams
         command.HasInitialPayment = searchParams.PaymentOptions != null ? searchParams.PaymentOptions == IssuePaymentOptions.WithInitialPayment : null;
         command.QuarterNumber = searchParams.QuarterNumber;
         command.QuarterYear = searchParams.QuarterYear;
+
+        AddSearchParamsToCommand(command, searchParams);
+    }
+
+    public static void AddPaymentSearchParamsToCommand(GetPaymentsBySearchParamsQuery command, PaymentSearchParamsDTO searchParams)
+    {
+
+        command.PaymentId = searchParams.PaymentId;
+        command.ApplicationUserEmail = searchParams.ApplicationUserEmail;
+        command.MinPaymentValuePLN = searchParams.MinPaymentValuePLN;
+        command.MaxPaymentValuePLN = searchParams.MaxPaymentValuePLN;
+        command.OnlyInitialPayment = searchParams.OnlyInitialPayment;
+
+        AddSearchParamsToCommand(command, searchParams);
+    }
+
+    public static void AddQuarterSearchParamsToCommand(GetQuartersBySearchParamsQuery command, QuarterSearchParamsDTO searchParams)
+    {
+        command.QuarterNumber = searchParams.Quarter;
+        command.Year = searchParams.Year;
+        command.Begin = searchParams.Begin;
+        command.End = searchParams.End;
 
         AddSearchParamsToCommand(command, searchParams);
     }

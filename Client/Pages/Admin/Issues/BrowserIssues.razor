@@ -13,21 +13,17 @@
                 </div>
                 <div class="row g-3">
                     <div class="col-md-12">
-                        <label for="title" class="text-white">Issue ID</label>
                         <input type="text" id="title" class="form-control rounded-pill" @bind="SearchParams.IssueId" @bind:event="oninput">
                     </div>
                 </div>
                 <div class="row g-3">
                     <div class="col-md-3 col-sm-12">
-                        <label for="title" class="text-white">Title</label>
                         <input type="text" id="title" class="form-control rounded-pill" @bind="SearchParams.Title" @bind:event="oninput">
                     </div>
                     <div class="col-md-3 col-sm-12">
-                        <label for="question" class="text-white">Question</label>
                         <input type="text" id="question" class="form-control rounded-pill" @bind="SearchParams.Question" @bind:event="oninput">
                     </div>
                     <div class="col-md-3 col-sm-12">
-                        <label for="isVerifyByAdmin" class="text-white">Verified by Admin</label>
                         <select id="isVerifyByAdmin" class="form-control rounded-pill" @onchange="OnVerifyByAdminChanged">
                             <option value="">-- Select Verification --</option>
                             <option value="true" selected="@SearchParams.IsVerifyByAdmin">Yes</option>
@@ -35,7 +31,6 @@
                         </select>
                     </div>
                     <div class="col-md-3 col-sm-12">
-                        <label for="IssueVisibility" class="text-white">Issue Status</label>
                         <select id="IssueVisibility" class="form-control rounded-pill" @bind="SearchParams.IssueVisibility" @bind:event="onchange">
                             <option value="">-- Select Issue Status --</option>
                             @foreach (var status in Enum.GetValues(typeof(IssueVisibilityEnum)))
@@ -47,13 +42,11 @@
                 </div>
                 <div class="row g-3">
                     <div class="col-md-3 col-sm-12">
-                        <label for="ratingValue" class="text-white">Rating Value</label>
                         <input type="number" id="ratingValue" class="form-control rounded-pill" @bind="SearchParams.RatingValue" @bind:event="oninput">
                     </div>
                 </div>
             </div>
         </div>
-        <br />
         <div class="row">
             <_Paging QueryBase="SearchParams"
                      RefreshList="async () => await Refresh.InvokeAsync()"

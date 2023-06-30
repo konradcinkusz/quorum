@@ -5,27 +5,33 @@
 
 <PageTitle>Edit Issue</PageTitle>
 
+@if (dto.InitialPaymnet != null)
+{
+    <div class="card shadow rounded-3 m-3">
+        <ReadPayment Payment="dto.InitialPaymnet"></ReadPayment>
+    </div>
+}
+
+<div class="card shadow rounded-3 m-3">
+    <ReadIssue dto="issueReadDTO" />
+</div>
+
 <div class="card shadow rounded-3">
-    <div class="card-header bg-primary text-white py-3 rounded-3">
-        <h5 class="card-title mb-0">Congratulation you have created issue! You can edit it below!</h5>
+    <div class="card-header bg-primary text-white text-center py-3 rounded-3">
+        <h5 class="card-title mb-0">Congratulation you have created issue! You can see and edit it below!</h5>
     </div>
     <div class="row justify-content-center">
-        <div class="col-12 text-center">
-            <hr />
-            <h5>Preview</h5>
-        </div>
-        <div class="col-12">
+        <div class="col-12 mt-5">
             <div class="row d-flex justify-content-center">
                 <_CustomIssueCard BackgroundColor="@dto.BackgroundColor"
                                   Title="@dto.Title" Icon="@dto.Icon"
                                   Text="@dto.Question"
-                                  ApplicationUserEmail="@email"
-                                  IsVerifyByAdmin="false"
-                                  IssueVisibility="@IssueVisibilityEnum.VisibleOnlyToMe"
-                                  RatingValue="0" />
+                                  ApplicationUserEmail="@issueReadDTO.ApplicationUserEmail"
+                                  IsVerifyByAdmin="@issueReadDTO.IsVerifyByAdmin"
+                                  IssueVisibility="@issueReadDTO.IssueVisibility"
+                                  RatingValue="@issueReadDTO.RatingValue" />
             </div>
         </div>
-        <hr />
     </div>
 
     <div class="card-body">
@@ -103,19 +109,9 @@
     <_ApiResponse T="bool" result="published" />
 }
 
-@if (dto.InitialPaymnet != null)
-{
-    <ReadPayment Payment="dto.InitialPaymnet"></ReadPayment>
-}
-
 @if (paid != null)
 {
     <_ApiResponse T="bool" result="paid" />
-}
-
-@if(issueReadDTO != null)
-{
-    <ReadIssue dto="issueReadDTO" />
 }
 
 <style>
@@ -133,26 +129,24 @@
 
     private bool isActiveSubscription = false;
     private string email;
-
     private bool canBeEdited = false;
+    private IssueCreateDTO dto = new IssueCreateDTO();
+    private IssueReadDTO issueReadDTO = new IssueReadDTO();
+    private ApiResponse<Guid> result = null;
+    private ApiResponse<bool> published = null;
+    private IssuePayDTO issuePayDTO = null;
+    private ApiResponse<bool> paid = null;
 
     protected override async Task OnParametersSetAsync()
     {
         await base.OnParametersSetAsync();
-
         var authState = await AuthTask;
         var user = authState.User;
-        var claim = user.Claims.FirstOrDefault(x => x.Type == "isActiveSubscription");
-        if (claim != null && bool.TryParse(claim.Value, out bool subscriptionF))
-        {
-            isActiveSubscription = subscriptionF;
-        }
-
+        var isActiveSubscriptionClaim = user.Claims.FirstOrDefault(x => x.Type == "isActiveSubscription");
+        isActiveSubscription = bool.TryParse(isActiveSubscriptionClaim?.Value, out bool claimValue) ? claimValue : false;
         email = user.Claims.FirstOrDefault(x => x.Type == "name")?.Value ?? string.Empty;
     }
 
-    private IssueCreateDTO dto = new IssueCreateDTO();
-    private IssueReadDTO issueReadDTO = new IssueReadDTO();
     protected override async Task OnInitializedAsync()
     {
         if (!string.IsNullOrEmpty(id) && Guid.TryParse(id, out Guid result))
@@ -164,7 +158,6 @@
             dto.Icon = issueReadDTO.Icon;
             dto.BackgroundColor = issueReadDTO.BackgroundColor;
             dto.InitialPaymnet = issueReadDTO.InitialPayment;
-
             canBeEdited = issueReadDTO.IssueProcess == IssueProcessEnum.InCreation || issueReadDTO.IssueProcess == IssueProcessEnum.Created;
         }
     }
@@ -179,7 +172,6 @@
         dto.BackgroundColor = selectedColor;
     }
 
-    private ApiResponse<Guid> result = null;
     private async Task Create()
     {
         if (!string.IsNullOrEmpty(id) && Guid.TryParse(id, out Guid issueId))
@@ -197,18 +189,19 @@
         }
     }
 
-    private ApiResponse<bool> published = null;
     private async Task Publish()
     {
         if (!string.IsNullOrEmpty(id) && Guid.TryParse(id, out Guid issueId) && isActiveSubscription)
+        {
             published = await issueService.PublishIssue(issueId);
+        }
     }
 
-    private IssuePayDTO issuePayDTO = new IssuePayDTO() { PaymentMethod = "Bank", PaymentValue = 5, ReferenceNumber = "Bank" };
-    private ApiResponse<bool> paid = null;
     private async Task Pay()
     {
         if (!string.IsNullOrEmpty(id) && Guid.TryParse(id, out Guid issueId) && isActiveSubscription)
+        {
             paid = await issueService.PayForAnIssue(issueId, issuePayDTO);
+        }
     }
 }

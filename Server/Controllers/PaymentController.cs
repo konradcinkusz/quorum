@@ -38,33 +38,16 @@ public class PaymentController : MRBaseController
         return paymentDto;
     }
 
-    [HttpGet("GetPaymentsByQuery")]
-    public async Task<ActionResult<PaymentPagedListDTO>> GetPaymentsByQuery([FromQuery] PaymentSearchParamsDTO query)
+    [HttpGet("get-payments-by-search-params")]
+    public async Task<ActionResult<ApiResponse<PagedListDto<PaymentDTO>>>> GetPaymentsByQuery([FromQuery] PaymentSearchParamsDTO searchParams)
     {
-        Guid.TryParse(query.PaymentId, out Guid paymentGuid);
-
-        var result = await Mediator.Send(new GetPaymentsBySearchParamsQuery
-        {
-            PaymentId = paymentGuid,
-            ApplicationUserEmail = query.ApplicationUserEmail,
-            MinPaymentValuePLN = query.MinPaymentValuePLN,
-            MaxPaymentValuePLN = query.MaxPaymentValuePLN,
-            SearchParams = new SearchParams
-            {
-                CurrentPage = query.CurrentPage,
-                PageSize = query.PageSize
-            },
-            SortColumn = query.SortColumn,
-            SortOrder = (Microsoft.Data.SqlClient.SortOrder)query.SortOrder
-        });
-
-        var paymentDTOs = _mapper.Map<List<PaymentDTO>>(result);
-
-        return Ok(new PaymentPagedListDTO { Items = paymentDTOs, CurrentPage = result.CurrentPage, PageSize = result.PageSize, TotalItems = result.TotalItems, TotalPages = result.TotalPages });
+        var command = new GetPaymentsBySearchParamsQuery();
+        SearchParamsExtension.AddPaymentSearchParamsToCommand(command, searchParams);
+        return await ProcessPagedRequest<GetPaymentsBySearchParamsQuery, PaymentDTO, Payment>(command);
     }
 
-    [HttpPut("EditPayment/{id}")]
-    public async Task<IActionResult> EditPayment(Guid id, [FromBody] PaymentUpdateDTO paymentDto)
+    [HttpPut("edit-payment/{id}")]
+    public async Task<IActionResult> EditPayment([FromRoute] Guid id, [FromBody] PaymentUpdateDTO paymentDto)
     {
         if (id != paymentDto.Id)
         {
@@ -75,6 +58,7 @@ public class PaymentController : MRBaseController
         {
             return BadRequest(ModelState);
         }
+
         EditPaymentCommand command = _mapper.Map<EditPaymentCommand>(paymentDto);
         command.ApplicationUserId = GetUserId();
         command.PaymentId = id;
@@ -96,7 +80,5 @@ public class PaymentController : MRBaseController
 
     [HttpPut("accept-payment/{id}")]
     public async Task<ActionResult<ApiResponse<bool>>> AcceptPayment(Guid id)
-    {
-        return await HandleErrors(async () => await Mediator.Send(new AcceptPaymentCommand(id)), $"Payment {id} accepted");
-    }
+        => await HandleErrors(async () => await Mediator.Send(new AcceptPaymentCommand(id)), $"Payment {id} accepted");
 }
