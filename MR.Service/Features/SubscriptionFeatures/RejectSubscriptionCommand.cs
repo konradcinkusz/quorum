@@ -7,7 +7,7 @@ public class RejectSubscriptionCommand : IRequest<bool>
     {
         ApplicationUserId = applicationUserId;
     }
-    public class RejectSubscriptionCommandHandler : PaymentCommandHandlerBase<RejectSubscriptionCommand, bool>
+    internal class RejectSubscriptionCommandHandler : PaymentCommandHandlerBase<RejectSubscriptionCommand, bool>
     {
         public RejectSubscriptionCommandHandler(IApplicationDbContext context, ILogger<RejectSubscriptionCommand> logger)
             : base(context, logger)

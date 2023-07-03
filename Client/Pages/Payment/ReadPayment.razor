@@ -3,30 +3,23 @@
 <div class="card m-1 p-1">
     <div class="row mb-3">
         <div class="col-sm-2">
-            <p class="form-control-plaintext" id="payment-id">@Payment.Id</p>
+            <p class="form-control-plaintext" id="payment-id">@dto.Id</p>
         </div>
         <div class="col-sm-2">
-            <p class="form-control-plaintext" id="user-email">@Payment.ApplicationUserEmail</p>
+            <p class="form-control-plaintext" id="user-email">@dto.ApplicationUserEmail</p>
         </div>
         <div class="col-sm-1">
-            <p class="form-control-plaintext" id="payment-value">@Payment.PaymentValuePLN.ToString("C", CultureInfo.GetCultureInfo("pl-PL"))</p>
+            <p class="form-control-plaintext" id="payment-value">@dto.PaymentValuePLN.ToString("C", CultureInfo.GetCultureInfo("pl-PL"))</p>
         </div>
         <div class="col-sm-2">
-            <p class="form-control-plaintext" id="user-email">@Payment.PaymentStatus</p>
+            <p class="form-control-plaintext" id="user-email">@dto.PaymentStatus</p>
         </div>
         <div class="col-sm-2">
-            <p class="form-control-plaintext" id="payment-createdat">@Payment.CreatedAt</p>
+            <p class="form-control-plaintext" id="payment-createdat">@dto.CreatedAt</p>
         </div>
         <div class="col-sm-3">
             <div class="btn-group my-2" role="group">
-                @if (Accept.HasDelegate)
-                {
-                    <button class="btn btn-secondary btn-sm me-2" type="button" @onclick="@(async ()=>await Accept.InvokeAsync(Payment.Id))">Accept</button>
-                }
-                else
-                {
-                    <a href="/edit-payment/@Payment.Id" class="btn btn-secondary btn-sm me-2">Edit</a>
-                }
+                <a href="/edit-payment/@dto.Id" class="btn btn-secondary btn-sm me-2">Edit</a>
                 <button class="btn btn-primary btn-sm" type="button" @onclick="ToggleDetails">@ShowDetailsButtonText</button>
             </div>
         </div>
@@ -37,24 +30,24 @@
         <h5>Payment Details</h5>
         <dl class="row mb-3">
             <dt class="col-sm-3">Payment Method:</dt>
-            <dd class="col-sm-9">@Payment.PaymentMethod</dd>
+            <dd class="col-sm-9">@dto.PaymentMethod</dd>
 
             <dt class="col-sm-3">Reference ID:</dt>
-            <dd class="col-sm-9">@Payment.ReferenceNumber</dd>
+            <dd class="col-sm-9">@dto.ReferenceNumber</dd>
 
             <dt class="col-sm-3">Created At:</dt>
-            <dd class="col-sm-9">@Payment.CreatedAt.ToString("g", CultureInfo.InvariantCulture)</dd>
-            @if (Payment.UpdatedAt.HasValue)
+            <dd class="col-sm-9">@dto.CreatedAt.ToString("g", CultureInfo.InvariantCulture)</dd>
+            @if (dto.UpdatedAt.HasValue)
             {
                 <dt class="col-sm-3">Updated At:</dt>
-                <dd class="col-sm-9">@Payment.UpdatedAt.Value.ToString("g", CultureInfo.InvariantCulture)</dd>
+                <dd class="col-sm-9">@dto.UpdatedAt.Value.ToString("g", CultureInfo.InvariantCulture)</dd>
             }
             <dt class="col-sm-3">More:</dt>
-            <dd class="col-sm-9"><a href="/payments/@Payment.Id">View Payment Details</a></dd>
+            <dd class="col-sm-9"><a href="/payments/@dto.Id">View Payment Details</a></dd>
 
             <dt class="col-sm-3">Payment Status History:</dt>
             <dd class="col-sm-9">
-                @if (Payment.PaymentStatusHistories != null && Payment.PaymentStatusHistories.Any())
+                @if (dto.PaymentStatusHistories != null && dto.PaymentStatusHistories.Any())
                 {
                     <table class="table">
                         <thead>
@@ -64,7 +57,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var history in Payment.PaymentStatusHistories)
+                            @foreach (var history in dto.PaymentStatusHistories)
                             {
                                 <tr>
                                     <td>@history.PaymentStatus</td>
@@ -83,16 +76,18 @@
         <hr />
         <dl class="row mb-3">
             <dt class="col-sm-3">ApplicationUserId:</dt>
-            <dd class="col-sm-9">@Payment.ApplicationUserId</dd>
+            <dd class="col-sm-9">@dto.ApplicationUserId</dd>
+        </dl>
+        <dl class="row mb-3">
+            @ChildContent
         </dl>
     </div>
 </div>
 
 @code {
     [Parameter]
-    public PaymentDTO Payment { get; set; }
+    public RenderFragment? ChildContent { get; set; }
 
     [Parameter]
-    public EventCallback<Guid> Accept { get; set; }
-
+    public PaymentDTO dto { get; set; }
 }

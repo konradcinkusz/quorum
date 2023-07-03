@@ -9,6 +9,6 @@ public class PaymentSearchParamsDTO : SearchParamsDTO
     /// <summary>
     /// Only payment with relation to the issue initial payment
     /// </summary>
-    public bool? OnlyInitialPayment { get; set; }
+    public bool? OnlyInitialPayment { get; set; } = null;
 }
 

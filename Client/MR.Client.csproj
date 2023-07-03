@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Pages\Admin\Payment\" />
     <Folder Include="wwwroot\js\" />
   </ItemGroup>
 

@@ -18,11 +18,11 @@
                         <input type="search" id="paymentId" class="form-control rounded-pill" placeholder="Enter part of payment ID" @bind-value="SearchParams.PaymentId" @bind-value:event="oninput">
                     </div>
                     <div class="col-md-3 col-sm-12">
-                        <select id="isVerifyByAdmin" class="form-control rounded-pill" @onchange="OnSelectChange">
+                        <InputSelectBoolean class="form-control rounded-pill" @bind-Value="@SearchParams.OnlyInitialPayment">
                             <option value="">-- only initial payment --</option>
                             <option value="true">Yes</option>
                             <option value="false">No</option>
-                        </select>
+                        </InputSelectBoolean>
                     </div>
                 </div>
                 <div class="row g-3">
@@ -59,24 +59,7 @@
         SearchParams.MinPaymentValuePLN = null;
         SearchParams.MaxPaymentValuePLN = null;
         SearchParams.ApplicationUserEmail = null;
+        SearchParams.OnlyInitialPayment = null;
         await Refresh.InvokeAsync();
-    }
-
-    public bool? OnlyInitialPayment
-    {
-        get => SearchParams.OnlyInitialPayment;
-        set => SearchParams.OnlyInitialPayment = value;
-    }
-
-    private void OnSelectChange(ChangeEventArgs e)
-    {
-        if (bool.TryParse(e.Value?.ToString(), out bool result))
-        {
-            OnlyInitialPayment = result;
-        }
-        else
-        {
-            OnlyInitialPayment = null;
-        }
     }
 }

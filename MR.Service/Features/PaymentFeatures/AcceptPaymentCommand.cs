@@ -7,7 +7,7 @@ public class AcceptPaymentCommand : IRequest<bool>
     {
         PaymentId = paymentId;
     }
-    public class AcceptPaymentCommandHandler : PaymentCommandHandlerBase<AcceptPaymentCommand, bool>
+    internal class AcceptPaymentCommandHandler : PaymentCommandHandlerBase<AcceptPaymentCommand, bool>
     {
         public AcceptPaymentCommandHandler(IApplicationDbContext context, ILogger<AcceptPaymentCommand> logger) : base(context, logger)
         {

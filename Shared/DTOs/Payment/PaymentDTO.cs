@@ -13,4 +13,5 @@ public class PaymentDTO
     public decimal PaymentValuePLN { get; set; }
     public List<PaymentStatusHistoryDTO> PaymentStatusHistories { get; set; }
     public PaymentStatusEnum PaymentStatus { get; set; }
+    public Guid? RelatedIssueGuid { get; set; }
 }

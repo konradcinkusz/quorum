@@ -1,6 +1,6 @@
 ﻿namespace MR.Service.Features.PaymentFeatures;
 
-public abstract class PaymentCommandHandlerBase<TCommand, TResult> : CommandHandlerBase<TCommand, TResult>
+internal abstract class PaymentCommandHandlerBase<TCommand, TResult> : CommandHandlerBase<TCommand, TResult>
     where TCommand : IRequest<TResult>
 {
     public PaymentCommandHandlerBase(IApplicationDbContext context, ILogger<TCommand> logger) : base(context, logger)

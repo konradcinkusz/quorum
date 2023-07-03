@@ -19,7 +19,7 @@ public class IssueProfile : Profile
         CreateMap<Issue, IssueReadDTO>()
             .ForMember(dest => dest.InitialPayment, opt => opt.MapFrom(src => src.InitialPayment))
             .ForMember(dest => dest.ApplicationUserId, opt => opt.MapFrom(src => src.CreatedBy != null ? src.CreatedBy.Id : string.Empty))
-            .ForMember(dest => dest.ApplicationUserEmail, opt => opt.MapFrom(src => src.CreatedBy != null ? src.CreatedBy.Email : string.Empty));
-
+            .ForMember(dest => dest.ApplicationUserEmail, opt => opt.MapFrom(src => src.CreatedBy != null ? src.CreatedBy.Email : string.Empty))
+            .PreserveReferences();
     }
 }

@@ -13,9 +13,9 @@
         else
         {
             <BrowserPayment Refresh="_refresh"
-                        SearchParams="PaymentSearchParamsDTO"
-                        TotalItems="PaymentPagedListDto.TotalItems"
-                        TotalPages="PaymentPagedListDto.TotalPages" />
+                            SearchParams="PaymentSearchParamsDTO"
+                            TotalItems="PaymentPagedListDto.TotalItems"
+                            TotalPages="PaymentPagedListDto.TotalPages" />
             @if (PaymentPagedListDto.Items.Count == 0)
             {
                 <_Info Description="No payments for that search params" />
@@ -23,13 +23,22 @@
             else
             {
                 <HeaderPayment Refresh="_refresh"
-                       SearchParams="PaymentSearchParamsDTO"></HeaderPayment>
+                               SearchParams="PaymentSearchParamsDTO"></HeaderPayment>
                 <div class="content">
                     <div class="container">
                         <div class="row align-content-center justify-content-center">
                             @foreach (var p in PaymentPagedListDto.Items)
                             {
-                                <ReadPayment Payment="p"></ReadPayment>
+                                @if (p.RelatedIssueGuid.IsNullOrEmpty())
+                                {
+                                    <ReadPayment dto="p"></ReadPayment>
+                                }
+                                else
+                                {
+                                    <ReadPayment dto="p">
+                                        <button class="btn btn-primary btn-sm" type="button" @onclick="@(async () => await paymentService.AcceptIssueInitialPayment(p.Id))">Accept initial Payment</button>
+                                    </ReadPayment>
+                                }
                             }
                         </div>
                     </div>

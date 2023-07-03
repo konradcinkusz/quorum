@@ -1,6 +1,4 @@
-﻿using MR.Domain.Entities;
-
-namespace MR.Service.Features.SubscriptionFeatures;
+﻿namespace MR.Service.Features.SubscriptionFeatures;
 
 public class RefundSubscriptionCommand : IRequest<bool>
 {
@@ -9,7 +7,7 @@ public class RefundSubscriptionCommand : IRequest<bool>
     {
         ApplicationUserId = applicationUserId;
     }
-    public class RefundSubscriptionCommandHandler : PaymentCommandHandlerBase<RefundSubscriptionCommand, bool>
+    internal class RefundSubscriptionCommandHandler : PaymentCommandHandlerBase<RefundSubscriptionCommand, bool>
     {
         public RefundSubscriptionCommandHandler(IApplicationDbContext context, ILogger<RefundSubscriptionCommand> logger)
             : base(context, logger)

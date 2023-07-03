@@ -43,7 +43,8 @@ public class PaymentController : MRBaseController
     {
         var command = new GetPaymentsBySearchParamsQuery();
         SearchParamsExtension.AddPaymentSearchParamsToCommand(command, searchParams);
-        return await ProcessPagedRequest<GetPaymentsBySearchParamsQuery, PaymentDTO, Payment>(command);
+        var result = await ProcessPagedRequest<GetPaymentsBySearchParamsQuery, PaymentDTO, Payment>(command);
+        return result;
     }
 
     [HttpPut("edit-payment/{id}")]
@@ -81,4 +82,8 @@ public class PaymentController : MRBaseController
     [HttpPut("accept-payment/{id}")]
     public async Task<ActionResult<ApiResponse<bool>>> AcceptPayment(Guid id)
         => await HandleErrors(async () => await Mediator.Send(new AcceptPaymentCommand(id)), $"Payment {id} accepted");
+
+    [HttpPut("accept-initial-payment/{id}")]
+    public async Task<ActionResult<ApiResponse<bool>>> AcceptIssueInitialPayment(Guid id)
+        => await HandleErrors(async () => await Mediator.Send(new AcceptIssueInitialPaymentCommand(id)), $"Payment {id} accepted");
 }
