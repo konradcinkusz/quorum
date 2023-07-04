@@ -33,17 +33,21 @@ public class AdminSubscriptionController : MRBaseController
         return new ApiResponse<string>() { StatusCode = (int)HttpStatusCode.BadRequest, Success = false, Message = "Something went wrong" };
     }
 
-    [HttpPost("activate-subscription")]
-    public async Task<ActionResult<ApiResponse<PagedListDto<SubscriptionDTO>>>> ActivateSubscription()
-        => await ProcessPagedRequest<ActivateSubscriptionCommand, SubscriptionDTO, Subscription>(new ActivateSubscriptionCommand());
+    [HttpPut("activate-subscription/{id}")]
+    public async Task<ActionResult<ApiResponse<bool>>> ActivateSubscription(string id)
+        => await HandleErrors(async () => await Mediator.Send(new ActivateSubscriptionCommand(id)), "Subscription activated");
+
+    [HttpPost("activate-subscriptions")]
+    public async Task<ActionResult<ApiResponse<PagedListDto<SubscriptionDTO>>>> ActivateSubscriptions()
+        => await ProcessPagedRequest<ActivateSubscriptionsCommand, SubscriptionDTO, Subscription>(new ActivateSubscriptionsCommand());
 
     [HttpGet("get-subscriptions-that-could-be-activated")]
     public async Task<ActionResult<ApiResponse<PagedListDto<SubscriptionDTO>>>> GetSubscriptionsThatCouldBeActivated()
         => await ProcessPagedRequest<GetSubscriptionsThatCouldBeActivateCommand, SubscriptionDTO, Subscription>(new GetSubscriptionsThatCouldBeActivateCommand());
 
-    [HttpPost("deactivate-subscription")]
-    public async Task<ActionResult<ApiResponse<PagedListDto<SubscriptionDTO>>>> DeactivateSubscription([FromBody] string applicationUserId)
-        => await ProcessPagedRequest<DeactivateSubscriptionCommand, SubscriptionDTO, Subscription>(new DeactivateSubscriptionCommand(applicationUserId));
+    [HttpPut("deactivate-subscription/{id}")]
+    public async Task<ActionResult<ApiResponse<bool>>> DeactivateSubscription(string id)
+        => await HandleErrors(async () => await Mediator.Send(new DeactivateSubscriptionCommand(id)), "Subscription deactivated");
 
     [HttpGet("get-subscriptions-that-could-be-deactivated")]
     public async Task<ActionResult<ApiResponse<PagedListDto<SubscriptionDTO>>>> GetSubscriptionsThatCouldBeDeactivated()

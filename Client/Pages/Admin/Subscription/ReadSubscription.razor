@@ -4,47 +4,65 @@
 <div class="card m-1 p-1">
     <div class="row mb-3">
         <div class="col-sm-2">
-            <p class="form-control-plaintext" id="user-email">@SubscriptionDTO.ApplicationUserEmail</p>
+            <p class="form-control-plaintext" id="user-email">@DTO.ApplicationUserEmail</p>
         </div>
         <div class="col-sm-2">
-            <p class="form-control-plaintext" id="begin-date">@SubscriptionDTO.Begin?.ToString("g", CultureInfo.InvariantCulture)</p>
+            <p class="form-control-plaintext" id="begin-date">@DTO.Begin?.ToString("g", CultureInfo.InvariantCulture)</p>
         </div>
         <div class="col-sm-2">
-            <p class="form-control-plaintext" id="end-date">@SubscriptionDTO.End?.ToString("g", CultureInfo.InvariantCulture)</p>
+            <p class="form-control-plaintext" id="end-date">@DTO.End?.ToString("g", CultureInfo.InvariantCulture)</p>
         </div>
         <div class="col-sm-3">
-            <p class="form-control-plaintext" id="is-active">@SubscriptionDTO.IsActive</p>
+            <p class="form-control-plaintext" id="is-active">@DTO.IsActive</p>
         </div>
         <div class="col-sm-3">
             <div class="btn-group my-2" role="group">
-                <a href="/admin/create-subscription/@SubscriptionDTO.ApplicationUserId?returnUrl=@Uri.EscapeDataString(NavigationManager.Uri)" class="btn btn-secondary btn-sm me-2">Edit</a>
+                <a href="/admin/create-subscription/@DTO.ApplicationUserId?returnUrl=@Uri.EscapeDataString(NavigationManager.Uri)" class="btn btn-secondary btn-sm me-2">Edit</a>
                 <button class="btn btn-primary btn-sm" type="button" @onclick="ToggleDetails">@ShowDetailsButtonText</button>
             </div>
         </div>
     </div>
-
-
     <div class="@DetailsCssClass">
         <hr />
         <h5>Subscription Details</h5>
         <dl class="row mb-3">
             <dt class="col-sm-3">ApplicationUserId</dt>
-            <dd class="col-sm-9">@SubscriptionDTO.ApplicationUserId</dd>
+            <dd class="col-sm-9">@DTO.ApplicationUserId</dd>
 
             <dt class="col-sm-12">Payments:</dt>
             <dd class="col-sm-12">
-                @foreach (var p in SubscriptionDTO.PaymentDTOs)
+                @foreach (var p in DTO.PaymentDTOs)
                 {
-                    <ReadPayment dto="p" Accept="AcceptPayment" />
+                    <ReadPayment dto="p" />
+                    @if (p.PaymentStatus == PaymentStatusEnum.Pending)
+                    {
+                        <button class="btn btn-primary btn-sm" type="button" @onclick="@(async ()=> await AcceptPayment.InvokeAsync(p.Id))">Accept</button>
+                    }
+                    else if (p.PaymentStatus == PaymentStatusEnum.Accepted)
+                    {
+                        <button class="btn btn-primary btn-sm" type="button" @onclick="@(async ()=> await ActivateSubscription.InvokeAsync(DTO.ApplicationUserId))">Activate</button>
+                    }
                 }
             </dd>
+
+            @if (DTO.IsActive)
+            {
+                <dt class="col-sm-12">Force deactivate:</dt>
+                <dd class="col-sm-12">
+                    <button class="btn btn-danger btn-sm" type="button" @onclick="@(async ()=> await DeactivateSubscription.InvokeAsync(DTO.ApplicationUserId))">Deactivate</button>
+                </dd>
+            }
         </dl>
     </div>
 </div>
 
 @code {
     [Parameter]
-    public SubscriptionDTO SubscriptionDTO { get; set; }
+    public SubscriptionDTO DTO { get; set; }
     [Parameter]
     public EventCallback<Guid> AcceptPayment { get; set; }
+    [Parameter]
+    public EventCallback<string> ActivateSubscription { get; set; }
+    [Parameter]
+    public EventCallback<string> DeactivateSubscription { get; set; }
 }

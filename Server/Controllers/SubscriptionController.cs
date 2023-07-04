@@ -55,6 +55,11 @@ public class SubscriptionController : MRBaseController
             {
                 sub.SubscriptionViewStatusEnum = SubscriptionViewStatusEnum.PaymentHasBeenAcceptedWaitingForAdminActivation;
             }
+            else if (!sub.IsActive && lastPayment != null)
+            {
+                sub.SubscriptionViewStatusEnum = SubscriptionViewStatusEnum.YouDontHaveActiveSub;
+            }
+
             response.Data = sub;
         }
         catch (Exception ex)

@@ -30,12 +30,16 @@
                 {
                     <_ApiResponse T="bool" result="response" />
                 }
+                @if (activationResponse != null && !activationResponse.Success)
+                {
+                    <_ApiResponse T="bool" result="activationResponse" />
+                }
                 <div class="content">
                     <div class="container">
                         <div class="row align-content-center justify-content-center">
                             @foreach (var p in SubscriptionPagedListDto.Items)
                             {
-                                <ReadSubscription SubscriptionDTO="p" AcceptPayment="acceptPayment" />
+                                <ReadSubscription DTO="p" AcceptPayment="acceptPayment" ActivateSubscription="activateSubscription" />
                             }
                         </div>
                     </div>
@@ -72,6 +76,20 @@
     private async Task acceptPayment(Guid paymentId)
     {
         response = await paymentService.AcceptPayment(paymentId);
+        await _refresh();
+    }
+
+    private ApiResponse<bool> activationResponse = null;
+    private async Task activateSubscription(string subId)
+    {
+        response = await subscriptionService.ActivateSubscription(subId);
+        await _refresh();
+    }
+
+    private ApiResponse<bool> deactivationResponse = null;
+    private async Task deactivateSubscription(string subId)
+    {
+        response = await subscriptionService.DeactivateSubscription(subId);
         await _refresh();
     }
 }

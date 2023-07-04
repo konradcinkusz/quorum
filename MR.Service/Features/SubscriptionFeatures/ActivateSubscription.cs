@@ -1,19 +1,14 @@
-﻿using MR.Service.ViewModels;
+﻿namespace MR.Service.Features.SubscriptionFeatures;
 
-namespace MR.Service.Features.SubscriptionFeatures;
-
-public class ActivateSubscriptionCommand : IRequest<PagedList<Subscription>>
+public sealed class ActivateSubscriptionsCommand : IRequest<PagedList<Subscription>>
 {
-    public class ActivateSubscriptionCommandHandler : 
-        CommandHandlerBase<ActivateSubscriptionCommand, PagedList<Subscription>>
+    internal class ActivateSubscriptionsCommandHandler : CommandHandlerBase<ActivateSubscriptionsCommand, PagedList<Subscription>>
     {
-        public ActivateSubscriptionCommandHandler(
-            IApplicationDbContext context, ILogger<ActivateSubscriptionCommand> logger)
-            : base(context, logger)
+        public ActivateSubscriptionsCommandHandler(IApplicationDbContext context, ILogger<ActivateSubscriptionsCommand> logger) : base(context, logger)
         {
         }
 
-        public override async Task<PagedList<Subscription>> Handle(ActivateSubscriptionCommand request, CancellationToken cancellationToken)
+        public override async Task<PagedList<Subscription>> Handle(ActivateSubscriptionsCommand request, CancellationToken cancellationToken)
         {
             var currentDate = DateTime.UtcNow;
 
@@ -30,15 +25,15 @@ public class ActivateSubscriptionCommand : IRequest<PagedList<Subscription>>
                     item.Subscription.Begin = currentDate;
                     item.Subscription.End = currentDate.AddYears(1);
                     item.Payment.PaymentStatus = PaymentStatus.Completed;
-                    item.Payment.PaymentStatusHistories = new List<PaymentStatusHistory>() 
-                    { 
+                    item.Payment.PaymentStatusHistories = new List<PaymentStatusHistory>()
+                    {
                         new PaymentStatusHistory {
                             PaymentStatus = PaymentStatus.Completed
-                        } 
+                        }
                     };
                 }
             }
-            
+
             var sum = await _context.SaveChangesAsync(cancellationToken);
 
             return PagedList<Subscription>.Create(query.Select(x => x.Subscription).ToList(), new());

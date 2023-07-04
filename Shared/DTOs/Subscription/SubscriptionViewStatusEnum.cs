@@ -12,5 +12,5 @@ public enum SubscriptionViewStatusEnum
     //"Payment has been accepted. Waiting for admin activation."
     PaymentHasBeenAcceptedWaitingForAdminActivation,
     NoPaymentYouHaveToBuySubscription,
-    YourSubHasBeenActivatedByAdmin
+    YourSubHasBeenActivatedByAdmin,
 }

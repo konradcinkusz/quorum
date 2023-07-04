@@ -24,3 +24,4 @@ global using MR.Service.Extensions;
 global using MR.Domain.Base;
 global using MR.Service.Features.PaymentFeatures;
 global using MR.Service.RequestHandling;
+global using MR.Service.ViewModels;
