@@ -103,10 +103,4 @@
         appUserResult = await subscriptionService.RejectSubscription();
         await _refresh();
     }
-
-    private async Task Unsubscribe()
-    {
-        appUserResult = await subscriptionService.UnsubscribeSubscription();
-        await _refresh();
-    }
 }

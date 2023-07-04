@@ -1,4 +1,6 @@
-﻿namespace MR.Service.Features.QuarterFeatures;
+﻿using MR.Service.UserManagement;
+
+namespace MR.Service.Features.QuarterFeatures;
 
 public class InitQuarterCommand : IRequest<Guid>
 {

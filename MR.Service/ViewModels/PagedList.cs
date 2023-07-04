@@ -1,4 +1,4 @@
-﻿namespace MR.Service;
+﻿namespace MR.Service.ViewModels;
 
 public class PagedList<T> : List<T>
 {

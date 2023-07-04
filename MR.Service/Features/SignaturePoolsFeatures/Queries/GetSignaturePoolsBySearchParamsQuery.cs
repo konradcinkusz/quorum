@@ -1,4 +1,6 @@
-﻿namespace MR.Service.Features.SignaturePoolsFeatures.Queries;
+﻿using MR.Service.ViewModels;
+
+namespace MR.Service.Features.SignaturePoolsFeatures.Queries;
 
 public class GetSignaturePoolsBySearchParamsQuery : QueryBase, IRequest<PagedList<SignaturePool>>
 {

@@ -1,0 +1,17 @@
+﻿@typeparam TSearchParams where TSearchParams : SearchParamsDTO
+
+@code {
+    [Parameter]
+    public EventCallback Refresh { get; set; }
+    [Parameter]
+    public int TotalPages { get; set; }
+    [Parameter]
+    public int TotalItems { get; set; } = 0;
+    [Parameter]
+    public TSearchParams SearchParams { get; set; }
+
+    protected virtual async Task ClearQuery()
+    {
+        await Refresh.InvokeAsync();
+    }
+}

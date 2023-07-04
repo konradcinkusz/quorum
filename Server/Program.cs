@@ -1,4 +1,5 @@
 using MR.Server;
+using MR.Service.UserManagement;
 
 var builder = WebApplication.CreateBuilder(args);
 

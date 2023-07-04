@@ -1,4 +1,6 @@
-﻿namespace MR.Service.Features.Queries;
+﻿using MR.Service.ViewModels;
+
+namespace MR.Service.Features.Queries;
 
 public class GetAdminLogsBySearchParamsQuery : QueryBase, IRequest<PagedList<AdminLog>>
 {

@@ -1,4 +1,6 @@
-﻿namespace MR.Service.Features.PaymentFeatures.Queries;
+﻿using MR.Service.ViewModels;
+
+namespace MR.Service.Features.PaymentFeatures.Queries;
 
 public class GetPaymentsBySearchParamsQuery : QueryBase, IRequest<PagedList<Payment>>
 {

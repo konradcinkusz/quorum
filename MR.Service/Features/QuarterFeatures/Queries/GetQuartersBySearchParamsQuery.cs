@@ -1,4 +1,6 @@
-﻿namespace MR.Service.Features.QuarterFeatures.Queries;
+﻿using MR.Service.ViewModels;
+
+namespace MR.Service.Features.QuarterFeatures.Queries;
 
 public class GetQuartersBySearchParamsQuery : QueryBase, IRequest<PagedList<Quarter>>
 {

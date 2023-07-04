@@ -38,3 +38,4 @@ global using MR.Shared;
 global using MR.Service.Features.Issues;
 global using MR.Service.Features.AdminFeatures;
 global using MR.Server.Mappings.SearchParamsMapping;
+global using MR.Service.ViewModels;

@@ -1,4 +1,4 @@
-﻿namespace MR.Service;
+﻿namespace MR.Service.ViewModels;
 
 public abstract class QueryBase
 {

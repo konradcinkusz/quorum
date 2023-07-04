@@ -1,4 +1,6 @@
-﻿namespace MR.Server.Controllers.Admin;
+﻿using MR.Service.ViewModels;
+
+namespace MR.Server.Controllers.Admin;
 
 [Authorize(Policy = Policies.RequireAdminRole)]
 public class AdminController : MRBaseController

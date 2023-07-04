@@ -1,4 +1,6 @@
-﻿namespace MR.Service.Features.PaymentFeatures;
+﻿using MR.Service.ViewModels;
+
+namespace MR.Service.Features.PaymentFeatures;
 
 public class SeedPaymentCommand : IRequest<PagedList<Payment>>
 {

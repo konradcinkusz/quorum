@@ -1,4 +1,6 @@
-﻿namespace MR.Service.Features.SubscriptionFeatures.Queries;
+﻿using MR.Service.ViewModels;
+
+namespace MR.Service.Features.SubscriptionFeatures.Queries;
 
 public class GetSubscriptionsThatCouldBeDeactivateCommand :
     IRequest<PagedList<Subscription>>

@@ -1,4 +1,6 @@
-﻿namespace MR.Service.Features.AdminFeatures;
+﻿using MR.Service.UserManagement;
+
+namespace MR.Service.Features.AdminFeatures;
 
 public class GetUserEmailByUserIdCommand : IRequest<string>
 {

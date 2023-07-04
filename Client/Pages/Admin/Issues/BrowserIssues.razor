@@ -1,10 +1,12 @@
-﻿<div class="row domain-search bg-green rounded row-spacing">
+﻿@inherits Browser<IssueSearchParamsDTO>
+
+<div class="row domain-search bg-green rounded row-spacing">
     <div class="container">
         <div class="row">
             <div class="col-md-12">
                 <div class="row g-3 mt-2">
                     <div class="col-md-9 col-sm-12">
-                        <input type="search" class="form-control rounded-pill" placeholder="User name" @bind-value="SearchParams.CreatedByEmail" @bind-value:event="oninput">
+                        <input type="search" class="form-control rounded-pill" placeholder="User name or part of name" @bind-value="SearchParams.CreatedByEmail" @bind-value:event="oninput">
                     </div>
                     <div class="col-md-3 col-sm-12 text-end">
                         <button type="submit" class="btn btn-outline-light btn-block rounded-pill" @onclick="ClearQuery"><span class="flex-center search">Clear</span></button>
@@ -13,26 +15,26 @@
                 </div>
                 <div class="row g-3">
                     <div class="col-md-12">
-                        <input type="text" id="title" class="form-control rounded-pill" @bind="SearchParams.IssueId" @bind:event="oninput">
+                        <input type="text" id="title" class="form-control rounded-pill" placeholder="Issue id"  @bind="SearchParams.IssueId" @bind:event="oninput">
                     </div>
                 </div>
                 <div class="row g-3">
                     <div class="col-md-3 col-sm-12">
-                        <input type="text" id="title" class="form-control rounded-pill" @bind="SearchParams.Title" @bind:event="oninput">
+                        <input type="text" id="title" class="form-control rounded-pill" placeholder="Title" @bind="SearchParams.Title" @bind:event="oninput">
                     </div>
                     <div class="col-md-3 col-sm-12">
-                        <input type="text" id="question" class="form-control rounded-pill" @bind="SearchParams.Question" @bind:event="oninput">
+                        <input type="text" id="question" class="form-control rounded-pill" placeholder="Question" @bind="SearchParams.Question" @bind:event="oninput">
                     </div>
                     <div class="col-md-3 col-sm-12">
-                        <select id="isVerifyByAdmin" class="form-control rounded-pill" @onchange="OnVerifyByAdminChanged">
-                            <option value="">-- Select Verification --</option>
-                            <option value="true" selected="@SearchParams.IsVerifyByAdmin">Yes</option>
-                            <option value="false" selected="@(SearchParams.IsVerifyByAdmin == false)">No</option>
-                        </select>
+                        <InputSelectBoolean class="form-control rounded-pill" @bind-Value="@SearchParams.IsVerifyByAdmin">
+                            <option value="">-- verify by admin --</option>
+                            <option value="true">Yes</option>
+                            <option value="false">No</option>
+                        </InputSelectBoolean>
                     </div>
                     <div class="col-md-3 col-sm-12">
                         <select id="IssueVisibility" class="form-control rounded-pill" @bind="SearchParams.IssueVisibility" @bind:event="onchange">
-                            <option value="">-- Select Issue Status --</option>
+                            <option value="">-- issue status --</option>
                             @foreach (var status in Enum.GetValues(typeof(IssueVisibilityEnum)))
                             {
                                 <option value="@status">@status</option>
@@ -42,7 +44,7 @@
                 </div>
                 <div class="row g-3">
                     <div class="col-md-3 col-sm-12">
-                        <input type="number" id="ratingValue" class="form-control rounded-pill" @bind="SearchParams.RatingValue" @bind:event="oninput">
+                        <input type="number" id="ratingValue" class="form-control rounded-pill" placeholder="Rating value" @bind="SearchParams.RatingValue" @bind:event="oninput">
                     </div>
                 </div>
             </div>
@@ -57,16 +59,7 @@
 </div>
 
 @code {
-    [Parameter]
-    public IssueSearchParamsDTO SearchParams { get; set; }
-    [Parameter]
-    public EventCallback Refresh { get; set; }
-    [Parameter]
-    public int TotalPages { get; set; }
-    [Parameter]
-    public int TotalItems { get; set; } = 0;
-
-    private async Task ClearQuery()
+    protected override async Task ClearQuery()
     {
         SearchParams.IssueId = null;
         SearchParams.CreatedByEmail = null;
@@ -79,24 +72,6 @@
         SearchParams.QuarterNumber = null;
         SearchParams.PaymentOptions = null;
 
-        await Refresh.InvokeAsync();
-    }
-
-    public bool? IsVerifyByAdmin
-    {
-        get => SearchParams.IsVerifyByAdmin;
-        set => SearchParams.IsVerifyByAdmin = value;
-    }
-
-    private void OnVerifyByAdminChanged(ChangeEventArgs e)
-    {
-        if (bool.TryParse(e.Value?.ToString(), out bool result))
-        {
-            IsVerifyByAdmin = result;
-        }
-        else
-        {
-            IsVerifyByAdmin = null;
-        }
+        await base.ClearQuery();
     }
 }

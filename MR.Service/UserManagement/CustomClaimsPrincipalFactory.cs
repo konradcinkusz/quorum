@@ -1,4 +1,4 @@
-﻿namespace MR.Service;
+﻿namespace MR.Service.UserManagement;
 
 public class CustomClaimsPrincipalFactory : UserClaimsPrincipalFactory<ApplicationUser, IdentityRole>
 {

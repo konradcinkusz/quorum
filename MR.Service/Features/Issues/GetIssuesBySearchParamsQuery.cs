@@ -1,4 +1,5 @@
-﻿using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+﻿using MR.Service.ViewModels;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace MR.Service.Features.Issues;
 

@@ -7,35 +7,6 @@ public class SubscriptionController : MRBaseController
     {
     }
 
-    private async Task<ActionResult<ApiResponse<SubscriptionPagedListDTO>>> ProcessSubscriptionRequest<T>(T command)
-    where T : notnull
-    {
-        var result = await Mediator.Send(command) as PagedList<Subscription>;
-
-        if (result is null)
-        {
-            // Handle the case when result is null, for example by returning an appropriate error response
-            return new ApiResponse<SubscriptionPagedListDTO>("Failed to process the subscription request.", (int)HttpStatusCode.BadRequest);
-        }
-
-        var DTOs = _mapper.Map<List<SubscriptionDTO>>(result);
-        var response =
-            new ApiResponse<SubscriptionPagedListDTO>(
-                new SubscriptionPagedListDTO
-                {
-                    Items = DTOs,
-                    CurrentPage = result.CurrentPage,
-                    PageSize = result.PageSize,
-                    TotalItems = result.TotalItems,
-                    TotalPages = result.TotalPages
-                })
-            {
-                Success = true
-            };
-
-        return response;
-    }
-
     [HttpGet("get-my-subscription")]
     public async Task<ActionResult<ApiResponse<SubscriptionReadDTO>>> GetMySubscription()
     {
@@ -110,70 +81,6 @@ public class SubscriptionController : MRBaseController
         {
             return new ApiResponse<bool> { StatusCode = (int)HttpStatusCode.BadRequest, Success = false, Message = ex.Message };
         }
-    }
-
-    [Authorize(Policy = Policies.RequireAdminRole)]
-    [HttpGet("get-subscriptions-by-search-params")]
-    public async Task<ActionResult<ApiResponse<SubscriptionPagedListDTO>>>
-        GetSubscriptionsBySearchParams([FromQuery] SubscriptionSearchParamsDTO searchParams)
-    {
-        var command = new GetSubscriptionsBySearchParamsQuery
-        {
-            ApplicationUserId = searchParams.ApplicationUserId,
-            ApplicationUserEmail = searchParams.ApplicationUserEmail,
-            Begin = searchParams.Begin,
-            End = searchParams.End,
-            Activity = (GetSubscriptionsBySearchParamsQuery.ActivityEnum?)searchParams.Activity
-        };
-
-        AddSearchParamsToCommand(command, searchParams);
-
-        var result = await ProcessSubscriptionRequest(command);
-        result.Value?.Data.Items.ForEach(x => x.PaymentDTOs = x.PaymentDTOs.OrderByDescending(p => p.CreatedAt).ToList());
-
-        return result;
-    }
-
-    [Authorize(Policy = Policies.RequireAdminRole)]
-    [HttpPost("create-or-edit-subscription")]
-    public async Task<ActionResult<ApiResponse<string>>> CreateOrEditSubscription(SubscriptionCreateForUserDTO subscriptionDto)
-    {
-        var subId = await Mediator.Send(new CreateSubscriptionCommand(subscriptionDto.ApplicationUserId)
-        {
-            Begin = subscriptionDto.Begin,
-            End = subscriptionDto.End
-        });
-        if (subId)
-            return new ApiResponse<string>(subscriptionDto.ApplicationUserId) { StatusCode = (int)HttpStatusCode.Created };
-        return new ApiResponse<string>() { StatusCode = (int)HttpStatusCode.BadRequest, Success = false, Message = "Something went wrong" };
-    }
-
-    [Authorize(Policy = Policies.RequireAdminRole)]
-    [HttpPost("activate-subscription")]
-    public async Task<ActionResult<ApiResponse<SubscriptionPagedListDTO>>> ActivateSubscription()
-    {
-        return await ProcessSubscriptionRequest(new ActivateSubscriptionCommand());
-    }
-
-    [Authorize(Policy = Policies.RequireAdminRole)]
-    [HttpGet("get-subscriptions-that-could-be-activated")]
-    public async Task<ActionResult<ApiResponse<SubscriptionPagedListDTO>>> GetSubscriptionsThatCouldBeActivated()
-    {
-        return await ProcessSubscriptionRequest(new GetSubscriptionsThatCouldBeActivateCommand());
-    }
-
-    [Authorize(Policy = Policies.RequireAdminRole)]
-    [HttpPost("deactivate-subscription")]
-    public async Task<ActionResult<ApiResponse<SubscriptionPagedListDTO>>> DeactivateSubscription([FromBody] string applicationUserId)
-    {
-        return await ProcessSubscriptionRequest(new DeactivateSubscriptionCommand(applicationUserId));
-    }
-
-    [Authorize(Policy = Policies.RequireAdminRole)]
-    [HttpGet("get-subscriptions-that-could-be-deactivated")]
-    public async Task<ActionResult<ApiResponse<SubscriptionPagedListDTO>>> GetSubscriptionsThatCouldBeDeactivated()
-    {
-        return await ProcessSubscriptionRequest(new GetSubscriptionsThatCouldBeDeactivateCommand());
     }
 
     [HttpPost("reject-subscription")]

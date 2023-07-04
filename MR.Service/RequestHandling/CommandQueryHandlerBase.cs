@@ -1,4 +1,6 @@
-﻿namespace MR.Service.RequestHandling;
+﻿using MR.Service.ViewModels;
+
+namespace MR.Service.RequestHandling;
 
 public abstract class CommandQueryHandlerBase<TCommand, TResult> : CommandHandlerBase<TCommand, TResult>
     where TCommand : IRequest<TResult>

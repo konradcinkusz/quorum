@@ -1,4 +1,7 @@
-﻿using MR.Persistence.Migrations;
+﻿using MR.Domain.Auth;
+using MR.Persistence.Migrations;
+using MR.Service.ViewModels;
+using System.Diagnostics;
 
 namespace MR.Server.Mappings.SearchParamsMapping;
 
@@ -49,6 +52,17 @@ public static class SearchParamsExtension
         command.Year = searchParams.Year;
         command.Begin = searchParams.Begin;
         command.End = searchParams.End;
+
+        AddSearchParamsToCommand(command, searchParams);
+    }
+
+    public static void AddSubscriptionsSearchParamsToCommand(GetSubscriptionsBySearchParamsQuery command, SubscriptionSearchParamsDTO searchParams)
+    {
+        command.ApplicationUserId = searchParams.ApplicationUserId;
+        command.ApplicationUserEmail = searchParams.ApplicationUserEmail;
+        command.Begin = searchParams.Begin;
+        command.End = searchParams.End;
+        command.Activity = (GetSubscriptionsBySearchParamsQuery.ActivityEnum?)searchParams.Activity;
 
         AddSearchParamsToCommand(command, searchParams);
     }

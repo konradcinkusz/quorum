@@ -1,4 +1,6 @@
-﻿namespace MR.Service.Features.Issues;
+﻿using MR.Service.UserManagement;
+
+namespace MR.Service.Features.Issues;
 
 public interface IIssueCommandData
 {

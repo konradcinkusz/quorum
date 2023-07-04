@@ -1,4 +1,6 @@
-﻿namespace MR.Server;
+﻿using MR.Service.ViewModels;
+
+namespace MR.Server;
 
 [Route(Constants.RouteValues.AdvanceAPIRoute)]
 [ApiController]
