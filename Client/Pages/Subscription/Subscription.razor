@@ -21,7 +21,7 @@
         }
         else if (subscriptionReadDTO.SubscriptionViewStatusEnum == SubscriptionViewStatusEnum.SubBoughtAndWaitingForPayment)
         {
-            <_HelperReadActiveSubscription SubscriptionReadDTO="@subscriptionReadDTO"
+            <_HelperReadActiveSubscription DTO="@subscriptionReadDTO"
                                            Infos="@(new List<string> {"You have bought subscription and we are waiting for your payment.",
                     "Transfer any amount to the account: XXX XXX, providing your PESEL number in the title. After the transfer, you need to wait for up to 3 days for payment approval. Once the payment is approved, the annual subscription is automatically accepted."})" />
 
@@ -29,23 +29,22 @@
         }
         else if (subscriptionReadDTO.SubscriptionViewStatusEnum == SubscriptionViewStatusEnum.SubBoughtButSomethingHappendWithAPayment)
         {
-            <_HelperReadActiveSubscription SubscriptionReadDTO="@subscriptionReadDTO"
+            <_HelperReadActiveSubscription DTO="@subscriptionReadDTO"
                                            Infos="@(new List<string> {"You have bought subscription but something went wrong with payment acceptation, contact administrator."})" />
         }
         else if (subscriptionReadDTO.SubscriptionViewStatusEnum == SubscriptionViewStatusEnum.YouHaveAnActiveSub)
         {
-            <_HelperReadActiveSubscription SubscriptionReadDTO="@subscriptionReadDTO"
+            <_HelperReadActiveSubscription DTO="@subscriptionReadDTO"
                                            Infos="@(new List<string> {"You have an active subscription. If you still see InActive in header, refresh your page."})" />
-            @if (subscriptionReadDTO.Begin != null && subscriptionReadDTO.End != null)
-            {
-                <div class="subscription-period">
-                    <span>Subscription period:</span> @subscriptionReadDTO.Begin.Value.ToShortDateString() - @subscriptionReadDTO.End.Value.ToShortDateString()
-                </div>
-            }
+        }
+        else if (subscriptionReadDTO.SubscriptionViewStatusEnum == SubscriptionViewStatusEnum.YourSubHasBeenActivatedByAdmin)
+        {
+            <_HelperReadActiveSubscription DTO="@subscriptionReadDTO"
+                                           Infos="@(new List<string> {"Your subscription has been activated by admin so you don't have a payment record related."})" />
         }
         else if (subscriptionReadDTO.SubscriptionViewStatusEnum == SubscriptionViewStatusEnum.PaymentHasBeenAcceptedWaitingForAdminActivation)
         {
-            <_HelperReadActiveSubscription SubscriptionReadDTO="@subscriptionReadDTO"
+            <_HelperReadActiveSubscription DTO="@subscriptionReadDTO"
                                            Infos="@(new List<string> {"Payment has been accepted. Waiting for admin activation."})" />
         }
         else if (subscriptionReadDTO.SubscriptionViewStatusEnum == SubscriptionViewStatusEnum.YouDontHaveActiveSub || subscriptionReadDTO.SubscriptionViewStatusEnum == SubscriptionViewStatusEnum.NoPaymentYouHaveToBuySubscription)

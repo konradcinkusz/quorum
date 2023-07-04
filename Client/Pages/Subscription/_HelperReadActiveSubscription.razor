@@ -6,17 +6,27 @@
         </div>
     }
 </div>
-<div class="payment-info row">
-    <div class="col-md-12">
-        <span>Your last payment status: </span>
+@if (DTO.PaymentDate.HasValue && DTO.PaymentStatus.HasValue)
+{
+    <div class="payment-info row">
+        <div class="col-md-12">
+            <span>Your last payment status: </span>
+        </div>
+        <div class="payment-status col-md-12">@DTO.PaymentStatus </div>
+        <div class="payment-date col-md-12">At: @DTO.PaymentDate</div>
     </div>
-    <div class="payment-status col-md-12">@SubscriptionReadDTO.PaymentStatus </div>
-    <div class="payment-date col-md-12">At: @SubscriptionReadDTO.PaymentDate</div>
-</div>
+}
+
+@if (DTO.Begin.HasValue && DTO.End.HasValue)
+{
+    <div class="subscription-period">
+        <span>Subscription period:</span> @DTO.Begin.Value.ToShortDateString() - @DTO.End.Value.ToShortDateString()
+    </div>
+}
 
 @code {
     [Parameter]
-    public SubscriptionReadDTO SubscriptionReadDTO { get; set; }
+    public SubscriptionReadDTO DTO { get; set; }
     [Parameter]
     public List<string> Infos { get; set; }
 }

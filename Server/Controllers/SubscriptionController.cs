@@ -28,7 +28,11 @@ public class SubscriptionController : MRBaseController
             sub.PaymentDate = lastPayment?.CreatedAt;
 
             response.Data = sub;
-            if (lastPayment == null)
+            if (lastPayment == null && sub.IsActive)
+            {
+                sub.SubscriptionViewStatusEnum = SubscriptionViewStatusEnum.YourSubHasBeenActivatedByAdmin;
+            }
+            else if (lastPayment == null)
             {
                 sub.SubscriptionViewStatusEnum = SubscriptionViewStatusEnum.NoPaymentYouHaveToBuySubscription;
             }

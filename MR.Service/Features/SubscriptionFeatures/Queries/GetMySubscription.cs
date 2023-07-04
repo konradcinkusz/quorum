@@ -2,7 +2,7 @@
 
 public class GetMySubscription : IRequest<Subscription>
 {
-    public string ApplicationUserId { get; }
+    private readonly string ApplicationUserId;
     public GetMySubscription(string applicationUserId)
     {
         ApplicationUserId = applicationUserId;

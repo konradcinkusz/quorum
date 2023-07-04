@@ -13,8 +13,7 @@
         }
         else
         {
-            <BrowserSubscription Refresh="_refresh"
-                        SearchParams="SubscriptionSearchParamsDTO" />
+            <BrowserSubscription SearchParams="SubscriptionSearchParamsDTO" Refresh="_refresh" />
             @if (result != null && !result.Success)
             {
                 <hr />
@@ -26,8 +25,7 @@
             }
             else
             {
-                <HeaderSubscription Refresh="_refresh"
-                            SearchParams="SubscriptionSearchParamsDTO" />
+                <HeaderSubscription SearchParams="SubscriptionSearchParamsDTO" Refresh="_refresh" />
                 @if (response != null && !response.Success)
                 {
                     <_ApiResponse T="bool" result="response" />

@@ -1,4 +1,4 @@
-﻿@inherits BaseAdmin
+﻿@inherits Browser<SubscriptionSearchParamsDTO>
 
 <div class="row domain-search bg-green rounded row-spacing">
     <div class="container">
@@ -37,20 +37,11 @@
 </div>
 
 @code {
-    [Parameter]
-    public SubscriptionSearchParamsDTO SearchParams { get; set; }
-    [Parameter]
-    public EventCallback Refresh { get; set; }
-    [Parameter]
-    public int TotalPages { get; set; }
-    [Parameter]
-    public int TotalItems { get; set; } = 0;
-
-    async Task ClearQuery()
+    protected override async Task ClearQuery()
     {
         SearchParams.ApplicationUserEmail = null;
         SearchParams.Begin = null;
         SearchParams.End = null;
-        await Refresh.InvokeAsync();
+        await base.ClearQuery();
     }
 }
