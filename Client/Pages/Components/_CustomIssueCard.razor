@@ -21,26 +21,34 @@
             </div>
             <div class="card-footer text-muted">
                 @FooterContent
-            </div>
-        </div>
-    </div>
-    <div>
-        <div class="d-flex justify-content-center m-3">
-            @if (Id != Guid.Empty)
-            {
-                <a href="/issue/edit-issue/@Id.ToString()" class="btn btn-secondary btn-sm me-2">
-                    Edit
-                </a>
-            }
-        </div>
 
-        <div class="card">
-            <div class="card-body">
-                <span>
-                    Status: @EnumParser.GetEnumString(IssueVisibility)
-                </span>
-                <span class="@GetIssueStatusIcon(IssueVisibility)" style="float: right;">
-                </span>
+                @if (ShowButtons)
+                {
+                    <div class="d-flex justify-content-center m-3">
+                        @if (Id != Guid.Empty)
+                        {
+                            <a href="/issue/edit-issue/@Id.ToString()" class="btn btn-secondary btn-sm me-2">
+                                Edit
+                            </a>
+                        }
+                    </div>
+                }
+
+                @if (ShowStatus)
+                {
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-center">
+                                <span class="big-font-size @GetIssueStatusIcon(IssueVisibility)"></span>
+                            </div>
+                            <div class="d-flex justify-content-center">
+                                <span>
+                                    Status: @EnumParser.GetEnumString(IssueVisibility)
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                }
             </div>
         </div>
     </div>
@@ -80,6 +88,12 @@
     [Parameter]
     public IssueVisibilityEnum IssueVisibility { get; set; }
 
+    [Parameter]
+    public bool ShowButtons { get; set; } = false;
+
+    [Parameter]
+    public bool ShowStatus { get; set; } = false;
+
     private string VerifiedByAdminIcon => IsVerifyByAdmin ? "oi oi-check" : "oi oi-x";
 
     private string IconClass => $"oi {Icon} oi-3x mb-3 icon-lg";
@@ -89,7 +103,7 @@
         return status switch
         {
             IssueVisibilityEnum.NotVisible => "oi oi-caret-left oi-3x mb-3 icon-lg",
-            IssueVisibilityEnum.VisibleOnlyToMe => "oi oi-eye oi-3x mb-3 icon-lg",
+            IssueVisibilityEnum.VisibleOnlyToMe => "oi oi-eye oi-3x mb-3 icon-lg fw-bold text-danger",
             IssueVisibilityEnum.VisibleForAll => "oi oi-compass oi-3x mb-3 icon-lg",
             IssueVisibilityEnum.OutOfCurrentQuarter => "oi oi-bell oi-3x mb-3 icon-lg",
             IssueVisibilityEnum.OutOfCurrentQuarterVisibleOnlyToMe => "oi oi-yen oi-3x mb-3 icon-lg",

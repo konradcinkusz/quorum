@@ -32,14 +32,15 @@
                             @foreach (var dto in IssuePagedListDto.Items)
                             {
                                 <_CustomIssueCard BackgroundColor="@dto.BackgroundColor"
-                                      Title="@dto.Title" Icon="@dto.Icon"
-                                      Text="@dto.Question"
-                                      ApplicationUserEmail="@dto.ApplicationUserEmail"
-                                      IsVerifyByAdmin="false"
-                                      IssueVisibility="@IssueVisibilityEnum.VisibleOnlyToMe"
-                                      RatingValue="0"
-                                      Id="@dto.Id"
-                                      />
+                                                  Title="@dto.Title" Icon="@dto.Icon"
+                                                  Text="@dto.Question"
+                                                  ApplicationUserEmail="@dto.ApplicationUserEmail"
+                                                  IsVerifyByAdmin="false"
+                                                  IssueVisibility="@IssueVisibilityEnum.VisibleOnlyToMe"
+                                                  RatingValue="0"
+                                                  Id="@dto.Id"
+                                                  ShowButtons="true"
+                                                  ShowStatus="true" />
                             }
                         </div>
                     </div>
