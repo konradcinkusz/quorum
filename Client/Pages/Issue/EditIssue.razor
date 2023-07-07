@@ -93,9 +93,9 @@
     </div>
 </div>
 
-@if (result != null)
+@if (edittedResult != null)
 {
-    <_ApiResponse T="Guid" result="result" />
+    <_ApiResponse T="int" result="edittedResult" />
 }
 
 @if (published != null)
@@ -126,7 +126,7 @@
     private bool canBeEdited = false;
     private IssueCreateDTO dto = new IssueCreateDTO();
     private IssueReadDTO issueReadDTO = new IssueReadDTO();
-    private ApiResponse<Guid> result = null;
+    private ApiResponse<int> edittedResult = null;
     private ApiResponse<bool> published = null;
     private IssuePayDTO issuePayDTO = null;
     private ApiResponse<bool> paid = null;
@@ -168,16 +168,16 @@
     {
         if (!string.IsNullOrEmpty(id) && Guid.TryParse(id, out Guid issueId))
         {
-            result = await issueService.EditIssue(issueId, dto);
+            edittedResult = await issueService.EditIssue(issueId, dto);
 
-            if (result != null)
+            if (edittedResult != null)
             {
-                navigationManager.NavigateTo($"/issue/edit-issue/{result.Data}");
+                navigationManager.NavigateTo($"/issue/edit-issue/{edittedResult.Data}");
             }
         }
         else
         {
-            result = new ApiResponse<Guid>() { Success = false, Message = "Problem with EditIssue page, Id doesn't match Guid!" };
+            edittedResult = new ApiResponse<int>() { Success = false, Message = "Problem with EditIssue page, Id doesn't match Guid!" };
         }
     }
 

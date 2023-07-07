@@ -54,6 +54,11 @@
                                                 Already paid
                                             </button>
                                         }
+
+                                        <button type="button" @onclick="@(async () => await Archived(dto.Id))" class="btn btn-primary rounded-pill m-1 inactive-subscription-button"
+                                                disabled="@(!isActiveSubscription)" data-bs-toggle="tooltip" title="@(isActiveSubscription ? string.Empty : "You don't have an active subscription yet")">
+                                            Archived
+                                        </button>
                                     }
                                 </_CustomIssueCard>
                             }
@@ -86,10 +91,10 @@
         var tuple = AuthHelper.IsActiveSubscription(await AuthTask);
         isActiveSubscription = tuple.Item1;
         IssueSearchParamsDTO = new IssueSearchParamsDTO();
-        await _refresh();
+        await refresh();
     }
 
-    async Task _refresh()
+    private async Task refresh()
     {
         result = await issueService.GetMyIssuesBySearchParams(IssueSearchParamsDTO);
         IssuePagedListDto = result.Data;
@@ -112,6 +117,16 @@
         if (!id.IsNullOrEmpty() && isActiveSubscription)
         {
             paid = await issueService.PayForAnIssue(id, new IssuePayDTO());
+        }
+    }
+
+    private ApiResponse<bool> archivedResult = null;
+    private async Task Archived(Guid id)
+    {
+        if (!id.IsNullOrEmpty() && isActiveSubscription)
+        {
+            archivedResult = await issueService.ArchiveIssue(id);
+            await refresh();
         }
     }
 }

@@ -26,7 +26,7 @@ public sealed class AdminIssueController : MRBaseController
     }
 
     [HttpPut("edit-issue-by-admin/{id}")]
-    public async Task<ActionResult<ApiResponse<Guid>>> EditIssueByAdmin([FromRoute] Guid id, [FromBody] IssueAdminCreateDTO dto)
+    public async Task<ActionResult<ApiResponse<int>>> EditIssueByAdmin([FromRoute] Guid id, [FromBody] IssueAdminCreateDTO dto)
     {
         var idR = await Mediator.Send(new EditIssueCommand(id)
         {
@@ -39,7 +39,7 @@ public sealed class AdminIssueController : MRBaseController
             Icon = dto.Icon,
             BackgroundColor = dto.BackgroundColor,
         });
-        return new ApiResponse<Guid> { Data = idR };
+        return new ApiResponse<int> { Data = idR };
     }
 
     [HttpPut("verify-issue/{id}")]
@@ -51,6 +51,7 @@ public sealed class AdminIssueController : MRBaseController
     {
         var command = new GetIssuesBySearchParamsQuery();
         SearchParamsExtension.AddIssueSearchParamsToCommand(command, searchParams);
+        command.IsDeleted = null;
         return await ProcessPagedRequest<GetIssuesBySearchParamsQuery, IssueReadDTO, Issue>(command);
     }
 
@@ -60,5 +61,5 @@ public sealed class AdminIssueController : MRBaseController
 
     [HttpDelete("force-delete-issue/{id}")]
     public async Task<ActionResult<ApiResponse<bool>>> ForceDeleteIssue([FromRoute] Guid id)
-        => await HandleErrors(async () => await Mediator.Send(new ForceDeleteCommand(id)));
+        => await HandleErrors(async () => await Mediator.Send(new ForceDeleteIssueCommand(id)));
 }

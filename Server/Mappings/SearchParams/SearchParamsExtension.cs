@@ -1,9 +1,4 @@
-﻿using MR.Domain.Auth;
-using MR.Persistence.Migrations;
-using MR.Service.ViewModels;
-using System.Diagnostics;
-
-namespace MR.Server.Mappings.SearchParamsMapping;
+﻿namespace MR.Server.Mappings.SearchParamsMapping;
 
 public static class SearchParamsExtension
 {
@@ -30,6 +25,7 @@ public static class SearchParamsExtension
         command.HasInitialPayment = searchParams.PaymentOptions != null ? searchParams.PaymentOptions == IssuePaymentOptions.WithInitialPayment : null;
         command.QuarterNumber = searchParams.QuarterNumber;
         command.QuarterYear = searchParams.QuarterYear;
+        command.IsDeleted = searchParams.Archived;
 
         AddSearchParamsToCommand(command, searchParams);
     }

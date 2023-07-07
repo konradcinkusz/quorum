@@ -1,20 +1,20 @@
 ﻿namespace MR.Service.Features.Issues;
 
-public class ForceDeleteCommand : IRequest<bool>
+public class ForceDeleteIssueCommand : IRequest<bool>
 {
     private readonly Guid _issueId;
-    public ForceDeleteCommand(Guid issueId)
+    public ForceDeleteIssueCommand(Guid issueId)
     {
         _issueId = issueId;
     }
 
-    internal class ForceDeleteCommandHandler : CommandHandlerBase<ForceDeleteCommand, bool>
+    internal class ForceDeleteIssueCommandHandler : CommandHandlerBase<ForceDeleteIssueCommand, bool>
     {
-        public ForceDeleteCommandHandler(IApplicationDbContext context, ILogger<ForceDeleteCommand> logger) : base(context, logger)
+        public ForceDeleteIssueCommandHandler(IApplicationDbContext context, ILogger<ForceDeleteIssueCommand> logger) : base(context, logger)
         {
         }
 
-        public override async Task<bool> Handle(ForceDeleteCommand request, CancellationToken cancellationToken)
+        public override async Task<bool> Handle(ForceDeleteIssueCommand request, CancellationToken cancellationToken)
         {
             var issue = await _context.Issues
                 .Include(x => x.IssueProcessingHistories)

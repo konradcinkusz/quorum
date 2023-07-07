@@ -12,4 +12,5 @@ public class IssueSearchParamsDTO : SearchParamsDTO
     public int? QuarterYear { get; set; }
     public int? QuarterNumber { get; set; }
     public IssuePaymentOptions? PaymentOptions { get; set; }
+    public bool Archived { get; set; } = false;
 }

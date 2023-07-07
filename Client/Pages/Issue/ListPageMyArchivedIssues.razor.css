@@ -1,0 +1,7 @@
+﻿.disabled-component {
+    opacity: 0.5; /* Reduce opacity to visually indicate the disabled state */
+    pointer-events: none; /* Disable pointer events on the component */
+    background-color: #e9e9e9; /* Change the background color to a muted tone */
+    cursor: not-allowed; /* Change the cursor to indicate that the component is not clickable */
+    /* Add any additional styles to convey the disabled state */
+}

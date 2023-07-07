@@ -7,37 +7,12 @@ public sealed class IssueController : MRBaseController
     {
     }
 
-    [AllowAnonymous]
     [HttpGet("get-issues-by-search-params")]
     public async Task<ActionResult<ApiResponse<PagedListDto<IssueReadDTO>>>> GetIssuesBySearchParams([FromQuery] IssueSearchParamsDTO searchParams)
     {
-        try
-        {
-            var command = new GetIssuesBySearchParamsQuery
-            {
-                IssueId = searchParams.IssueId,
-                CreatedByEmail = searchParams.CreatedByEmail,
-            };
-
-            AddSearchParamsToCommand(command, searchParams);
-
-            var result = await Mediator.Send(command);
-
-            var IssuesPagedListDto = new PagedListDto<IssueReadDTO>
-            {
-                Items = _mapper.Map<List<IssueReadDTO>>(result),
-                CurrentPage = result.CurrentPage,
-                PageSize = result.PageSize,
-                TotalItems = result.TotalItems,
-                TotalPages = result.TotalPages
-            };
-
-            return new ApiResponse<PagedListDto<IssueReadDTO>>(IssuesPagedListDto);
-        }
-        catch (Exception ex)
-        {
-            return new ApiResponse<PagedListDto<IssueReadDTO>>(new PagedListDto<IssueReadDTO>()) { Message = ex.Message, StatusCode = (int)HttpStatusCode.BadRequest };
-        }
+        var command = new GetIssuesBySearchParamsQuery();
+        SearchParamsExtension.AddIssueSearchParamsToCommand(command, searchParams);
+        return await ProcessPagedRequest<GetIssuesBySearchParamsQuery, IssueReadDTO, Issue>(command);
     }
 
     [HttpGet("get-issue-by-id-for-edit")]
@@ -70,9 +45,9 @@ public sealed class IssueController : MRBaseController
             }));
 
     [HttpPut("edit-issue/{id}")]
-    public async Task<ActionResult<ApiResponse<Guid>>> EditIssue([FromRoute] Guid id, [FromBody] IssueCreateDTO issueDTO)
+    public async Task<ActionResult<ApiResponse<int>>> EditIssue([FromRoute] Guid id, [FromBody] IssueCreateDTO issueDTO)
     {
-        var issueId = await Mediator.Send(new EditIssueCommand(id)
+        var countOfChangedProperties = await Mediator.Send(new EditIssueCommand(id)
         {
             Question = issueDTO.Question,
             Title = issueDTO.Title,
@@ -80,7 +55,7 @@ public sealed class IssueController : MRBaseController
             BackgroundColor = issueDTO.BackgroundColor,
         });
 
-        return new ApiResponse<Guid> { Data = issueId, Message = "Edited" };
+        return new ApiResponse<int> { Data = countOfChangedProperties, Message = "Edited" };
     }
 
     [HttpPost("create-issue")]
@@ -108,4 +83,8 @@ public sealed class IssueController : MRBaseController
 
         return ApiResponse<Guid>.BadRequestApiResponse(Guid.Empty);
     }
+
+    [HttpDelete("archive-issue/{id}")]
+    public async Task<ActionResult<ApiResponse<bool>>> ArchiveIssue([FromRoute] Guid id)
+        => await HandleErrors(async () => await Mediator.Send(new ArchiveIssueCommand(id)));
 }

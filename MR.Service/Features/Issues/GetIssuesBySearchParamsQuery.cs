@@ -1,7 +1,4 @@
-﻿using MR.Service.ViewModels;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
-
-namespace MR.Service.Features.Issues;
+﻿namespace MR.Service.Features.Issues;
 
 public class GetIssuesBySearchParamsQuery : QueryBase, IRequest<PagedList<Issue>>
 {
@@ -16,6 +13,7 @@ public class GetIssuesBySearchParamsQuery : QueryBase, IRequest<PagedList<Issue>
     public bool? HasInitialPayment { get; set; }
     public int? QuarterYear { get; set; }
     public int? QuarterNumber { get; set; }
+    public bool? IsDeleted { get; set; } = false;
     public class GetIssuesBySearchParamsQueryHandler : CommandQueryHandlerBase<GetIssuesBySearchParamsQuery, PagedList<Issue>>
     {
         public GetIssuesBySearchParamsQueryHandler(IApplicationDbContext context, ILogger<GetIssuesBySearchParamsQuery> logger) : base(context, logger)
@@ -29,7 +27,13 @@ public class GetIssuesBySearchParamsQuery : QueryBase, IRequest<PagedList<Issue>
                 .Include(x => x.QuarterIssues).ThenInclude(qi => qi.Quarter)
                 .Include(x => x.IssueVisibilityHistories)
                 .Include(x => x.IssueProcessingHistories)
-                .Include(x => x.CreatedBy).AsQueryable();
+                .Include(x => x.CreatedBy)
+                .AsQueryable();
+
+            if (request.IsDeleted.HasValue)
+            {
+                query = query.Where(x => x.IsDeleted == request.IsDeleted);
+            }
 
             if (request.IssueId.HasValue)
             {

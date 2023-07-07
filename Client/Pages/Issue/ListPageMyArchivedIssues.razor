@@ -1,0 +1,75 @@
+﻿@attribute [Authorize]
+@inject IIssueService issueService
+@page "/issue/my-issues-archived"
+
+<PageTitle>Yout Issues list</PageTitle>
+
+<AuthorizeView>
+    <Authorized>
+        @if (IssuePagedListDto == null)
+        {
+            <_Loading LoadingText="Loading of issues list" />
+        }
+        else
+        {
+            @if (result != null && !result.Success)
+            {
+                <hr />
+                <_ApiResponse T="PagedListDto<IssueReadDTO>" result="result" />
+            }
+            @if (IssuePagedListDto.Items.Count == 0)
+            {
+                <hr />
+                <div class="alert alert-danger" role="alert">
+                    <p><em>Brak danych spełniających kryteria wyszukiwania...</em></p>
+                </div>
+            }
+            else
+            {
+                <div class="content">
+                    <div class="container">
+                        <div class="row align-content-center justify-content-center disabled-component">
+                            @foreach (var dto in IssuePagedListDto.Items)
+                            {
+                                <_CustomIssueCard dto="dto" ShowStatus="true" />
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </Authorized>
+    <NotAuthorized>
+        <div class="m-2 p-2 font-weight-bold" style="background-color:grey">
+            You must be logged as a super admin user at least to see these page
+        </div>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthTask { get; set; }
+
+    private IssueSearchParamsDTO IssueSearchParamsDTO;
+    private PagedListDto<IssueReadDTO>? IssuePagedListDto;
+
+    private ApiResponse<PagedListDto<IssueReadDTO>> result = null;
+
+    private bool isActiveSubscription = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var tuple = AuthHelper.IsActiveSubscription(await AuthTask);
+        isActiveSubscription = tuple.Item1;
+        IssueSearchParamsDTO = new IssueSearchParamsDTO() { Archived = true };
+        await _refresh();
+    }
+
+    async Task _refresh()
+    {
+        result = await issueService.GetMyIssuesBySearchParams(IssueSearchParamsDTO);
+        IssuePagedListDto = result.Data;
+        IssueSearchParamsDTO.CurrentPage = IssuePagedListDto.CurrentPage;
+        IssueSearchParamsDTO.PageSize = IssuePagedListDto.PageSize;
+    }
+}
