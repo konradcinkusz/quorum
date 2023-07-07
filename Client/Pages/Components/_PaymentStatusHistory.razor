@@ -1,0 +1,32 @@
+﻿<dt class="col-sm-3">InitialPayment Status History:</dt>
+<dd class="col-sm-9">
+    @if (PaymentStatusHistories.Any())
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Payment Status</th>
+                    <th>Status Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var history in PaymentStatusHistories)
+                {
+                    <tr>
+                        <td>@history.PaymentStatus</td>
+                        <td>@history.CreatedAt.ToString("g", CultureInfo.InvariantCulture)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p>No payment status history available.</p>
+    }
+</dd>
+
+@code{
+    [Parameter]
+    public List<PaymentStatusHistoryDTO> PaymentStatusHistories { get; set; } = new List<PaymentStatusHistoryDTO>();
+}

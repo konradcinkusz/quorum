@@ -10,5 +10,14 @@ public class PaymentSearchParamsDTO : SearchParamsDTO
     /// Only payment with relation to the issue initial payment
     /// </summary>
     public bool? OnlyInitialPayment { get; set; } = null;
+
+    public override void Clear()
+    {
+        this.PaymentId = null;
+        this.ApplicationUserEmail = null;
+        this.MinPaymentValuePLN = null;
+        this.MaxPaymentValuePLN = null;
+        this.OnlyInitialPayment = null;
+    }
 }
 

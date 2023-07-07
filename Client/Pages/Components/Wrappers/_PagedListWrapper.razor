@@ -1,0 +1,24 @@
+﻿@typeparam T where T : BaseDTO
+
+@if (PagedListDto == null)
+{
+    <_Loading LoadingText="Loadinng list..." />
+}
+else
+{
+    @ChildContent
+    @if (result != null && !result.Success)
+    {
+        <hr />
+        <_ApiResponse T="PagedListDto<T>" result="result" />
+    }
+}
+
+@code {
+    [Parameter]
+    public PagedListDto<T>? PagedListDto { get; set; }
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+    [Parameter]
+    public ApiResponse<PagedListDto<T>> result { get; set; } = null;
+}

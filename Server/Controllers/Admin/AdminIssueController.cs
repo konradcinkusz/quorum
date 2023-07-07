@@ -51,7 +51,6 @@ public sealed class AdminIssueController : MRBaseController
     {
         var command = new GetIssuesBySearchParamsQuery();
         SearchParamsExtension.AddIssueSearchParamsToCommand(command, searchParams);
-        command.IsDeleted = null;
         return await ProcessPagedRequest<GetIssuesBySearchParamsQuery, IssueReadDTO, Issue>(command);
     }
 

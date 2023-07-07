@@ -12,5 +12,20 @@ public class IssueSearchParamsDTO : SearchParamsDTO
     public int? QuarterYear { get; set; }
     public int? QuarterNumber { get; set; }
     public IssuePaymentOptions? PaymentOptions { get; set; }
-    public bool Archived { get; set; } = false;
+    public bool? IsDeleted { get; set; }
+
+    public override void Clear()
+    {
+        this.IssueId = null;
+        this.CreatedByEmail = null;
+        this.Title = null;
+        this.Question = null;
+        this.IsVerifyByAdmin = null;
+        this.IssueVisibility = null;
+        this.RatingValue = null;
+        this.QuarterYear = null;
+        this.QuarterNumber = null;
+        this.PaymentOptions = null;
+        this.IsDeleted = null;
+    }
 }

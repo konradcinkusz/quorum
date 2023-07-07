@@ -12,6 +12,7 @@
 
     protected virtual async Task ClearQuery()
     {
+        SearchParams.Clear();
         await Refresh.InvokeAsync();
     }
 }

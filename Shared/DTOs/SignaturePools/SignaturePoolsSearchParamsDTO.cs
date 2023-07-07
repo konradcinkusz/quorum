@@ -8,4 +8,14 @@ public class SignaturePoolsSearchParamsDTO : SearchParamsDTO
     public int? Quarter { get; set; }
     public DateTime? Begin { get; set; }
     public DateTime? End { get; set; }
+
+    public override void Clear()
+    {
+        this.ApplicationUserId = null; 
+        this.ApplicationUserEmail = null;
+        this.Year = null;
+        this.Quarter = null;
+        this.Begin = null;
+        this.End = null;
+    }
 }

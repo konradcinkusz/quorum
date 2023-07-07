@@ -1,0 +1,20 @@
+﻿<PageTitle>@PageTitle</PageTitle>
+
+<AuthorizeView>
+    <Authorized>
+        @ChildContent
+    </Authorized>
+    <NotAuthorized>
+        <div class="m-2 p-2 font-weight-bold" style="background-color:grey">
+            You must be logged as a super admin user at least to see these page
+        </div>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    [Parameter]
+    public string PageTitle { get; set; } = "MR";
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+}

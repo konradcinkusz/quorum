@@ -59,6 +59,16 @@
 
                 <dt class="col-sm-3">InitialPayment user</dt>
                 <dd class="col-sm-9">@dto.InitialPayment.ApplicationUserEmail</dd>
+
+                <_PaymentStatusHistory PaymentStatusHistories="dto.InitialPayment.PaymentStatusHistories"/>
+
+                @if (dto.IssueProcess == IssueProcessEnum.PaymentInProgress && dto.InitialPayment.PaymentStatus == PaymentStatusEnum.Pending && AcceptInitialPaymentByPaymentGuid.HasDelegate)
+                {
+                    <dt class="col-sm-3">Accept initial payment</dt>
+                    <dd class="col-sm-9">
+                        <button class="btn btn-success btn-sm m-1" type="button" @onclick="@(async () => await AcceptInitialPaymentByPaymentGuid.InvokeAsync(dto.InitialPayment.Id))">Accept</button>
+                    </dd>
+                }
             }
             @*
             <dt class="col-sm-3">Quarters</dt>
@@ -173,6 +183,9 @@
     [Parameter]
     public EventCallback<Guid> Delete { get; set; }
 
+    [Parameter]
+    public EventCallback<Guid> AcceptInitialPaymentByPaymentGuid { get; set; }
+
     private bool confirmationCheckboxChecked;
 
     private ApiResponse<bool> result = null;
@@ -185,6 +198,4 @@
             await Refresh.InvokeAsync();
         }
     }
-
-
 }

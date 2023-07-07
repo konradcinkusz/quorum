@@ -25,7 +25,7 @@ public static class SearchParamsExtension
         command.HasInitialPayment = searchParams.PaymentOptions != null ? searchParams.PaymentOptions == IssuePaymentOptions.WithInitialPayment : null;
         command.QuarterNumber = searchParams.QuarterNumber;
         command.QuarterYear = searchParams.QuarterYear;
-        command.IsDeleted = searchParams.Archived;
+        command.IsDeleted = searchParams.IsDeleted;
 
         AddSearchParamsToCommand(command, searchParams);
     }

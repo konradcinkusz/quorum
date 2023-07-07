@@ -4,30 +4,34 @@
     <div class="container">
         <div class="row">
             <div class="col-md-12">
-                <div class="row g-3 mt-2">
-                    <div class="col-md-9 col-sm-12">
+                <div class="row g-1 mt-2">
+                    <div class="col-md-3 col-sm-12">
                         <input type="search" class="form-control rounded-pill" placeholder="User name or part of name" @bind-value="SearchParams.CreatedByEmail" @bind-value:event="oninput">
                     </div>
-                    <div class="col-md-3 col-sm-12 text-end">
-                        <button type="submit" class="btn btn-outline-light btn-block rounded-pill" @onclick="ClearQuery"><span class="flex-center search">Clear</span></button>
-                        <button type="submit" class="btn btn-outline-light btn-block rounded-pill" @onclick="async () => await Refresh.InvokeAsync()"><span class="flex-center search">Search</span></button>
-                    </div>
-                </div>
-                <div class="row g-3">
-                    <div class="col-md-12">
-                        <input type="text" id="title" class="form-control rounded-pill" placeholder="Issue id"  @bind="SearchParams.IssueId" @bind:event="oninput">
-                    </div>
-                </div>
-                <div class="row g-3">
                     <div class="col-md-3 col-sm-12">
-                        <input type="text" id="title" class="form-control rounded-pill" placeholder="Title" @bind="SearchParams.Title" @bind:event="oninput">
+                        <input type="search" class="form-control rounded-pill" placeholder="Title" @bind="SearchParams.Title" @bind:event="oninput">
                     </div>
                     <div class="col-md-3 col-sm-12">
-                        <input type="text" id="question" class="form-control rounded-pill" placeholder="Question" @bind="SearchParams.Question" @bind:event="oninput">
+                        <input type="search" class="form-control rounded-pill" placeholder="Question" @bind="SearchParams.Question" @bind:event="oninput">
+                    </div>
+                    <div class="col-md-3 col-sm-12">
+                        <input type="search" class="form-control rounded-pill" placeholder="Issue id" @bind="SearchParams.IssueId" @bind:event="oninput">
+                    </div>
+                </div>
+                <div class="row g-1">
+                    <div class="col-md-3 col-sm-12">
+                        <input type="number" id="ratingValue" class="form-control rounded-pill" placeholder="Rating value" @bind="SearchParams.RatingValue" @bind:event="oninput">
                     </div>
                     <div class="col-md-3 col-sm-12">
                         <InputSelectBoolean class="form-control rounded-pill" @bind-Value="@SearchParams.IsVerifyByAdmin">
                             <option value="">-- verify by admin --</option>
+                            <option value="true">Yes</option>
+                            <option value="false">No</option>
+                        </InputSelectBoolean>
+                    </div>
+                    <div class="col-md-3 col-sm-12">
+                        <InputSelectBoolean class="form-control rounded-pill" @bind-Value="@SearchParams.IsDeleted">
+                            <option value="">-- archived --</option>
                             <option value="true">Yes</option>
                             <option value="false">No</option>
                         </InputSelectBoolean>
@@ -42,11 +46,12 @@
                         </select>
                     </div>
                 </div>
-                <div class="row g-3">
-                    <div class="col-md-3 col-sm-12">
-                        <input type="number" id="ratingValue" class="form-control rounded-pill" placeholder="Rating value" @bind="SearchParams.RatingValue" @bind:event="oninput">
-                    </div>
-                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <button type="submit" class="btn btn-outline-light btn-block rounded-pill" @onclick="async () => await base.ClearQuery()"><span class="flex-center search">Clear</span></button>
+                <button type="submit" class="btn btn-outline-light btn-block rounded-pill" @onclick="async () => await Refresh.InvokeAsync()"><span class="flex-center search">Search</span></button>
             </div>
         </div>
         <div class="row">
@@ -57,21 +62,3 @@
         </div>
     </div>
 </div>
-
-@code {
-    protected override async Task ClearQuery()
-    {
-        SearchParams.IssueId = null;
-        SearchParams.CreatedByEmail = null;
-        SearchParams.Title = null;
-        SearchParams.Question = null;
-        SearchParams.IsVerifyByAdmin = null;
-        SearchParams.IssueVisibility = null;
-        SearchParams.RatingValue = null;
-        SearchParams.QuarterYear = null;
-        SearchParams.QuarterNumber = null;
-        SearchParams.PaymentOptions = null;
-
-        await base.ClearQuery();
-    }
-}

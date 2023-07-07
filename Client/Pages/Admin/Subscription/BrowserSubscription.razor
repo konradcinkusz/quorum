@@ -34,13 +34,3 @@
         </div>
     </div>
 </div>
-
-@code {
-    protected override async Task ClearQuery()
-    {
-        SearchParams.ApplicationUserEmail = null;
-        SearchParams.Begin = null;
-        SearchParams.End = null;
-        await base.ClearQuery();
-    }
-}

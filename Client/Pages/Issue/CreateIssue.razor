@@ -139,7 +139,11 @@
     }
 
     private ApiResponse<Guid> result = null;
-    private async Task Create() => result = await issueService.CreateIssue(dto);
+    private async Task Create()
+    {
+        result = await issueService.CreateIssue(dto);
+        navigationManager.NavigateTo("/issue/my-issues");
+    }
 
     private int currentPage = 1;
 

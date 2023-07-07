@@ -46,18 +46,24 @@
                                         }
                                         else
                                         {
-                                            <button type="button" @onclick="@(async () => await Publish(dto.Id))" class="btn btn-primary rounded-pill m-1 inactive-subscription-button"
-                                                    disabled="@(!isActiveSubscription)" data-bs-toggle="tooltip" title="@(isActiveSubscription ? string.Empty : "You don't have an active subscription yet")">
-                                                Publish
-                                            </button>
-                                            <button type="button" class="btn btn-primary rounded-pill m-1 disabled">
-                                                Already paid
-                                            </button>
+                                            @if (dto.InitialPayment.PaymentStatus == PaymentStatusEnum.Completed)
+                                            {
+                                                <button type="button" @onclick="@(async () => await Publish(dto.Id))" class="btn btn-primary rounded-pill m-1 inactive-subscription-button"
+                                                disabled="@(!isActiveSubscription)" data-bs-toggle="tooltip" title="@(isActiveSubscription ? string.Empty : "You don't have an active subscription yet")">
+                                                    Publish
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <button type="button" class="btn btn-primary rounded-pill m-1 disabled">
+                                                    Processing
+                                                </button>
+                                            }
                                         }
 
                                         <button type="button" @onclick="@(async () => await Archived(dto.Id))" class="btn btn-primary rounded-pill m-1 inactive-subscription-button"
                                                 disabled="@(!isActiveSubscription)" data-bs-toggle="tooltip" title="@(isActiveSubscription ? string.Empty : "You don't have an active subscription yet")">
-                                            Archived
+                                            Archive
                                         </button>
                                     }
                                 </_CustomIssueCard>
