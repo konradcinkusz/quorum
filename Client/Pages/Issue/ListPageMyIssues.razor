@@ -31,16 +31,31 @@
                         <div class="row align-content-center justify-content-center">
                             @foreach (var dto in IssuePagedListDto.Items)
                             {
-                                <_CustomIssueCard BackgroundColor="@dto.BackgroundColor"
-                                                  Title="@dto.Title" Icon="@dto.Icon"
-                                                  Text="@dto.Question"
-                                                  ApplicationUserEmail="@dto.ApplicationUserEmail"
-                                                  IsVerifyByAdmin="false"
-                                                  IssueVisibility="@IssueVisibilityEnum.VisibleOnlyToMe"
-                                                  RatingValue="0"
-                                                  Id="@dto.Id"
+                                <_CustomIssueCard dto="dto"
                                                   ShowButtons="true"
-                                                  ShowStatus="true" />
+                                                  ShowStatus="true">
+
+                                    @if (!dto.Id.IsNullOrEmpty())
+                                    {
+                                        @if (dto.InitialPayment == null)
+                                        {
+                                            <button type="button" @onclick="@(async () => await Pay(dto.Id))" class="btn btn-primary rounded-pill m-1 inactive-subscription-button"
+                                                    disabled="@(!isActiveSubscription)" data-bs-toggle="tooltip" title="@(isActiveSubscription ? string.Empty : "You don't have an active subscription yet")">
+                                                Pay
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <button type="button" @onclick="@(async () => await Publish(dto.Id))" class="btn btn-primary rounded-pill m-1 inactive-subscription-button"
+                                                    disabled="@(!isActiveSubscription)" data-bs-toggle="tooltip" title="@(isActiveSubscription ? string.Empty : "You don't have an active subscription yet")">
+                                                Publish
+                                            </button>
+                                            <button type="button" class="btn btn-primary rounded-pill m-1 disabled">
+                                                Already paid
+                                            </button>
+                                        }
+                                    }
+                                </_CustomIssueCard>
                             }
                         </div>
                     </div>
@@ -56,13 +71,20 @@
 </AuthorizeView>
 
 @code {
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthTask { get; set; }
+
     private IssueSearchParamsDTO IssueSearchParamsDTO;
     private PagedListDto<IssueReadDTO>? IssuePagedListDto;
 
     private ApiResponse<PagedListDto<IssueReadDTO>> result = null;
 
+    private bool isActiveSubscription = false;
+
     protected override async Task OnInitializedAsync()
     {
+        var tuple = AuthHelper.IsActiveSubscription(await AuthTask);
+        isActiveSubscription = tuple.Item1;
         IssueSearchParamsDTO = new IssueSearchParamsDTO();
         await _refresh();
     }
@@ -73,5 +95,23 @@
         IssuePagedListDto = result.Data;
         IssueSearchParamsDTO.CurrentPage = IssuePagedListDto.CurrentPage;
         IssueSearchParamsDTO.PageSize = IssuePagedListDto.PageSize;
+    }
+
+    private ApiResponse<bool> published = null;
+    private async Task Publish(Guid id)
+    {
+        if (!id.IsNullOrEmpty() && isActiveSubscription)
+        {
+            published = await issueService.PublishIssue(id);
+        }
+    }
+
+    private ApiResponse<bool> paid = null;
+    private async Task Pay(Guid id)
+    {
+        if (!id.IsNullOrEmpty() && isActiveSubscription)
+        {
+            paid = await issueService.PayForAnIssue(id, new IssuePayDTO());
+        }
     }
 }

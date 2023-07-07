@@ -1,6 +1,4 @@
-﻿using MR.Service.UserManagement;
-
-namespace MR.Service.Features.Issues;
+﻿namespace MR.Service.Features.Issues;
 
 public class PayForAnIssueCommand : IRequest<bool>, IIssueCommandData
 {

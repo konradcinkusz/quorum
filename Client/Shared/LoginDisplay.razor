@@ -34,13 +34,9 @@
     {
         await base.OnParametersSetAsync();
 
-        var authState = await AuthTask;
-        var user = authState.User;
-        var claim = user.Claims.FirstOrDefault(x => x.Type == "isActiveSubscription");
-        if (claim != null && bool.TryParse(claim.Value, out bool subscriptionF))
-        {
-            IsActiveSubscription = subscriptionF;
-        }
+        await base.OnParametersSetAsync();
+        var tuple = AuthHelper.IsActiveSubscription(await AuthTask);
+        IsActiveSubscription = tuple.Item1;
     }
 
     private void BeginLogOut()

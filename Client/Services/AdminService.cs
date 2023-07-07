@@ -21,6 +21,7 @@ public interface IAdminService
     Task<ApiResponse<Guid>> CreateIssue(IssueAdminCreateDTO issueDTO);
     Task<ApiResponse<string>> GetUserEmailByUserId(string userId);
     Task<ApiResponse<bool>> VerifyIssue(Guid issueId, bool confirmed);
+    Task<ApiResponse<bool>> ForceDeleteIssue(Guid issueId);
 }
 
 internal sealed class AdminService : DataServiceBase, IAdminService
@@ -183,5 +184,11 @@ internal sealed class AdminService : DataServiceBase, IAdminService
     {
         var endpoint = $"{_adminIssueControllerPath}/verify-issue/{issueId}";
         return await HandleResponse<bool>(async () => await _httpClient.PutAsJsonAsync(endpoint, confirmed));
+    }
+
+    public async Task<ApiResponse<bool>> ForceDeleteIssue(Guid issueId)
+    {
+        var endpoint = $"{_adminIssueControllerPath}/force-delete-issue/{issueId}";
+        return await HandleResponse<bool>(async () => await _httpClient.DeleteAsync(endpoint));
     }
 }

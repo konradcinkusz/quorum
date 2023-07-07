@@ -48,7 +48,16 @@
     justify-content: center;
 }
 
-/* Add margin to the preview section */
-.row.justify-content-center > .col-12 {
-    margin-top: 2rem;
+    /* Add margin to the preview section */
+    .row.justify-content-center > .col-12 {
+        margin-top: 2rem;
+    }
+
+.progress-text {
+    padding: 5px;
+    font-size: 18px;
+}
+
+.progress {
+    height: 2rem;
 }

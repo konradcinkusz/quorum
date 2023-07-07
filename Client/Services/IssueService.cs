@@ -42,6 +42,7 @@ internal class IssueService : DataServiceBase, IIssueService
         var endpoint = $"{_issueControllerPath}/pay-for-an-issue/{issueId}";
         return await HandleResponse<bool>(async () => await _httpClient.PutAsJsonAsync(endpoint, issuePayDTO));
     }
+
     public async Task<ApiResponse<PagedListDto<IssueReadDTO>>> GetMyIssuesBySearchParams
         (IssueSearchParamsDTO searchParams)
     {

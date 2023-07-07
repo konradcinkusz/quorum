@@ -10,15 +10,17 @@ public interface IApplicationDbContext
     DbSet<Quarter> Quarters { get; set; }
     DbSet<SignaturePool> SignaturePools { get; set; }
     DbSet<Signature> Signatures { get; set; }
+    DbSet<IssueProcessingHistory> IssueProcessingHistories { get; set; }
+    DbSet<IssueVisibilityHistory> IssueVisibilityHistories { get; set; }
+    DbSet<QuarterIssue> QuarterIssues { get; set; }
+
     DbSet<TEntity> Set<TEntity>() where TEntity : class;
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }
 
 public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>, IApplicationDbContext
 {
-    public ApplicationDbContext(
-        DbContextOptions options,
-        IOptions<OperationalStoreOptions> operationalStoreOptions) : base(options, operationalStoreOptions)
+    public ApplicationDbContext(DbContextOptions options, IOptions<OperationalStoreOptions> operationalStoreOptions) : base(options, operationalStoreOptions)
     {
     }
 
@@ -32,6 +34,10 @@ public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>, 
     public DbSet<Quarter> Quarters { get; set; }
     public DbSet<SignaturePool> SignaturePools { get; set; }
     public DbSet<Signature> Signatures { get; set; }
+    public DbSet<IssueProcessingHistory> IssueProcessingHistories { get; set; }
+    public DbSet<IssueVisibilityHistory> IssueVisibilityHistories { get; set; }
+    public DbSet<QuarterIssue> QuarterIssues { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Seed();

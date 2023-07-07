@@ -57,4 +57,8 @@ public sealed class AdminIssueController : MRBaseController
     [HttpPost("add-signature-to-signature-pool")]
     public async Task<ActionResult<ApiResponse<bool>>> AddSignatureToSignaturePool([FromBody] Guid signaturePoolDTO)
         => await HandleErrors(async () => await Mediator.Send(new AddSignatureToSignaturePoolCommand { SignaturePoolId = signaturePoolDTO }), "Adding new signature to the pool");
+
+    [HttpDelete("force-delete-issue/{id}")]
+    public async Task<ActionResult<ApiResponse<bool>>> ForceDeleteIssue([FromRoute] Guid id)
+        => await HandleErrors(async () => await Mediator.Send(new ForceDeleteCommand(id)));
 }

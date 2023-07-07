@@ -81,32 +81,14 @@
 
             <div class="row justify-content-center">
                 <div class="col-12">
-                    <div class="progress mt-4">
+                    <div class="progress">
                         <div class="progress-bar" role="progressbar" style="width: @(currentPage * 25)%;"
                              aria-valuenow="@currentPage" aria-valuemin="1" aria-valuemax="4">
-                            @($"{(currentPage * 25)}% Complete")
+                            <span class="progress-text">@($"{(currentPage * 25)}% Complete")</span>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <div class="row justify-content-center">
-                <div class="col-12 text-center">
-                    <hr />
-                    <h5>Preview</h5>
-                </div>
-                <div class="row d-flex justify-content-center">
-                    <_CustomIssueCard BackgroundColor="@dto.BackgroundColor"
-                                      Title="@dto.Title" Icon="@dto.Icon"
-                                      Text="@dto.Question"
-                                      ApplicationUserEmail="@email"
-                                      IsVerifyByAdmin="false"
-                                      IssueVisibility="@IssueVisibilityEnum.VisibleOnlyToMe"
-                                      RatingValue="0"
-                                      ColsDefinition="col-12" />
-                </div>
-            </div>
-
         </EditForm>
     </div>
 </div>
@@ -139,14 +121,9 @@
         await base.OnParametersSetAsync();
 
         var authState = await AuthTask;
-        var user = authState.User;
-        var claim = user.Claims.FirstOrDefault(x => x.Type == "isActiveSubscription");
-        if (claim != null && bool.TryParse(claim.Value, out bool subscriptionF))
-        {
-            isActiveSubscription = subscriptionF;
-        }
-
-        email = user.Claims.FirstOrDefault(x => x.Type == "name")?.Value ?? string.Empty;
+        var tuple = AuthHelper.IsActiveSubscription(await AuthTask);
+        isActiveSubscription = tuple.Item1;
+        email = tuple.Item2;
     }
 
     private IssueCreateDTO dto = new IssueCreateDTO();
