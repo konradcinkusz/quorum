@@ -96,7 +96,7 @@
     {
         var tuple = AuthHelper.IsActiveSubscription(await AuthTask);
         isActiveSubscription = tuple.Item1;
-        IssueSearchParamsDTO = new IssueSearchParamsDTO();
+        IssueSearchParamsDTO = new IssueSearchParamsDTO() { IsDeleted = false };
         await refresh();
     }
 
@@ -114,6 +114,7 @@
         if (!id.IsNullOrEmpty() && isActiveSubscription)
         {
             published = await issueService.PublishIssue(id);
+            await refresh();
         }
     }
 
@@ -123,6 +124,7 @@
         if (!id.IsNullOrEmpty() && isActiveSubscription)
         {
             paid = await issueService.PayForAnIssue(id, new IssuePayDTO());
+            await refresh();
         }
     }
 

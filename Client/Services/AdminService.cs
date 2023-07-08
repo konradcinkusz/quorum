@@ -20,7 +20,7 @@ public interface IAdminService
     Task<ApiResponse<PagedListDto<IssueReadDTO>>> GetIssuesBySearchParams(IssueSearchParamsDTO searchParams);
     Task<ApiResponse<Guid>> CreateIssue(IssueAdminCreateDTO issueDTO);
     Task<ApiResponse<string>> GetUserEmailByUserId(string userId);
-    Task<ApiResponse<bool>> VerifyIssue(Guid issueId, bool confirmed);
+    Task<ApiResponse<bool>> VerifyIssue(Guid issueId);
     Task<ApiResponse<bool>> ForceDeleteIssue(Guid issueId);
 }
 
@@ -180,10 +180,10 @@ internal sealed class AdminService : DataServiceBase, IAdminService
         return await HandleResponse<string>(async () => await _httpClient.GetAsync(endpoint));
     }
 
-    public async Task<ApiResponse<bool>> VerifyIssue(Guid issueId, bool confirmed)
+    public async Task<ApiResponse<bool>> VerifyIssue(Guid issueId)
     {
         var endpoint = $"{_adminIssueControllerPath}/verify-issue/{issueId}";
-        return await HandleResponse<bool>(async () => await _httpClient.PutAsJsonAsync(endpoint, confirmed));
+        return await HandleResponse<bool>(async () => await _httpClient.PutAsync(endpoint, null));
     }
 
     public async Task<ApiResponse<bool>> ForceDeleteIssue(Guid issueId)

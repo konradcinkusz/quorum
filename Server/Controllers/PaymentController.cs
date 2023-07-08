@@ -66,8 +66,8 @@ public class PaymentController : MRBaseController
 
         try
         {
-            var paymentId = await Mediator.Send(command);
-            return CreatedAtAction(nameof(GetPayment), new { id = paymentId }, null);
+            var propertiesChangedCount = await Mediator.Send(command);
+            return CreatedAtAction(nameof(GetPayment), new { id = propertiesChangedCount }, null);
         }
         catch (NotFoundException ex)
         {
@@ -86,4 +86,8 @@ public class PaymentController : MRBaseController
     [HttpPut("accept-initial-payment/{id}")]
     public async Task<ActionResult<ApiResponse<bool>>> AcceptIssueInitialPayment(Guid id)
         => await HandleErrors(async () => await Mediator.Send(new AcceptIssueInitialPaymentCommand(id)), $"Payment {id} accepted");
+
+    [HttpPut("set-payment-status/{id}")]
+    public async Task<ActionResult<ApiResponse<bool>>> SetPaymentStatus([FromRoute] Guid id, [FromBody] PaymentStatusEnum paymentStatus)
+        => await HandleErrors(async () => await Mediator.Send(new SetPaymentStatusCommand(id, (PaymentStatus)paymentStatus)), $"Payment {id} accepted");
 }

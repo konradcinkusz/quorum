@@ -40,7 +40,12 @@ public class AcceptIssueInitialPaymentCommand : IRequest<bool>
 
             issue.IssueProcessingHistories.Add(new() { IssueProcess = IssueProcess.PaymentInProgress });
             SetPaymentStatus(payment, PaymentStatus.Accepted);
+            SetPaymentStatus(payment, PaymentStatus.Completed);
             issue.IssueProcessingHistories.Add(new() { IssueProcess = IssueProcess.PaymentCompleted });
+            issue.IssueProcessingHistories.Add(new() { IssueProcess = IssueProcess.InAdminVerification });
+
+            issue.IssueProcess = IssueProcess.InAdminVerification;
+
             int result = await _context.SaveChangesAsync(cancellationToken);
 
             return result > 0;

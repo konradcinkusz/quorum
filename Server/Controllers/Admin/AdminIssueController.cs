@@ -43,8 +43,8 @@ public sealed class AdminIssueController : MRBaseController
     }
 
     [HttpPut("verify-issue/{id}")]
-    public async Task<ActionResult<ApiResponse<bool>>> VerifyIssue(Guid id, bool confirmed)
-        => await HandleErrors(async () => await Mediator.Send(new VerifyByAdminCommand(id, confirmed)));
+    public async Task<ActionResult<ApiResponse<bool>>> VerifyIssue(Guid id)
+        => await HandleErrors(async () => await Mediator.Send(new VerifyByAdminCommand(id)));
 
     [HttpGet("get-issues-by-search-params-admin")]
     public async Task<ActionResult<ApiResponse<PagedListDto<IssueReadDTO>>>> GetIssuesBySearchParamsAdmin([FromQuery] IssueSearchParamsDTO searchParams)

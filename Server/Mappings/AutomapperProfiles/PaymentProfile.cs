@@ -12,7 +12,5 @@ public class PaymentProfile : Profile
         CreateMap<PaymentStatusHistoryDTO, PaymentStatusHistory>();
         CreateMap<PaymentDTO, Payment>()
             .ForMember(dest => dest.PaymentStatusHistories, opt => opt.MapFrom(src => src.PaymentStatusHistories));
-
-        CreateMap<PaymentUpdateDTO, EditPaymentCommand>();
     }
 }

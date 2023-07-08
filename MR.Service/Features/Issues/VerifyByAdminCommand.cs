@@ -3,12 +3,9 @@
 public class VerifyByAdminCommand : IRequest<bool>
 {
     private readonly Guid _issueId;
-    private readonly bool _confirmed;
-
-    public VerifyByAdminCommand(Guid issueId, bool confirmed)
+    public VerifyByAdminCommand(Guid issueId)
     {
         _issueId = issueId;
-        _confirmed = confirmed;
     }
 
     internal class VerifyByAdminCommandHandler : CommandHandlerBase<VerifyByAdminCommand, bool>
@@ -22,7 +19,7 @@ public class VerifyByAdminCommand : IRequest<bool>
             var issue = await _context.Issues.FirstAsync(x => x.Id == request._issueId, cancellationToken);
             if (issue != null && issue.IssueProcess == IssueProcess.InAdminVerification)
             {
-                issue.IsVerifyByAdmin = request._confirmed;
+                issue.IsVerifyByAdmin = true;
                 issue.IssueProcessingHistories = new List<IssueProcessingHistory>
                 {
                     new IssueProcessingHistory() { IssueProcess = IssueProcess.AdminVerificationPassed }

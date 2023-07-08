@@ -8,6 +8,7 @@ public interface IPaymentService
     Task<ApiResponse<PagedListDto<PaymentDTO>>> GetPaymentsBySearchParams(PaymentSearchParamsDTO searchParams);
     Task<ApiResponse<bool>> AcceptPayment(Guid paymentId);
     Task<ApiResponse<bool>> AcceptIssueInitialPayment(Guid paymentId);
+    Task<ApiResponse<bool>> SetPaymentStatus(Guid paymentId, PaymentStatusEnum paymentStatus);
 }
 
 internal class PaymentService : DataServiceBase, IPaymentService
@@ -21,6 +22,7 @@ internal class PaymentService : DataServiceBase, IPaymentService
         var endpoint = $"{_paymentControllerPath}/accept-payment/{paymentId}";
         return await HandleResponse<bool>(async () => await _httpClient.PutAsync(endpoint, null));
     }
+
     public async Task<ApiResponse<bool>> AcceptIssueInitialPayment(Guid paymentId)
     {
         var endpoint = $"{_paymentControllerPath}/accept-initial-payment/{paymentId}";
@@ -66,5 +68,12 @@ internal class PaymentService : DataServiceBase, IPaymentService
         }
 
         return response.Headers.Location.Segments.Last();
+    }
+
+    public async Task<ApiResponse<bool>> SetPaymentStatus(Guid paymentId, PaymentStatusEnum paymentStatus)
+    {
+        var endpoint = $"{_paymentControllerPath}/set-payment-status/{paymentId}";
+        var serializedPaymentStatus = JsonSerializer.Serialize(paymentStatus);
+        return await HandleResponse<bool>(async () => await _httpClient.PutAsJsonAsync(endpoint, serializedPaymentStatus));
     }
 }

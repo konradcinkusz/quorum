@@ -16,7 +16,9 @@ public class ForceDeleteIssueCommand : IRequest<bool>
 
         public override async Task<bool> Handle(ForceDeleteIssueCommand request, CancellationToken cancellationToken)
         {
+            bool result = false;
             var issue = await _context.Issues
+                .Include(x => x.InitialPayment)
                 .Include(x => x.IssueProcessingHistories)
                 .Include(x => x.IssueVisibilityHistories)
                 .Include(x => x.QuarterIssues)
@@ -29,13 +31,15 @@ public class ForceDeleteIssueCommand : IRequest<bool>
                 _context.IssueVisibilityHistories.RemoveRange(issue.IssueVisibilityHistories);
                 _context.QuarterIssues.RemoveRange(issue.QuarterIssues);
                 _context.Signatures.RemoveRange(issue.Signatures);
-
+                if (issue.InitialPayment != null)
+                {
+                    _context.Payments.Remove(issue.InitialPayment);
+                }
                 _context.Issues.Remove(issue);
-                var sum = await _context.SaveChangesAsync(cancellationToken);
-                return sum > 0;
+                result = await _context.SaveChangesAsync(cancellationToken) > 0;
             }
 
-            return false;
+            return result;
         }
     }
 }
