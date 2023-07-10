@@ -5,19 +5,15 @@
     <_PagedListWrapper PagedListDto="QuarterPagedListDto" result="result">
         <BrowserQuarter Refresh="_refresh" SearchParams="QuarterSearchParamsDTO" TotalPages="QuarterPagedListDto.TotalPages" TotalItems="QuarterPagedListDto.TotalItems" />
         <HeaderQuarter Refresh="_refresh" SearchParams="QuarterSearchParamsDTO" />
-        <div class="content">
-            <div class="container">
-                <div class="row align-content-center justify-content-center">
-                    @foreach (var p in QuarterPagedListDto.Items)
-                    {
-                        <ReadQuarter DTO="p" Delete="Delete" />
-                    }
-                    @if (QuarterPagedListDto.Items.Count == 0)
-                    {
-                        <span>There is nothing to show...</span>
-                    }
-                </div>
-            </div>
+        <div class="row align-content-center justify-content-center">
+            @foreach (var p in QuarterPagedListDto.Items)
+            {
+                <ReadQuarter DTO="p" Delete="Delete" />
+            }
+            @if (QuarterPagedListDto.Items.Count == 0)
+            {
+                <span>There is nothing to show...</span>
+            }
         </div>
     </_PagedListWrapper>
 </_AuthorizationWrapper>

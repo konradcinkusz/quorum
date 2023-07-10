@@ -81,11 +81,13 @@
         result = await adminService.RemoveSignature(signatureId);
         await Refresh.InvokeAsync();
     }
+
     private async Task UnpinSignatureFromIssue(Guid signatureId)
     {
         result = await adminService.UnpinSignatureFromIssue(signatureId);
         await Refresh.InvokeAsync();
     }
+
     private async Task AddSignature()
     {
         result = await adminService.AddSignatureToSignaturePool(SignaturePool.Id);

@@ -1,0 +1,21 @@
+﻿@typeparam T where T : BaseDTO
+
+<div class="content">
+    <div class="container">
+        <div class="row align-content-center justify-content-center">
+            @foreach (var p in PagedListDto.Items)
+            {
+                @ChildContent(p)
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public PagedListDto<T>? PagedListDto { get; set; }
+    [Parameter]
+    public RenderFragment<T>? ChildContent { get; set; }
+    [Parameter]
+    public ApiResponse<PagedListDto<T>> result { get; set; } = null;
+}

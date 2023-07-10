@@ -1,6 +1,4 @@
-﻿using MR.Service.ViewModels;
-
-namespace MR.Service.Features.SignaturePoolsFeatures.Queries;
+﻿namespace MR.Service.Features.SignaturePoolsFeatures.Queries;
 
 public class GetSignaturePoolsBySearchParamsQuery : QueryBase, IRequest<PagedList<SignaturePool>>
 {
@@ -11,13 +9,11 @@ public class GetSignaturePoolsBySearchParamsQuery : QueryBase, IRequest<PagedLis
 
     public class GetSignaturePoolsByQueryHandler : CommandQueryHandlerBase<GetSignaturePoolsBySearchParamsQuery, PagedList<SignaturePool>>
     {
-        public GetSignaturePoolsByQueryHandler(IApplicationDbContext context, ILogger<GetSignaturePoolsBySearchParamsQuery> logger) :
-            base(context, logger)
+        public GetSignaturePoolsByQueryHandler(IApplicationDbContext context, ILogger<GetSignaturePoolsBySearchParamsQuery> logger) : base(context, logger)
         {
         }
 
-        public override async Task<PagedList<SignaturePool>> Handle(GetSignaturePoolsBySearchParamsQuery request,
-            CancellationToken cancellationToken)
+        public override async Task<PagedList<SignaturePool>> Handle(GetSignaturePoolsBySearchParamsQuery request, CancellationToken cancellationToken)
         {
             var query = _context.SignaturePools
                 .Include(x=>x.Signatures).Include(x=>x.Quarter).Include(x=>x.ApplicationUser).AsQueryable();

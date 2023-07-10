@@ -1,4 +1,6 @@
-﻿namespace MR.Server.Mappings.SearchParamsMapping;
+﻿using MR.Domain.Auth;
+
+namespace MR.Server.Mappings.SearchParamsMapping;
 
 public static class SearchParamsExtension
 {
@@ -26,6 +28,18 @@ public static class SearchParamsExtension
         command.QuarterNumber = searchParams.QuarterNumber;
         command.QuarterYear = searchParams.QuarterYear;
         command.IsDeleted = searchParams.IsDeleted;
+
+        AddSearchParamsToCommand(command, searchParams);
+    }
+
+    public static void AddSignaturePoolsSearchParamsToCommand(GetSignaturePoolsBySearchParamsQuery command, SignaturePoolsSearchParamsDTO searchParams)
+    {
+        command.Year = searchParams.Year;
+        command.Quarter = searchParams.Quarter;
+        command.ApplicationUserId = searchParams.ApplicationUserId;
+        command.ApplicationUserEmail = searchParams.ApplicationUserEmail;
+        command.Begin = searchParams.Begin;
+        command.End = searchParams.End;
 
         AddSearchParamsToCommand(command, searchParams);
     }

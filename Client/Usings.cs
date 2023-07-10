@@ -24,3 +24,5 @@ global using MR.Shared.DTOs.SignaturePools;
 global using MR.Shared.DTOs.Issue;
 global using MR.Client.Features;
 global using Microsoft.AspNetCore.Components.Forms;
+global using Microsoft.AspNetCore.Components;
+global using MR.Shared.DTOs;
