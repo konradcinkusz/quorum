@@ -1,4 +1,9 @@
-﻿namespace MR.Service.UserManagement;
+﻿using Azure.Core;
+using MR.Domain.Auth;
+using System.Threading;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+
+namespace MR.Service.UserManagement;
 
 public class MRUserManager : UserManager<ApplicationUser>
 {
@@ -22,9 +27,27 @@ public class MRUserManager : UserManager<ApplicationUser>
         if (result.Succeeded)
         {
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-            CancellationToken token = cancellationTokenSource.Token;
-            await _context.Subscriptions.AddAsync(new Subscription { ApplicationUserId = user.Id }, token);
-            await _context.SaveChangesAsync(token);
+            CancellationToken cancellationToken = cancellationTokenSource.Token;
+            await _context.Subscriptions.AddAsync(new Subscription { ApplicationUserId = user.Id }, cancellationToken);
+            //sprawdz czy jest już dodany kwartał, jeżeli tak, to zainicjalizuj 
+            var quarterList = _context.Quarters.GetCurrentAndFutureQuarters();
+            foreach(var quarter in quarterList)
+            {
+                var signaturePool = new SignaturePool
+                {
+                    ApplicationUserId = user.Id,
+                    QuarterId = quarter.Id,
+                    Signatures = new List<Signature>()
+                };
+
+                for (int i = 0; i < quarter.PrimarySignatureCount; i++)
+                {
+                    signaturePool.Signatures.Add(new());
+                }
+
+                await _context.SignaturePools.AddAsync(signaturePool, cancellationToken);
+            }
+            await _context.SaveChangesAsync(cancellationToken);
         }
         return result;
     }

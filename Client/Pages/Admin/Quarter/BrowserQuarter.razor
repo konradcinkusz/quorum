@@ -1,12 +1,11 @@
-﻿@inherits BaseAdmin
+﻿@inherits Browser<QuarterSearchParamsDTO>
 
 <div class="row domain-search bg-green rounded row-spacing">
     <div class="container">
         <div class="row">
             <div class="col-md-12">
-                <div class="row g-3 mt-2">
+                <div class="row g-1 mt-2">
                     <div class="col-md-3 col-sm-12">
-                        <label for="year" class="text-white">Year</label>
                         <select id="year" class="form-control rounded-pill" @bind="SearchParams.Year" @bind:event="onchange">
                             <option value="">-- Select Year --</option>
                             <option value="2021">2021</option>
@@ -16,7 +15,6 @@
                         </select>
                     </div>
                     <div class="col-md-3 col-sm-12">
-                        <label for="quarter" class="text-white">Quarter</label>
                         <select id="quarter" class="form-control rounded-pill" @bind="SearchParams.Quarter" @bind:event="onchange">
                             <option value="">-- Select Quarter --</option>
                             <option value="1">Q1</option>
@@ -26,7 +24,7 @@
                         </select>
                     </div>
                     <div class="col-md-6 col-sm-12 text-end">
-                        <button type="submit" class="btn btn-outline-light btn-block rounded-pill" @onclick="ClearQuery"><span class="flex-center search">Clear</span></button>
+                        <button type="submit" class="btn btn-outline-light btn-block rounded-pill" @onclick="async () => await base.ClearQuery()"><span class="flex-center search">Clear</span></button>
                         <button type="submit" class="btn btn-outline-light btn-block rounded-pill" @onclick="async () => await Refresh.InvokeAsync()"><span class="flex-center search">Search</span></button>
                     </div>
                 </div>
@@ -34,30 +32,7 @@
         </div>
         <br />
         <div class="row">
-            <_Paging QueryBase="SearchParams"
-                     RefreshList="async () => await Refresh.InvokeAsync()"
-                     TotalPages="TotalPages"
-                     TotalItems="TotalItems"></_Paging>
+            <_Paging QueryBase="SearchParams" RefreshList="async () => await Refresh.InvokeAsync()" TotalPages="TotalPages" TotalItems="TotalItems" />
         </div>
     </div>
 </div>
-
-@code {
-    [Parameter]
-    public QuarterSearchParamsDTO SearchParams { get; set; }
-    [Parameter]
-    public EventCallback Refresh { get; set; }
-    [Parameter]
-    public int TotalPages { get; set; }
-    [Parameter]
-    public int TotalItems { get; set; } = 0;
-
-    async Task ClearQuery()
-    {
-        SearchParams.Begin = null;
-        SearchParams.End = null;
-        SearchParams.Year = null;
-        SearchParams.Quarter = null;
-        await Refresh.InvokeAsync();
-    }
-}

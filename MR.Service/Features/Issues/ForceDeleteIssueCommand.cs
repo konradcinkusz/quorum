@@ -1,5 +1,9 @@
 ﻿namespace MR.Service.Features.Issues;
 
+/// <summary>
+/// Delete od force delete różni się tym, że nie usuwamy powiązań -> patrz DeleteQuarter
+/// W force delete usuwamy wszystkie powiązane obiekty -> patrz na ForceDeleteIssueCommand
+/// </summary>
 public class ForceDeleteIssueCommand : IRequest<bool>
 {
     private readonly Guid _issueId;

@@ -1,4 +1,4 @@
-﻿namespace MR.Server.Controllers;
+﻿namespace MR.Server.Controllers.Admin;
 
 [Authorize(Policy = Policies.RequireAdminRole)]
 public class QuarterController : MRBaseController
@@ -17,20 +17,9 @@ public class QuarterController : MRBaseController
 
     [HttpPost("init-quarter")]
     public async Task<ActionResult<ApiResponse<Guid>>> InitQuarter([FromBody] InitQuarterDTO initQuarterDTO)
-    {
-        try
-        {
-            var result = await Mediator.Send(new InitQuarterCommand
-            {
-                Month = initQuarterDTO.Month,
-                Year = initQuarterDTO.Year,
-                SignaturesCount = initQuarterDTO.SignaturesCount
-            });
-            return new ApiResponse<Guid>(result);
-        }
-        catch (ApplicationException ex)
-        {
-            return new ApiResponse<Guid>() { Message = ex.Message };
-        }
-    }
+        => await HandleErrors(async () => await Mediator.Send(new InitQuarterCommand(initQuarterDTO.Year, initQuarterDTO.Month) { SignaturesCount = initQuarterDTO.SignaturesCount }));
+
+    [HttpDelete("delete-quarter/{id}")]
+    public async Task<ActionResult<ApiResponse<bool>>> ForceDeleteIssue([FromRoute] Guid id)
+        => await HandleErrors(async () => await Mediator.Send(new DeleteQuarterCommand(id)));
 }

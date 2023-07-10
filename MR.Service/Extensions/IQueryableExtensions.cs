@@ -1,16 +1,14 @@
-﻿namespace MR.Service.Extensions;
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace MR.Service.Extensions;
 
 internal static class IQueryableExtensions
 {
     public static IOrderedQueryable<T> OrderBy<T>(this IQueryable<T> source, string propertyName)
-    {
-        return source.OrderBy(ToLambda<T>(propertyName));
-    }
+        => source.OrderBy(ToLambda<T>(propertyName));
 
     public static IOrderedQueryable<T> OrderByDescending<T>(this IQueryable<T> source, string propertyName)
-    {
-        return source.OrderByDescending(ToLambda<T>(propertyName));
-    }
+        => source.OrderByDescending(ToLambda<T>(propertyName));
 
     private static Expression<Func<T, object>> ToLambda<T>(string propertyName)
     {

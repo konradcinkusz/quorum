@@ -12,7 +12,7 @@ public interface IAdminService
     Task<ApiResponse<SubscriptionPagedListDTO>> GetSubscriptionsBySearchParams(SubscriptionSearchParamsDTO query);
     Task<ApiResponse<string>> CreateOrEditSubscription(SubscriptionCreateForUserDTO SubscriptionDto);
     Task<ApiResponse<Guid>> InitQuarter(InitQuarterDTO quarter);
-    Task<ApiResponse<QuarterPagedListDTO>> GetQuarters(QuarterSearchParamsDTO searchParams);
+    Task<ApiResponse<PagedListDto<QuarterDTO>>> GetQuarters(QuarterSearchParamsDTO searchParams);
     Task<ApiResponse<SignaturePoolsPagedListDTO>> GetSignaturePoolsBySearchParams(SignaturePoolsSearchParamsDTO searchParams);
     Task<ApiResponse<bool>> UnpinSignatureFromIssue(Guid signatureId);
     Task<ApiResponse<bool>> RemoveSignature(Guid signatureId);
@@ -22,6 +22,7 @@ public interface IAdminService
     Task<ApiResponse<string>> GetUserEmailByUserId(string userId);
     Task<ApiResponse<bool>> VerifyIssue(Guid issueId);
     Task<ApiResponse<bool>> ForceDeleteIssue(Guid issueId);
+    Task<ApiResponse<bool>> DeleteQuarter(Guid issueId);
 }
 
 internal sealed class AdminService : DataServiceBase, IAdminService
@@ -29,6 +30,7 @@ internal sealed class AdminService : DataServiceBase, IAdminService
     private const string _adminControllerPath = $"{_apiVersion}Admin";
     private const string _adminSubscriptionControllerPath = $"{_apiVersion}AdminSubscription";
     private const string _adminIssueControllerPath = $"{_apiVersion}AdminIssue";
+    private const string _adminQuarterControllerPath = $"{_apiVersion}Quarter";
 
     public AdminService(HttpClient httpclient) : base(httpclient)
     {
@@ -38,8 +40,7 @@ internal sealed class AdminService : DataServiceBase, IAdminService
     {
         var q = BuildQuery(query);
         var endpoint = $"{_adminControllerPath}/get-admin-logs-by-query?{q}";
-        return await HandleResponse<AdminLogPagedListDTO>(async () =>
-            await _httpClient.GetAsync(endpoint));
+        return await HandleResponse<AdminLogPagedListDTO>(async () => await _httpClient.GetAsync(endpoint));
     }
 
     public async Task<ApiResponse<PaymentPagedListDTO>> SeedPayments(SeedPaymentRequest seedPaymentRequest)
@@ -57,7 +58,7 @@ internal sealed class AdminService : DataServiceBase, IAdminService
 
     public async Task<ApiResponse<Guid>> InitQuarter(InitQuarterDTO quarter)
     {
-        var endpoint = $"{_quarterControllerPath}/init-quarter";
+        var endpoint = $"{_adminQuarterControllerPath}/init-quarter";
 
         var response = await _httpClient.PostAsJsonAsync(endpoint, quarter);
 
@@ -76,22 +77,11 @@ internal sealed class AdminService : DataServiceBase, IAdminService
         return apiResponse;
     }
 
-    public async Task<ApiResponse<QuarterPagedListDTO>> GetQuarters(QuarterSearchParamsDTO searchParams)
+    public async Task<ApiResponse<PagedListDto<QuarterDTO>>> GetQuarters(QuarterSearchParamsDTO searchParams)
     {
         var q = BuildQuery(searchParams);
-
-        var response = await _httpClient.GetAsync($"{_quarterControllerPath}/get-quarters-by-search-params?{q}");
-
-        response.EnsureSuccessStatusCode();
-
-        var content = await response.Content.ReadAsStringAsync();
-
-        var result = JsonSerializer.Deserialize<ApiResponse<QuarterPagedListDTO>>(content, new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        });
-
-        return result ?? throw new Exception("Deserialized response is null.");
+        var endpoint = $"{_adminQuarterControllerPath}/get-quarters-by-search-params?{q}";
+        return await HandleResponse<PagedListDto<QuarterDTO>>(async () => await _httpClient.GetAsync(endpoint));
     }
 
     public async Task<ApiResponse<SignaturePoolsPagedListDTO>> GetSignaturePoolsBySearchParams(SignaturePoolsSearchParamsDTO searchParams)
@@ -189,6 +179,12 @@ internal sealed class AdminService : DataServiceBase, IAdminService
     public async Task<ApiResponse<bool>> ForceDeleteIssue(Guid issueId)
     {
         var endpoint = $"{_adminIssueControllerPath}/force-delete-issue/{issueId}";
+        return await HandleResponse<bool>(async () => await _httpClient.DeleteAsync(endpoint));
+    }
+
+    public async Task<ApiResponse<bool>> DeleteQuarter(Guid quarterId)
+    {
+        var endpoint = $"{_adminQuarterControllerPath}/delete-quarter/{quarterId}";
         return await HandleResponse<bool>(async () => await _httpClient.DeleteAsync(endpoint));
     }
 }

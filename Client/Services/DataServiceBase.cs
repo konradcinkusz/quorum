@@ -4,7 +4,6 @@ internal abstract class DataServiceBase
 {
     protected const string _apiVersion = @"/api/v1.0/";
     protected const string _subscriptionControllerPath = $"{_apiVersion}Subscription";
-    protected const string _quarterControllerPath = $"{_apiVersion}Quarter";
     protected const string _signaturePoolControllerPath = $"{_apiVersion}SignaturePool";
     protected const string _paymentControllerPath = $"{_apiVersion}Payment";
     protected const string _issueControllerPath = $"{_apiVersion}Issue";

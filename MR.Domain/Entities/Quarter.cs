@@ -9,4 +9,6 @@ public class Quarter : BaseEntity<Guid>
     //kwestie rozpatrywane w danym kwartale
     [InverseProperty(nameof(QuarterIssue.Quarter))]
     public ICollection<QuarterIssue> QuarterIssues { get; set; }
+
+    public int PrimarySignatureCount { get; set; }
 }

@@ -1,0 +1,49 @@
+﻿@inherits BaseAdmin
+@page "/admin/quarters"
+
+<_AuthorizationWrapper PageTitle="Issue list">
+    <_PagedListWrapper PagedListDto="QuarterPagedListDto" result="result">
+        <BrowserQuarter Refresh="_refresh" SearchParams="QuarterSearchParamsDTO" TotalPages="QuarterPagedListDto.TotalPages" TotalItems="QuarterPagedListDto.TotalItems" />
+        <HeaderQuarter Refresh="_refresh" SearchParams="QuarterSearchParamsDTO" />
+        <div class="content">
+            <div class="container">
+                <div class="row align-content-center justify-content-center">
+                    @foreach (var p in QuarterPagedListDto.Items)
+                    {
+                        <ReadQuarter DTO="p" Delete="Delete" />
+                    }
+                    @if (QuarterPagedListDto.Items.Count == 0)
+                    {
+                        <span>There is nothing to show...</span>
+                    }
+                </div>
+            </div>
+        </div>
+    </_PagedListWrapper>
+</_AuthorizationWrapper>
+
+@code {
+    private QuarterSearchParamsDTO QuarterSearchParamsDTO;
+    private PagedListDto<QuarterDTO>? QuarterPagedListDto;
+    private ApiResponse<PagedListDto<QuarterDTO>> result = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        QuarterSearchParamsDTO = new QuarterSearchParamsDTO();
+        await _refresh();
+    }
+
+    private async Task _refresh()
+    {
+        result = await adminService.GetQuarters(QuarterSearchParamsDTO);
+        QuarterPagedListDto = result.Data;
+        QuarterSearchParamsDTO.CurrentPage = QuarterPagedListDto.CurrentPage;
+        QuarterSearchParamsDTO.PageSize = QuarterPagedListDto.PageSize;
+    }
+
+    private async Task Delete(Guid quarterId)
+    {
+        await adminService.DeleteQuarter(quarterId);
+        await _refresh();
+    }
+}

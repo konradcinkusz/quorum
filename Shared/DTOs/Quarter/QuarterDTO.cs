@@ -1,11 +1,10 @@
 ﻿namespace MR.Shared.DTOs.Quarter;
 
-public class QuarterDTO
+public class QuarterDTO : BaseDTO
 {
-    public Guid Id { get; set; }
     public int Year { get; set; }
     public int QuarterNumber { get; set; }
-    public DateTime CreatedAt { get; set; }
     public List<IssueReadDTO> Issues { get; set; } = new List<IssueReadDTO>();
     public List<SignaturePoolDTO> SignaturePools { get; set; } = new List<SignaturePoolDTO>();
+    public int PrimarySignatureCount { get; set; }
 }

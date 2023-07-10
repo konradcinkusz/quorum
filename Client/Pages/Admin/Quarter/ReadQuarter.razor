@@ -1,0 +1,46 @@
+﻿@inherits Read
+
+<div class="card m-1 p-1">
+    <div class="row mb-3">
+        <div class="col-sm-2">
+            <p class="form-control-plaintext" id="Quarter-id">@DTO.Id</p>
+        </div>
+        <div class="col-sm-1">
+            <p class="form-control-plaintext" id="user-email">@DTO.PrimarySignatureCount</p>
+        </div>
+        <div class="col-sm-2">
+            <p class="form-control-plaintext" id="user-email">@DTO.QuarterNumber</p>
+        </div>
+        <div class="col-sm-2">
+            <p class="form-control-plaintext" id="Quarter-value">@DTO.Year</p>
+        </div>
+        <div class="col-sm-2">
+            <p class="form-control-plaintext" id="Quarter-createdat">@DTO.CreatedAt</p>
+        </div>
+        <div class="col-sm-3">
+            <div class="btn-group my-2" role="group">
+                <button class="btn btn-primary btn-sm" type="button" @onclick="ToggleDetails">@ShowDetailsButtonText</button>
+                @if (Delete.HasDelegate)
+                {
+                    <button class="btn btn-danger btn-sm m-1" type="button" @onclick="@(async () => await Delete.InvokeAsync(DTO.Id))">Delete</button>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="@DetailsCssClass">
+        <hr />
+        <h5>Quarter Details</h5>
+        <dl class="row mb-3">
+            <dt class="col-sm-3">Issues count:</dt>
+            <dd class="col-sm-9">@DTO.Issues.Count</dd>
+        </dl>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public QuarterDTO DTO { get; set; }
+    [Parameter]
+    public EventCallback<Guid> Delete { get; set; }
+}
