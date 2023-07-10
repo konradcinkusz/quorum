@@ -13,7 +13,7 @@ public interface IAdminService
     Task<ApiResponse<string>> CreateOrEditSubscription(SubscriptionCreateForUserDTO SubscriptionDto);
     Task<ApiResponse<Guid>> InitQuarter(InitQuarterDTO quarter);
     Task<ApiResponse<PagedListDto<QuarterDTO>>> GetQuarters(QuarterSearchParamsDTO searchParams);
-    Task<ApiResponse<PagedListDto<SignaturePoolDTO>>> GetSignaturePoolsBySearchParams(SignaturePoolsSearchParamsDTO searchParams);
+    Task<ApiResponse<PagedListDto<SignaturePoolAdminDTO>>> GetSignaturePoolsBySearchParams(SignaturePoolAdminSearchParamsDTO searchParams);
     Task<ApiResponse<bool>> UnpinSignatureFromIssue(Guid signatureId);
     Task<ApiResponse<bool>> RemoveSignature(Guid signatureId);
     Task<ApiResponse<bool>> AddSignatureToSignaturePool(Guid signaturePoolId);
@@ -30,7 +30,7 @@ internal sealed class AdminService : DataServiceBase, IAdminService
     private const string _adminControllerPath = $"{_apiVersion}Admin";
     private const string _adminSubscriptionControllerPath = $"{_apiVersion}AdminSubscription";
     private const string _adminIssueControllerPath = $"{_apiVersion}AdminIssue";
-    private const string _adminQuarterControllerPath = $"{_apiVersion}Quarter";
+    private const string _adminQuarterControllerPath = $"{_apiVersion}AdminQuarter";
     private const string _adminAdminSignaturePoolControllerPath = $"{_apiVersion}AdminSignaturePool";
 
     public AdminService(HttpClient httpclient) : base(httpclient)
@@ -53,29 +53,13 @@ internal sealed class AdminService : DataServiceBase, IAdminService
     public async Task<ApiResponse<string>> CreateOrEditSubscription(SubscriptionCreateForUserDTO SubscriptionDto)
     {
         var endpoint = $"{_adminSubscriptionControllerPath}/create-or-edit-subscription";
-        return await HandleResponse<string>(async () =>
-            await _httpClient.PostAsJsonAsync(endpoint, SubscriptionDto));
+        return await HandleResponse<string>(async () => await _httpClient.PostAsJsonAsync(endpoint, SubscriptionDto));
     }
 
     public async Task<ApiResponse<Guid>> InitQuarter(InitQuarterDTO quarter)
     {
         var endpoint = $"{_adminQuarterControllerPath}/init-quarter";
-
-        var response = await _httpClient.PostAsJsonAsync(endpoint, quarter);
-
-        if (!response.IsSuccessStatusCode)
-        {
-            // Handle error response
-        }
-
-        var apiResponse = await response.Content.ReadFromJsonAsync<ApiResponse<Guid>>();
-
-        if (apiResponse == null)
-        {
-            apiResponse = new ApiResponse<Guid> { Data = Guid.Empty, Message = "The response is empty" };
-        }
-
-        return apiResponse;
+        return await HandleResponse<Guid>(async () => await _httpClient.PostAsJsonAsync(endpoint, quarter));
     }
 
     public async Task<ApiResponse<PagedListDto<QuarterDTO>>> GetQuarters(QuarterSearchParamsDTO searchParams)
@@ -85,11 +69,11 @@ internal sealed class AdminService : DataServiceBase, IAdminService
         return await HandleResponse<PagedListDto<QuarterDTO>>(async () => await _httpClient.GetAsync(endpoint));
     }
 
-    public async Task<ApiResponse<PagedListDto<SignaturePoolDTO>>> GetSignaturePoolsBySearchParams(SignaturePoolsSearchParamsDTO searchParams)
+    public async Task<ApiResponse<PagedListDto<SignaturePoolAdminDTO>>> GetSignaturePoolsBySearchParams(SignaturePoolAdminSearchParamsDTO searchParams)
     {
         var q = BuildQuery(searchParams);
         var endpoint = $"{_adminAdminSignaturePoolControllerPath}/get-signature-pools-by-search-params?{q}";
-        return await HandleResponse<PagedListDto<SignaturePoolDTO>>(async () => await _httpClient.GetAsync(endpoint));
+        return await HandleResponse<PagedListDto<SignaturePoolAdminDTO>>(async () => await _httpClient.GetAsync(endpoint));
     }
 
     public async Task<ApiResponse<bool>> UnpinSignatureFromIssue(Guid signatureId)
@@ -127,9 +111,9 @@ internal sealed class AdminService : DataServiceBase, IAdminService
     public async Task<ApiResponse<SubscriptionPagedListDTO>> GetSubscriptionsThatCouldBeActivate()
     {
         var endpoint = $"{_adminSubscriptionControllerPath}/get-subscriptions-that-could-be-activated";
-        return await HandleResponse<SubscriptionPagedListDTO>(
-            async () => await _httpClient.GetAsync(endpoint));
+        return await HandleResponse<SubscriptionPagedListDTO>(async () => await _httpClient.GetAsync(endpoint));
     }
+
     public async Task<ApiResponse<SubscriptionPagedListDTO>> GetSubscriptionsThatCouldBeDeactivate()
     {
         var endpoint = $"{_adminSubscriptionControllerPath}/get-subscriptions-that-could-be-deactivated";
@@ -159,8 +143,7 @@ internal sealed class AdminService : DataServiceBase, IAdminService
     {
         var q = BuildQuery(query);
         var endpoint = $"{_adminSubscriptionControllerPath}/get-subscriptions-by-search-params?{q}";
-        return await HandleResponse<SubscriptionPagedListDTO>(async () =>
-            await _httpClient.GetAsync(endpoint));
+        return await HandleResponse<SubscriptionPagedListDTO>(async () => await _httpClient.GetAsync(endpoint));
     }
 
     public async Task<ApiResponse<string>> GetUserEmailByUserId(string userId)

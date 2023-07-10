@@ -32,7 +32,7 @@ public static class SearchParamsExtension
         AddSearchParamsToCommand(command, searchParams);
     }
 
-    public static void AddSignaturePoolsSearchParamsToCommand(GetSignaturePoolsBySearchParamsQuery command, SignaturePoolsSearchParamsDTO searchParams)
+    public static void AddSignaturePoolsSearchParamsToCommand(GetSignaturePoolsBySearchParamsQuery command, SignaturePoolAdminSearchParamsDTO searchParams)
     {
         command.Year = searchParams.Year;
         command.Quarter = searchParams.Quarter;

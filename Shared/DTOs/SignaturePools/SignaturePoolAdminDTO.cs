@@ -1,6 +1,6 @@
 ﻿namespace MR.Shared.DTOs.SignaturePools;
 
-public class SignaturePoolDTO : BaseDTO
+public class SignaturePoolAdminDTO : BaseDTO
 {
     public string ApplicationUserId { get; set; }
     public string ApplicationUserEmail { get; set; }

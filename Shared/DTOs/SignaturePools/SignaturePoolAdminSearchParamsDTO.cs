@@ -1,6 +1,6 @@
 ﻿namespace MR.Shared.DTOs.SignaturePools;
 
-public class SignaturePoolsSearchParamsDTO : SearchParamsDTO
+public class SignaturePoolAdminSearchParamsDTO : SearchParamsDTO
 {
     public string? ApplicationUserId { get; set; }
     public string? ApplicationUserEmail { get; set; }

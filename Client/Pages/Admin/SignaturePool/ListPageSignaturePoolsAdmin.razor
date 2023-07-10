@@ -1,4 +1,4 @@
-﻿@inherits ListPageBase<SignaturePoolDTO, SignaturePoolsSearchParamsDTO>
+﻿@inherits ListPageBase<SignaturePoolAdminDTO, SignaturePoolAdminSearchParamsDTO>
 @attribute [Authorize(Policy = "AdminRoles")]
 @inject IAdminService adminService
 @page "/admin/signature-pools"
@@ -14,8 +14,8 @@
 </_AuthorizationWrapper>
 
 @code {
-    protected override void InitializeSearchParams() => searchParamsDTO = new SignaturePoolsSearchParamsDTO();
+    protected override void InitializeSearchParams() => searchParamsDTO = new SignaturePoolAdminSearchParamsDTO();
 
-    protected override async Task<ApiResponse<PagedListDto<SignaturePoolDTO>>> Get(SignaturePoolsSearchParamsDTO searchParamsDTO)
+    protected override async Task<ApiResponse<PagedListDto<SignaturePoolAdminDTO>>> Get(SignaturePoolAdminSearchParamsDTO searchParamsDTO)
         => await adminService.GetSignaturePoolsBySearchParams(searchParamsDTO);
 }

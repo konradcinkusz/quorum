@@ -1,9 +1,9 @@
 ﻿namespace MR.Server.Controllers.Admin;
 
 [Authorize(Policy = Policies.RequireAdminRole)]
-public class QuarterController : MRBaseController
+public class AdminQuarterController : MRBaseController
 {
-    public QuarterController(IMapper mapper) : base(mapper)
+    public AdminQuarterController(IMapper mapper) : base(mapper)
     {
     }
 

@@ -8,11 +8,11 @@ public class AdminSignaturePoolController : MRBaseController
     }
 
     [HttpGet("get-signature-pools-by-search-params")]
-    public async Task<ActionResult<ApiResponse<PagedListDto<SignaturePoolDTO>>>> GetSignaturePoolsBySearchParams([FromQuery] SignaturePoolsSearchParamsDTO searchParams)
+    public async Task<ActionResult<ApiResponse<PagedListDto<SignaturePoolAdminDTO>>>> GetSignaturePoolsBySearchParams([FromQuery] SignaturePoolAdminSearchParamsDTO searchParams)
     {
         var command = new GetSignaturePoolsBySearchParamsQuery();
         SearchParamsExtension.AddSignaturePoolsSearchParamsToCommand(command, searchParams);
-        return await ProcessPagedRequest<GetSignaturePoolsBySearchParamsQuery, SignaturePoolDTO, SignaturePool>(command);
+        return await ProcessPagedRequest<GetSignaturePoolsBySearchParamsQuery, SignaturePoolAdminDTO, SignaturePool>(command);
     }
 
     [HttpPost("add-signature-to-signature-pool")]
