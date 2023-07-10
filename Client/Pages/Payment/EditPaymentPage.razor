@@ -81,7 +81,8 @@ else
 
     private async Task UpdatePayment()
     {
-        var result = await paymentService.UpdatePayment(new PaymentUpdateDTO(paymentDto));
-        paymentEdited = !string.IsNullOrWhiteSpace(result);
+        Guid.TryParse(id, out Guid resultGuid);
+        var result = await paymentService.UpdatePayment(resultGuid, new PaymentUpdateDTO(paymentDto));
+        paymentEdited = result.Data > 0;
     }
 }

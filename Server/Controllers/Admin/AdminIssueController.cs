@@ -28,7 +28,7 @@ public sealed class AdminIssueController : MRBaseController
     [HttpPut("edit-issue-by-admin/{id}")]
     public async Task<ActionResult<ApiResponse<int>>> EditIssueByAdmin([FromRoute] Guid id, [FromBody] IssueAdminCreateDTO dto)
     {
-        var idR = await Mediator.Send(new EditIssueCommand(id)
+        var changedPropertiesCount = await Mediator.Send(new EditIssueCommand(id)
         {
             IssueVisibility = (IssueVisibility)dto.IssueVisibility,
             IssueProcess = (IssueProcess)dto.IssueProcess,
@@ -39,7 +39,7 @@ public sealed class AdminIssueController : MRBaseController
             Icon = dto.Icon,
             BackgroundColor = dto.BackgroundColor,
         });
-        return new ApiResponse<int> { Data = idR };
+        return new ApiResponse<int> { Data = changedPropertiesCount };
     }
 
     [HttpPut("verify-issue/{id}")]

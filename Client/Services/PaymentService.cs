@@ -4,7 +4,7 @@ public interface IPaymentService
 {
     Task<string> CreatePayment(PaymentCreateDTO paymentDto);
     Task<PaymentDTO> GetPayment(Guid id);
-    Task<string> UpdatePayment(PaymentUpdateDTO paymentUpdateDTO);
+    Task<ApiResponse<int>> UpdatePayment(Guid id, PaymentUpdateDTO paymentUpdateDTO);
     Task<ApiResponse<PagedListDto<PaymentDTO>>> GetPaymentsBySearchParams(PaymentSearchParamsDTO searchParams);
     Task<ApiResponse<bool>> AcceptPayment(Guid paymentId);
     Task<ApiResponse<bool>> AcceptIssueInitialPayment(Guid paymentId);
@@ -59,15 +59,10 @@ internal class PaymentService : DataServiceBase, IPaymentService
         return await HandleResponse<PagedListDto<PaymentDTO>>(async () => await _httpClient.GetAsync(endpoint));
     }
 
-    public async Task<string> UpdatePayment(PaymentUpdateDTO paymentUpdateDTO)
+    public async Task<ApiResponse<int>> UpdatePayment(Guid id, PaymentUpdateDTO paymentUpdateDTO)
     {
-        var response = await _httpClient.PutAsJsonAsync($"{_paymentControllerPath}/edit-payment/{paymentUpdateDTO.Id}", paymentUpdateDTO);
-        if (!response.IsSuccessStatusCode)
-        {
-            throw new ApplicationException(await response.Content.ReadAsStringAsync());
-        }
-
-        return response.Headers.Location.Segments.Last();
+        var endpoint = $"{_paymentControllerPath}/edit-payment/{id}";
+        return await HandleResponse<int>(async () => await _httpClient.PutAsJsonAsync(endpoint, paymentUpdateDTO));
     }
 
     public async Task<ApiResponse<bool>> SetPaymentStatus(Guid paymentId, PaymentStatusEnum paymentStatus)

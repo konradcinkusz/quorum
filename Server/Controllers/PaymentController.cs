@@ -48,35 +48,17 @@ public class PaymentController : MRBaseController
     }
 
     [HttpPut("edit-payment/{id}")]
-    public async Task<IActionResult> EditPayment([FromRoute] Guid id, [FromBody] PaymentUpdateDTO paymentDto)
+    public async Task<ActionResult<ApiResponse<int>>> EditPayment([FromRoute] Guid id, [FromBody] PaymentUpdateDTO paymentDto)
     {
-        if (id != paymentDto.Id)
+        var changedPropertiesCount = await Mediator.Send(new EditPaymentCommand(id)
         {
-            return BadRequest("Payment ID mismatch");
-        }
-
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
-
-        EditPaymentCommand command = _mapper.Map<EditPaymentCommand>(paymentDto);
-        command.ApplicationUserId = GetUserId();
-        command.PaymentId = id;
-
-        try
-        {
-            var propertiesChangedCount = await Mediator.Send(command);
-            return CreatedAtAction(nameof(GetPayment), new { id = propertiesChangedCount }, null);
-        }
-        catch (NotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, ex.Message);
-        }
+            ApplicationUserId = paymentDto.ApplicationUserId,
+            ReferenceNumber = paymentDto.ReferenceNumber,
+            PaymentMethod = paymentDto.PaymentMethod,
+            PaymentStatus = (PaymentStatus?)paymentDto.PaymentStatus,
+            PaymentValuePLN = paymentDto.PaymentValuePLN
+        });
+        return new ApiResponse<int> { Data = changedPropertiesCount };
     }
 
     [HttpPut("accept-payment/{id}")]

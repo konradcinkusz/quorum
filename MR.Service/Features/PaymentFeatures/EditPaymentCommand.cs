@@ -2,12 +2,17 @@
 
 public class EditPaymentCommand : IRequest<int>
 {
-    public Guid? PaymentId { get; set; }
+    private readonly Guid _paymentId;
     public PaymentStatus? PaymentStatus { get; set; }
     public string? ApplicationUserId { get; set; }
     public decimal? PaymentValuePLN { get; set; }
     public string? PaymentMethod { get; set; } // the payment method used (e.g. credit card, PayPal, etc.)
     public string? ReferenceNumber { get; set; }// a reference number associated with the payment (e.g. transaction ID)
+
+    public EditPaymentCommand(Guid paymentId)
+    {
+        _paymentId = paymentId;
+    }
 
     internal class EditPaymentCommandHandler : CommandHandlerBase<EditPaymentCommand, int>
     {
@@ -20,7 +25,7 @@ public class EditPaymentCommand : IRequest<int>
         {
             var payment = await _context.Payments
                 .Include(p => p.PaymentStatusHistories).
-                FirstOrDefaultAsync(p => p.Id == request.PaymentId);
+                FirstOrDefaultAsync(p => p.Id == request._paymentId, cancellationToken);
 
             if (payment != null)
             {
