@@ -1,5 +1,7 @@
 ﻿@inherits ListPageBase<PublicPublishedIssueRead, PublicPublishedIssueSearchParamsDTO>
 @inject IPublicService publicService
+@inject ISignatureService signatureService
+@inject IIssueService issueService
 @inject NavigationManager navigationManager
 @page "/issue/published-issues"
 
@@ -8,9 +10,18 @@
         <_CustomPublishedIssueCard dto="@context" ShowButtons="true" ShowStatus="true">
             @if (!context.Id.IsNullOrEmpty())
             {
-                <button type="button" @onclick="@(async () => await SignIssue(context.Id))" class="btn btn-primary rounded-pill m-1" data-bs-toggle="tooltip">
-                    Sign
-                </button>
+                if (context.SignedByCurrentUser)
+                {
+                    <button type="button" @onclick="@(async () => await UnsignIssue(context.Id))" class="btn btn-danger rounded-pill m-1" data-bs-toggle="tooltip">
+                        Unsign
+                    </button>
+                }
+                else
+                {
+                    <button type="button" @onclick="@(async () => await SignIssue(context.Id))" class="btn btn-primary rounded-pill m-1" data-bs-toggle="tooltip">
+                        Sign
+                    </button>
+                }
             }
         </_CustomPublishedIssueCard>
     </_ForEachPagedListWrapper>
@@ -35,19 +46,27 @@
     protected override void InitializeSearchParams() => searchParamsDTO = new PublicPublishedIssueSearchParamsDTO();
 
     protected override async Task<ApiResponse<PagedListDto<PublicPublishedIssueRead>>> Get(PublicPublishedIssueSearchParamsDTO searchParamsDTO)
-        => await publicService.GetMyIssuesBySearchParams(searchParamsDTO);
-
-    private async Task SignIssue(Guid id)
     {
-        var authState = await AuthTask;
-        if (!authState.User.Identity.IsAuthenticated)
-        {
-            navigationManager.NavigateTo("/authentication/login");
-        }
+        if (AuthHelper.IsLogged(await AuthTask, navigationManager))
+            return await issueService.GetCurrentQuarterIssues(searchParamsDTO);
+        return await publicService.GetCurrentQuarterIssues(searchParamsDTO);
+    }
 
-        if (!id.IsNullOrEmpty() && isActiveSubscription)
+    private async Task SignIssue(Guid issueId)
+    {
+        if (AuthHelper.IsLogged(await AuthTask, navigationManager) && !issueId.IsNullOrEmpty() && isActiveSubscription)
         {
-            throw new NotImplementedException();
+            await signatureService.SignIssue(issueId);
+            await Refresh();
+        }
+    }
+
+    private async Task UnsignIssue(Guid issueId)
+    {
+        if (AuthHelper.IsLogged(await AuthTask, navigationManager) && !issueId.IsNullOrEmpty())
+        {
+            await signatureService.UnsignIssue(issueId);
+            await Refresh();
         }
     }
 }

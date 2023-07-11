@@ -35,4 +35,12 @@ internal static class QuarterExtensions
         var currentQuarter = (currentDate.Month - 1) / 3 + 1;
         return x => x.Year == currentYear && x.QuarterNumber == currentQuarter;
     }
+
+    public static bool CheckCurrentQuarter(Quarter quarter)
+    {
+        var currentDate = DateTime.UtcNow;
+        var currentYear = currentDate.Year;
+        var currentQuarter = (currentDate.Month - 1) / 3 + 1;
+        return quarter.Year == currentYear && quarter.QuarterNumber == currentQuarter;
+    }
 }

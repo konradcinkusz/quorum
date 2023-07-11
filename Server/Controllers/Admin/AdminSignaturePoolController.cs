@@ -25,5 +25,5 @@ public class AdminSignaturePoolController : MRBaseController
 
     [HttpPost("unpin-signature-from-issue")]
     public async Task<ActionResult<ApiResponse<bool>>> UnpinSignatureFromIssue([FromBody] Guid signatureId)
-        => await HandleErrors(async () => await Mediator.Send(new UnpinSignatureFromIssueCommand { SignatureId = signatureId }), "Unpinning issue from signature");
+        => await HandleErrors(async () => await Mediator.Send(new UnpinSignatureFromIssueCommand(signatureId)), "Unpinning issue from signature");
 }

@@ -1,4 +1,5 @@
 ﻿TODO:
-Dodać obsługę publikowania kwestii
+
 DONE:
+Dodać obsługę publikowania kwestii
 Poprawić kontroler public async Task<IActionResult> EditPayment([FromRoute] Guid id, [FromBody] PaymentUpdateDTO paymentDto)

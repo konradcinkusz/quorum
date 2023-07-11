@@ -14,4 +14,14 @@ public static class AuthHelper
         var email = user.Claims.FirstOrDefault(x => x.Type == "name")?.Value ?? string.Empty;
         return new Tuple<bool, string>(isActiveSubscription, email);
     }
+
+    public static bool IsLogged(AuthenticationState? authState, NavigationManager navigationManager)
+    {
+        if (!authState.User.Identity.IsAuthenticated)
+        {
+            navigationManager.NavigateTo("/authentication/login");
+            return false;
+        }
+        return true;
+    }
 }

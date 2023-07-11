@@ -98,8 +98,7 @@ internal sealed class AdminService : DataServiceBase, IAdminService
     {
         var q = BuildQuery(searchParams);
         var endpoint = $"{_adminIssueControllerPath}/get-issues-by-search-params-admin?{q}";
-        return await HandleResponse<PagedListDto<IssueReadDTO>>(async () =>
-        await _httpClient.GetAsync(endpoint));
+        return await HandleResponse<PagedListDto<IssueReadDTO>>(async () => await _httpClient.GetAsync(endpoint));
     }
 
     public async Task<ApiResponse<Guid>> CreateIssue(IssueAdminCreateDTO issueDTO)
@@ -117,8 +116,7 @@ internal sealed class AdminService : DataServiceBase, IAdminService
     public async Task<ApiResponse<SubscriptionPagedListDTO>> GetSubscriptionsThatCouldBeDeactivate()
     {
         var endpoint = $"{_adminSubscriptionControllerPath}/get-subscriptions-that-could-be-deactivated";
-        return await HandleResponse<SubscriptionPagedListDTO>(async () =>
-        await _httpClient.GetAsync(endpoint));
+        return await HandleResponse<SubscriptionPagedListDTO>(async () => await _httpClient.GetAsync(endpoint));
     }
 
     public async Task<ApiResponse<SubscriptionPagedListDTO>> ActivateSubscriptions()

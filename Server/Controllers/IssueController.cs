@@ -16,7 +16,7 @@ public sealed class IssueController : MRBaseController
     }
 
     [AllowAnonymous]
-    [HttpGet("get-current-quarter-published")]
+    [HttpGet("get-current-quarter-issues-published")]
     public async Task<ActionResult<ApiResponse<PagedListDto<PublicPublishedIssueRead>>>> GetCurrentQuarterPublishedIssues([FromQuery] PublicPublishedIssueSearchParamsDTO searchParams)
     {
         var command = new GetCurrentQuarterPublishedIssues();
@@ -25,7 +25,16 @@ public sealed class IssueController : MRBaseController
         searchParams.PageSize = 100;
         searchParams.CurrentPage = 1;
         SearchParamsExtension.AddPublicPublishedIssueSearchParamsToCommand(command, searchParams);
-        return await ProcessPagedRequest<GetCurrentQuarterPublishedIssues, PublicPublishedIssueRead, Issue>(command);
+        var request = await ProcessPagedRequest<GetCurrentQuarterPublishedIssues, PublicPublishedIssueRead, Issue>(command);
+
+        string currentUserId = GetUserId();
+        if (!string.IsNullOrWhiteSpace(currentUserId) && request.Value != null)
+        {
+            var signedIssue = await Mediator.Send(new GetSignedIssueByUser(currentUserId));
+            request.Value.Data.Items.ForEach(x => x.SignedByCurrentUser = signedIssue.Any(y => x.Id == y));
+        }
+
+        return request;
     }
 
     [HttpGet("get-issue-by-id-for-edit")]
@@ -45,17 +54,17 @@ public sealed class IssueController : MRBaseController
     }
 
     [HttpPut("publish-issue/{id}")]
-    public async Task<ActionResult<ApiResponse<bool>>> PublishIssue([FromRoute] Guid id) 
+    public async Task<ActionResult<ApiResponse<bool>>> PublishIssue([FromRoute] Guid id)
         => await HandleErrors(async () => await Mediator.Send(new PublishIssueCommand(GetUserId(), id)));
 
     [HttpPut("pay-for-an-issue/{id}")]
     public async Task<ActionResult<ApiResponse<bool>>> PayForAnIssue([FromRoute] Guid id, [FromBody] IssuePayDTO issuePayDTO)
         => await HandleErrors(async () => await Mediator.Send(new PayForAnIssueCommand(GetUserId(), id)
-            {
-                PaymentMethod = issuePayDTO.PaymentMethod,
-                ReferenceNumber = issuePayDTO.ReferenceNumber,
-                PaymentValue = issuePayDTO.PaymentValue,
-            }));
+        {
+            PaymentMethod = issuePayDTO.PaymentMethod,
+            ReferenceNumber = issuePayDTO.ReferenceNumber,
+            PaymentValue = issuePayDTO.PaymentValue,
+        }));
 
     [HttpPut("edit-issue/{id}")]
     public async Task<ActionResult<ApiResponse<int>>> EditIssue([FromRoute] Guid id, [FromBody] IssueCreateDTO issueDTO)

@@ -34,6 +34,11 @@ public static partial class DependencyInjection
             .AddHttpClient<ISignaturePoolService, SignaturePoolService>(MRSignaturePoolDataService, client => client.BaseAddress = baseAddress)
             .AddHttpMessageHandler<BaseAddressAuthorizationMessageHandler>();
 
+        const string MRSignatureDataService = "MR.ServerAPI.Signature";
+        service
+            .AddHttpClient<ISignatureService, SignatureService>(MRSignatureDataService, client => client.BaseAddress = baseAddress)
+            .AddHttpMessageHandler<BaseAddressAuthorizationMessageHandler>();
+
         // Supply HttpClient instances that include access tokens when making requests to the server project
         //builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient(MRPaymentDataService));
         //builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient(MRAuthorizedDataService));

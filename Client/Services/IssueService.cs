@@ -9,7 +9,8 @@ public interface IIssueService
     Task<ApiResponse<IssueReadDTO>> GetIssueByIdForEdit(Guid id);
     Task<ApiResponse<bool>> PublishIssue(Guid issueId);
     Task<ApiResponse<bool>> PayForAnIssue(Guid issueId, IssuePayDTO issuePayDTO);
-    Task<ApiResponse<bool>> ArchiveIssue(Guid issueId);
+    Task<ApiResponse<bool>> ArchiveIssue(Guid issueId); 
+    Task<ApiResponse<PagedListDto<PublicPublishedIssueRead>>> GetCurrentQuarterIssues(PublicPublishedIssueSearchParamsDTO searchParams);
 }
 
 internal class IssueService : DataServiceBase, IIssueService
@@ -68,5 +69,12 @@ internal class IssueService : DataServiceBase, IIssueService
     {
         var endpoint = $"{_issueControllerPath}/archive-issue/{issueId}";
         return await HandleResponse<bool>(async () => await _httpClient.DeleteAsync(endpoint));
+    }
+
+    public async Task<ApiResponse<PagedListDto<PublicPublishedIssueRead>>> GetCurrentQuarterIssues(PublicPublishedIssueSearchParamsDTO searchParams)
+    {
+        var q = BuildQuery(searchParams);
+        var endpoint = $"{_issueControllerPath}/get-current-quarter-issues-published?{q}";
+        return await HandleResponse<PagedListDto<PublicPublishedIssueRead>>(async () => await _httpClient.GetAsync(endpoint));
     }
 }

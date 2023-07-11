@@ -2,7 +2,7 @@
 
 public interface IPublicService
 {
-    Task<ApiResponse<PagedListDto<PublicPublishedIssueRead>>> GetMyIssuesBySearchParams(PublicPublishedIssueSearchParamsDTO searchParams);
+    Task<ApiResponse<PagedListDto<PublicPublishedIssueRead>>> GetCurrentQuarterIssues(PublicPublishedIssueSearchParamsDTO searchParams);
 }
 
 internal class PublicService : DataServiceBase, IPublicService
@@ -11,10 +11,10 @@ internal class PublicService : DataServiceBase, IPublicService
     {
     }
 
-    public async Task<ApiResponse<PagedListDto<PublicPublishedIssueRead>>> GetMyIssuesBySearchParams(PublicPublishedIssueSearchParamsDTO searchParams)
+    public async Task<ApiResponse<PagedListDto<PublicPublishedIssueRead>>> GetCurrentQuarterIssues(PublicPublishedIssueSearchParamsDTO searchParams)
     {
         var q = BuildQuery(searchParams);
-        var endpoint = $"{_issueControllerPath}/get-current-quarter-published?{q}";
+        var endpoint = $"{_issueControllerPath}/get-current-quarter-issues-published?{q}";
         return await HandleResponse<PagedListDto<PublicPublishedIssueRead>>(async () => await _httpClient.GetAsync(endpoint));
     }
 }

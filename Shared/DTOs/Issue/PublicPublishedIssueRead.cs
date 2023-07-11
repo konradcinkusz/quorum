@@ -8,4 +8,5 @@ public class PublicPublishedIssueRead : BaseDTO
     public int RatingValue { get; set; } = 0;
     public string? Icon { get; set; }
     public string? BackgroundColor { get; set; }
+    public bool SignedByCurrentUser { get; set; } = false;
 }
