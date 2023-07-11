@@ -1,12 +1,11 @@
-using MR.Client.DI;
-
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddTransient<RoleAuthorizationMessageHandler>();
 
-builder.Services.InitializeHTTPDataServices(new Uri(builder.HostEnvironment.BaseAddress));
+builder.Services.InitializePrivateHTTPDataServices(new Uri(builder.HostEnvironment.BaseAddress));
+builder.Services.InitializePublicHTTPDataServices(new Uri(builder.HostEnvironment.BaseAddress));
 
 builder.Services.AddApiAuthorization();
 builder.Services.AddAuthorizationCore(options => {

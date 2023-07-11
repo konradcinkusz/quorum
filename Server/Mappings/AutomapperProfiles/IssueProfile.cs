@@ -21,5 +21,10 @@ public class IssueProfile : Profile
             .ForMember(dest => dest.ApplicationUserId, opt => opt.MapFrom(src => src.CreatedBy != null ? src.CreatedBy.Id : string.Empty))
             .ForMember(dest => dest.ApplicationUserEmail, opt => opt.MapFrom(src => src.CreatedBy != null ? src.CreatedBy.Email : string.Empty))
             .PreserveReferences();
+
+        CreateMap<Issue, PublicPublishedIssueRead>()
+            .ForMember(dest => dest.ApplicationUserEmail, opt => opt.MapFrom(src => src.CreatedBy != null ? src.CreatedBy.Email : string.Empty))
+            .PreserveReferences();
     }
 }
+

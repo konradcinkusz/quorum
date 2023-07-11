@@ -26,3 +26,4 @@ global using MR.Client.Features;
 global using Microsoft.AspNetCore.Components.Forms;
 global using Microsoft.AspNetCore.Components;
 global using MR.Shared.DTOs;
+global using MR.Client.DI;

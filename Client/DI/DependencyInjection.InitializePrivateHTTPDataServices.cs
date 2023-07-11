@@ -1,8 +1,8 @@
 ﻿namespace MR.Client.DI;
 
-public static class DependencyInjection
+public static partial class DependencyInjection
 {
-    public static IServiceCollection InitializeHTTPDataServices(this IServiceCollection service, Uri baseAddress)
+    public static IServiceCollection InitializePrivateHTTPDataServices(this IServiceCollection service, Uri baseAddress)
     {
         service.AddTransient<RoleAuthorizationMessageHandler>();
 
@@ -41,5 +41,4 @@ public static class DependencyInjection
 
         return service;
     }
-
 }

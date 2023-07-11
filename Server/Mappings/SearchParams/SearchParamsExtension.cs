@@ -1,4 +1,6 @@
-﻿namespace MR.Server.Mappings.SearchParamsMapping;
+﻿using MR.Service.Features.Issues.Queries;
+
+namespace MR.Server.Mappings.SearchParamsMapping;
 
 public static class SearchParamsExtension
 {
@@ -27,6 +29,11 @@ public static class SearchParamsExtension
         command.QuarterYear = searchParams.QuarterYear;
         command.IsDeleted = searchParams.IsDeleted;
 
+        AddSearchParamsToCommand(command, searchParams);
+    }
+
+    public static void AddPublicPublishedIssueSearchParamsToCommand(GetCurrentQuarterPublishedIssues command, PublicPublishedIssueSearchParamsDTO searchParams)
+    {
         AddSearchParamsToCommand(command, searchParams);
     }
 

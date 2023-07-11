@@ -1,4 +1,5 @@
-﻿using MR.Service.UserManagement;
+﻿using MR.Service.Features.Issues.Base;
+using MR.Service.UserManagement;
 
 namespace MR.Service.Features.Issues;
 

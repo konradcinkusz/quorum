@@ -1,4 +1,4 @@
-﻿namespace MR.Service;
+﻿namespace MR.Service.DI;
 
 public static class DependencyInjection
 {
@@ -18,11 +18,11 @@ public static class DependencyInjection
     }
 
     public static IServiceCollection AddDbContextService(
-        this IServiceCollection services, 
+        this IServiceCollection services,
         IConfiguration configuration,
         ConfigurationVariableNames? configurationVariableNames = default)
     {
-        if(configurationVariableNames == null)
+        if (configurationVariableNames == null)
         {
             configurationVariableNames = new ConfigurationVariableNames();
         }

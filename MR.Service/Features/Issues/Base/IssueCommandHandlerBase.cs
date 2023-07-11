@@ -1,6 +1,6 @@
 ﻿using MR.Service.UserManagement;
 
-namespace MR.Service.Features.Issues;
+namespace MR.Service.Features.Issues.Base;
 
 public interface IIssueCommandData
 {

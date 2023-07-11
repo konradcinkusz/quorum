@@ -1,6 +1,4 @@
-﻿using MR.Server.Controllers.Base;
-
-namespace MR.Server.Controllers;
+﻿namespace MR.Server.Controllers;
 
 [Authorize]
 public sealed class IssueController : MRBaseController
@@ -15,6 +13,19 @@ public sealed class IssueController : MRBaseController
         var command = new GetIssuesBySearchParamsQuery();
         SearchParamsExtension.AddIssueSearchParamsToCommand(command, searchParams);
         return await ProcessPagedRequest<GetIssuesBySearchParamsQuery, IssueReadDTO, Issue>(command);
+    }
+
+    [AllowAnonymous]
+    [HttpGet("get-current-quarter-published")]
+    public async Task<ActionResult<ApiResponse<PagedListDto<PublicPublishedIssueRead>>>> GetCurrentQuarterPublishedIssues([FromQuery] PublicPublishedIssueSearchParamsDTO searchParams)
+    {
+        var command = new GetCurrentQuarterPublishedIssues();
+        searchParams.SortColumn = "Rating";
+        searchParams.SortOrder = SortOrder.Descending;
+        searchParams.PageSize = 100;
+        searchParams.CurrentPage = 1;
+        SearchParamsExtension.AddPublicPublishedIssueSearchParamsToCommand(command, searchParams);
+        return await ProcessPagedRequest<GetCurrentQuarterPublishedIssues, PublicPublishedIssueRead, Issue>(command);
     }
 
     [HttpGet("get-issue-by-id-for-edit")]

@@ -1,4 +1,4 @@
-﻿namespace MR.Service.Features.Issues;
+﻿namespace MR.Service.Features.Issues.Queries;
 
 public class GetIssuesBySearchParamsQuery : QueryBase, IRequest<PagedList<Issue>>
 {
@@ -14,7 +14,8 @@ public class GetIssuesBySearchParamsQuery : QueryBase, IRequest<PagedList<Issue>
     public int? QuarterYear { get; set; }
     public int? QuarterNumber { get; set; }
     public bool? IsDeleted { get; set; } = false;
-    public class GetIssuesBySearchParamsQueryHandler : CommandQueryHandlerBase<GetIssuesBySearchParamsQuery, PagedList<Issue>>
+
+    internal class GetIssuesBySearchParamsQueryHandler : CommandQueryHandlerBase<GetIssuesBySearchParamsQuery, PagedList<Issue>>
     {
         public GetIssuesBySearchParamsQueryHandler(IApplicationDbContext context, ILogger<GetIssuesBySearchParamsQuery> logger) : base(context, logger)
         {

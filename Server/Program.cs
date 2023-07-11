@@ -1,6 +1,3 @@
-using MR.Server;
-using MR.Service.UserManagement;
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContextService(builder.Configuration);

@@ -1,4 +1,4 @@
-﻿namespace MR.Service.Features.Issues;
+﻿namespace MR.Service.Features.Issues.Queries;
 
 public class GetIssueByIdForEdit : IRequest<Issue>
 {
@@ -23,7 +23,7 @@ public class GetIssueByIdForEdit : IRequest<Issue>
                 .Include(x => x.IssueVisibilityHistories)
                 .Include(x => x.IssueProcessingHistories)
                 .Include(x => x.CreatedBy)
-                .FirstAsync(x=>x.Id == request.Id, cancellationToken);
+                .FirstAsync(x => x.Id == request.Id, cancellationToken);
         }
     }
 }

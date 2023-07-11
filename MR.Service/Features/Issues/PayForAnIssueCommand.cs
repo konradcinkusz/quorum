@@ -1,4 +1,6 @@
-﻿namespace MR.Service.Features.Issues;
+﻿using MR.Service.Features.Issues.Base;
+
+namespace MR.Service.Features.Issues;
 
 public class PayForAnIssueCommand : IRequest<bool>, IIssueCommandData
 {

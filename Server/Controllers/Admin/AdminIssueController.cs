@@ -1,4 +1,6 @@
-﻿namespace MR.Server.Controllers.Admin;
+﻿using MR.Service.Features.Issues.Queries;
+
+namespace MR.Server.Controllers.Admin;
 
 [Authorize(Policy = Constants.Policies.RequireAdminRole)]
 public sealed class AdminIssueController : MRBaseController
