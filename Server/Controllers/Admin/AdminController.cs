@@ -1,8 +1,6 @@
-﻿using MR.Service.ViewModels;
+﻿namespace MR.Server.Controllers.Admin;
 
-namespace MR.Server.Controllers.Admin;
-
-[Authorize(Policy = Policies.RequireAdminRole)]
+[Authorize(Policy = Constants.Policies.RequireAdminRole)]
 public class AdminController : MRBaseController
 {
     public AdminController(IMapper mapper) : base(mapper)

@@ -1,4 +1,4 @@
-﻿namespace MR.Client;
+﻿namespace MR.Client.DI;
 
 public static class DependencyInjection
 {
@@ -27,6 +27,11 @@ public static class DependencyInjection
         const string MRIssueDataService = "MR.ServerAPI.Issue";
         service
             .AddHttpClient<IIssueService, IssueService>(MRIssueDataService, client => client.BaseAddress = baseAddress)
+            .AddHttpMessageHandler<BaseAddressAuthorizationMessageHandler>();
+
+        const string MRSignaturePoolDataService = "MR.ServerAPI.SignaturePool";
+        service
+            .AddHttpClient<ISignaturePoolService, SignaturePoolService>(MRSignaturePoolDataService, client => client.BaseAddress = baseAddress)
             .AddHttpMessageHandler<BaseAddressAuthorizationMessageHandler>();
 
         // Supply HttpClient instances that include access tokens when making requests to the server project

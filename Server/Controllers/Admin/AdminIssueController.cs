@@ -1,6 +1,6 @@
 ﻿namespace MR.Server.Controllers.Admin;
 
-[Authorize(Policy = Policies.RequireAdminRole)]
+[Authorize(Policy = Constants.Policies.RequireAdminRole)]
 public sealed class AdminIssueController : MRBaseController
 {
     public AdminIssueController(IMapper mapper) : base(mapper)

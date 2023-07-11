@@ -1,6 +1,6 @@
 ﻿namespace MR.Server.Controllers.Admin;
 
-[Authorize(Policy = Policies.RequireAdminRole)]
+[Authorize(Policy = Constants.Policies.RequireAdminRole)]
 public class AdminSubscriptionController : MRBaseController
 {
     public AdminSubscriptionController(IMapper mapper) : base(mapper)

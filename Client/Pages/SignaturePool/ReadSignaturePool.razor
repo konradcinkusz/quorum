@@ -1,0 +1,49 @@
+﻿@inherits Read
+
+<div class="card m-1 p-1">
+    <div class="row mb-3">
+        <div class="col-sm-3">
+            <p class="form-control-plaintext" id="Quarter-id">@UserSignaturePool.Year</p>
+        </div>
+        <div class="col-sm-3">
+            <p class="form-control-plaintext" id="Quarter-id">@UserSignaturePool.QuarterNumber</p>
+        </div>
+        <div class="col-sm-3">
+            <p class="form-control-plaintext" id="Quarter-createdat">@UserSignaturePool.CreatedAt</p>
+        </div>
+        <div class="col-sm-3">
+            <div class="btn-group my-2" role="group">
+                <button class="btn btn-primary btn-sm" type="button" @onclick="ToggleDetails">@ShowDetailsButtonText</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="@DetailsCssClass">
+        <hr />
+        <h5>Details</h5>
+        <dl class="row mb-3">
+            <dt class="col-sm-3">Id</dt>
+            <dd class="col-sm-9">@UserSignaturePool.Id</dd>
+
+            <dt class="col-sm-3">Signatures count</dt>
+            <dd class="col-sm-9">@UserSignaturePool.SignatureDTOs.Count</dd>
+
+            <dt class="col-sm-3">Signed</dt>
+            <dd class="col-sm-9 separator-line">@UserSignaturePool.SignatureDTOs.Where(x=>x.IssueDTO != null).Count()</dd>
+
+            @foreach (var signature in UserSignaturePool.SignatureDTOs)
+            {
+                <dt class="col-sm-3">Signed issue</dt>
+                <dd class="col-sm-9">@(signature.IssueDTO != null ? "singed" : "null")</dd>
+            }
+        </dl>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public UserSignaturePool UserSignaturePool { get; set; }
+
+    [Parameter]
+    public EventCallback Refresh { get; set; }
+}

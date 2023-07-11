@@ -1,0 +1,12 @@
+﻿@inherits Header
+
+<div class="header-card">
+    <div class="header-row mb-3">
+        <_HeaderButton Name="Year" Width="3" SearchParams="SearchParams" Refresh="async () => await Refresh.InvokeAsync()" />
+        <_HeaderButton Name="Month" Width="3" SearchParams="SearchParams" Refresh="async () => await Refresh.InvokeAsync()" />
+        <_HeaderButton Name="CreatedAt" Width="3" SearchParams="SearchParams" Refresh="async () => await Refresh.InvokeAsync()" />
+        <div class="col-sm-3">
+            Actions:
+        </div>
+    </div>
+</div>

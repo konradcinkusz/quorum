@@ -18,7 +18,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Pages\SignaturePool\" />
     <Folder Include="wwwroot\js\" />
   </ItemGroup>
 

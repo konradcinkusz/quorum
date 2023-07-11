@@ -1,4 +1,4 @@
-﻿namespace MR.Server;
+﻿namespace MR.Server.Controllers.Base;
 
 [Route(Constants.RouteValues.AdvanceAPIRoute)]
 [ApiController]

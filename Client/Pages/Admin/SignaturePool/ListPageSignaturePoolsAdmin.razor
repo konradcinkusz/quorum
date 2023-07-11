@@ -5,10 +5,10 @@
 
 <_AuthorizationWrapper PageTitle="Signature pools list">
     <_PagedListWrapper PagedListDto="PagedListDTO" result="apiResponse">
-        <BrowserSignaturePools Refresh="Refresh" SearchParams="searchParamsDTO" TotalPages="PagedListDTO.TotalPages" TotalItems="PagedListDTO.TotalItems" />
-        <HeaderSignaturePools Refresh="Refresh" SearchParams="searchParamsDTO" />
+        <BrowserAdminSignaturePools Refresh="Refresh" SearchParams="searchParamsDTO" TotalPages="PagedListDTO.TotalPages" TotalItems="PagedListDTO.TotalItems" />
+        <HeaderAdminSignaturePools Refresh="Refresh" SearchParams="searchParamsDTO" />
         <_ForEachPagedListWrapper PagedListDto="PagedListDTO" result="apiResponse">
-            <ReadSignaturePool SignaturePool="@context" Refresh="Refresh" />
+            <ReadSignaturePoolAdmin SignaturePool="@context" Refresh="Refresh" />
         </_ForEachPagedListWrapper>
     </_PagedListWrapper>
 </_AuthorizationWrapper>

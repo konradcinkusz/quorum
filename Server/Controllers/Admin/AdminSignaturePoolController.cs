@@ -1,6 +1,6 @@
 ﻿namespace MR.Server.Controllers.Admin;
 
-[Authorize(Policy = Policies.RequireAdminRole)]
+[Authorize(Policy = Constants.Policies.RequireAdminRole)]
 public class AdminSignaturePoolController : MRBaseController
 {
     public AdminSignaturePoolController(IMapper mapper) : base(mapper)
@@ -11,7 +11,7 @@ public class AdminSignaturePoolController : MRBaseController
     public async Task<ActionResult<ApiResponse<PagedListDto<SignaturePoolAdminDTO>>>> GetSignaturePoolsBySearchParams([FromQuery] SignaturePoolAdminSearchParamsDTO searchParams)
     {
         var command = new GetSignaturePoolsBySearchParamsQuery();
-        SearchParamsExtension.AddSignaturePoolsSearchParamsToCommand(command, searchParams);
+        SearchParamsExtension.AddSignaturePoolAdminSearchParamsToCommand(command, searchParams);
         return await ProcessPagedRequest<GetSignaturePoolsBySearchParamsQuery, SignaturePoolAdminDTO, SignaturePool>(command);
     }
 

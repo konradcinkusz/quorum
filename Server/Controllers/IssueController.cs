@@ -1,4 +1,6 @@
-﻿namespace MR.Server.Controllers;
+﻿using MR.Server.Controllers.Base;
+
+namespace MR.Server.Controllers;
 
 [Authorize]
 public sealed class IssueController : MRBaseController

@@ -1,6 +1,4 @@
-﻿using MR.Domain.Auth;
-
-namespace MR.Server.Mappings.SearchParamsMapping;
+﻿namespace MR.Server.Mappings.SearchParamsMapping;
 
 public static class SearchParamsExtension
 {
@@ -32,7 +30,7 @@ public static class SearchParamsExtension
         AddSearchParamsToCommand(command, searchParams);
     }
 
-    public static void AddSignaturePoolsSearchParamsToCommand(GetSignaturePoolsBySearchParamsQuery command, SignaturePoolAdminSearchParamsDTO searchParams)
+    public static void AddSignaturePoolAdminSearchParamsToCommand(GetSignaturePoolsBySearchParamsQuery command, SignaturePoolAdminSearchParamsDTO searchParams)
     {
         command.Year = searchParams.Year;
         command.Quarter = searchParams.Quarter;
@@ -40,6 +38,15 @@ public static class SearchParamsExtension
         command.ApplicationUserEmail = searchParams.ApplicationUserEmail;
         command.Begin = searchParams.Begin;
         command.End = searchParams.End;
+
+        AddSearchParamsToCommand(command, searchParams);
+    }
+
+    public static void AddSignaturePoolSearchParamsToCommand(GetUserSignaturePools command, SignaturePoolSearchParamsDTO searchParams, string applicationUserId)
+    {
+        command.Year = searchParams.Year;
+        command.Quarter = searchParams.Quarter;
+        command.ApplicationUserId = applicationUserId;
 
         AddSearchParamsToCommand(command, searchParams);
     }

@@ -8,11 +8,10 @@ public class SignaturePoolController : MRBaseController
     }
 
     [HttpGet("get-my-signature-pools")]
-    public async Task<ActionResult<ApiResponse<PagedListDto<SignaturePoolAdminDTO>>>> GetMySignaturePools([FromQuery] SignaturePoolAdminSearchParamsDTO searchParams)
+    public async Task<ActionResult<ApiResponse<PagedListDto<UserSignaturePool>>>> GetMySignaturePools([FromQuery] SignaturePoolSearchParamsDTO searchParamsDTO)
     {
-        var command = new GetSignaturePoolsBySearchParamsQuery();
-        AddSearchParamsToCommand(command, searchParams);
-        command.ApplicationUserId = GetUserId();
-        return await ProcessPagedRequest<GetSignaturePoolsBySearchParamsQuery, SignaturePoolAdminDTO, SignaturePool>(command);
+        var command = new GetUserSignaturePools();
+        SearchParamsExtension.AddSignaturePoolSearchParamsToCommand(command, searchParamsDTO, GetUserId());
+        return await ProcessPagedRequest<GetUserSignaturePools, UserSignaturePool, SignaturePool>(command);
     }
 }

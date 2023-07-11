@@ -36,9 +36,9 @@ builder.Services.AddAuthentication()
 //https://stackoverflow.com/a/73930254/4510954
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy(Policies.RequireAdminRole, policy =>
+    options.AddPolicy(Constants.Policies.RequireAdminRole, policy =>
     {
-        policy.RequireClaim(ClaimTypes.Role, new[] { "Admin", "SuperAdmin" });
+        policy.RequireClaim(ClaimTypes.Role, new[] { Constants.Claims.Admin, Constants.Claims.SuperAdmin });
     });
 });
 
