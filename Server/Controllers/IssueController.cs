@@ -20,7 +20,7 @@ public sealed class IssueController : MRBaseController
     public async Task<ActionResult<ApiResponse<PagedListDto<PublicPublishedIssueRead>>>> GetCurrentQuarterPublishedIssues([FromQuery] PublicPublishedIssueSearchParamsDTO searchParams)
     {
         var command = new GetCurrentQuarterPublishedIssues();
-        searchParams.SortColumn = "Rating";
+        searchParams.SortColumn = "RatingValue";
         searchParams.SortOrder = SortOrder.Descending;
         searchParams.PageSize = 100;
         searchParams.CurrentPage = 1;

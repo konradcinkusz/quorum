@@ -1,13 +1,9 @@
-﻿using MR.Service.Features.Issues.Base;
-using MR.Service.UserManagement;
-
-namespace MR.Service.Features.Issues;
+﻿namespace MR.Service.Features.Issues;
 
 public class PublishIssueCommand : IRequest<bool>, IIssueCommandData
 {
     public string CreatedById { get; }
     public Guid IssueId { get; }
-
     public PublishIssueCommand(string createdById, Guid issueId)
     {
         CreatedById = createdById;
@@ -16,8 +12,7 @@ public class PublishIssueCommand : IRequest<bool>, IIssueCommandData
 
     public class PublishIssueCommandHandler : IssueCommandHandlerBase<PublishIssueCommand, bool>
     {
-        public PublishIssueCommandHandler(
-            MRUserManager MRUserManager, IApplicationDbContext context, ILogger<PublishIssueCommand> logger) : base(MRUserManager, context, logger)
+        public PublishIssueCommandHandler(MRUserManager MRUserManager, IApplicationDbContext context, ILogger<PublishIssueCommand> logger) : base(MRUserManager, context, logger)
         {
         }
 
@@ -35,22 +30,21 @@ public class PublishIssueCommand : IRequest<bool>, IIssueCommandData
                 throw new ApplicationException("Your issue hasn't been verified by admin yet.");
             }
 
-            var currentDate = DateTime.UtcNow;
-            //get current Quarter
-            var quarter = await _context.Quarters.FirstAsync(x => x.Year == currentDate.Year && x.QuarterNumber == currentDate.Month.GetQuarter());
-            
-            if(quarter == null)
+            var quarter = await _context.Quarters.FirstOrDefaultAsync(QuarterExtensions.GetCurrentQuarterExpression(), cancellationToken);
+            if (quarter == null)
             {
                 throw new ApplicationException("No current quarter has been initialized yet. Contact with Admin");
             }
-            
+
+            issue.IssueProcess = IssueProcess.Published;
+            issue.IssueProcessingHistories = new List<IssueProcessingHistory>() { new IssueProcessingHistory { IssueProcess = IssueProcess.Publishing }, new IssueProcessingHistory { IssueProcess = IssueProcess.Published } };
+
             issue.IssueVisibility = IssueVisibility.VisibleForAll;
+            issue.IssueVisibilityHistories = new List<IssueVisibilityHistory>() { new IssueVisibilityHistory() { IssueVisibility = IssueVisibility.VisibleForAll } };
 
-            issue.QuarterIssues.Add(new QuarterIssue { IssueId = issue.Id, QuarterId = quarter.Id });
+            _ = await _context.QuarterIssues.AddAsync(new QuarterIssue { Issue = issue, Quarter = quarter }, cancellationToken);
 
-            var sum = await _context.SaveChangesAsync(cancellationToken);
-
-            return sum > 0;
+            return await _context.SaveChangesAsync(cancellationToken) > 0;
         }
     }
 }

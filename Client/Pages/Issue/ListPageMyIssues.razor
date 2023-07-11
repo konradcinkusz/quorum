@@ -17,6 +17,11 @@
                 <hr />
                 <_ApiResponse T="PagedListDto<IssueReadDTO>" result="result" />
             }
+            @if (published != null && !published.Success)
+            {
+                <hr />
+                <_ApiResponse T="bool" result="published" />
+            }
             @if (IssuePagedListDto.Items.Count == 0)
             {
                 <hr />
@@ -31,9 +36,7 @@
                         <div class="row align-content-center justify-content-center">
                             @foreach (var dto in IssuePagedListDto.Items)
                             {
-                                <_CustomIssueCard dto="dto"
-                                                  ShowButtons="true"
-                                                  ShowStatus="true">
+                                <_CustomIssueCard dto="dto" ShowButtons="true" ShowStatus="true">
 
                                     @if (!dto.Id.IsNullOrEmpty())
                                     {

@@ -26,3 +26,4 @@ global using MR.Service.Features.PaymentFeatures;
 global using MR.Service.RequestHandling;
 global using MR.Service.ViewModels;
 global using MR.Service.UserManagement;
+global using MR.Service.Features.Issues.Base;

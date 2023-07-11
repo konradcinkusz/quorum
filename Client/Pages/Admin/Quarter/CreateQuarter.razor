@@ -21,9 +21,16 @@
                 </div>
 
                 <div class="col-md-12 mb-4">
-                    <label for="month-value" class="form-label">Month</label>
-                    <InputNumber id="month-value" class="form-control rounded-pill" @bind-Value="@dto.Month" required />
-                    <ValidationMessage For="@(() => dto.Month)" />
+                    <label for="quarter" class="form-label">Quarter</label>
+                    <div class="col-md-3 col-sm-12">
+                        <select id="quarter" class="form-control rounded-pill" @bind="dto.QuarterNumber" @bind:event="onchange">
+                            <option value="1">Q1</option>
+                            <option value="2">Q2</option>
+                            <option value="3">Q3</option>
+                            <option value="4">Q4</option>
+                        </select>
+                    </div>
+                    <ValidationMessage For="@(() => dto.QuarterNumber)" />
                 </div>
 
                 <div class="col-md-12 mb-4">

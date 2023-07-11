@@ -17,7 +17,7 @@ public class AdminQuarterController : MRBaseController
 
     [HttpPost("init-quarter")]
     public async Task<ActionResult<ApiResponse<Guid>>> InitQuarter([FromBody] InitQuarterDTO initQuarterDTO)
-        => await HandleErrors(async () => await Mediator.Send(new InitQuarterCommand(initQuarterDTO.Year, initQuarterDTO.Month) { SignaturesCount = initQuarterDTO.SignaturesCount }));
+        => await HandleErrors(async () => await Mediator.Send(new InitQuarterCommand(initQuarterDTO.Year, initQuarterDTO.QuarterNumber) { SignaturesCount = initQuarterDTO.SignaturesCount }));
 
     [HttpDelete("delete-quarter/{id}")]
     public async Task<ActionResult<ApiResponse<bool>>> ForceDeleteIssue([FromRoute] Guid id)
