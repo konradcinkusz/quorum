@@ -1,0 +1,58 @@
+﻿@inherits BaseAdmin
+@page "/admin/recalculate-issue-rating"
+
+<_AuthorizationWrapper PageTitle="Issue recalculated list">
+
+    <div class="car MRCard">
+        <div class="form-group MRForm-group">
+            Here you can recalculate rating for current published issues
+        </div>
+        <button class="btn btn-primary MRBtn" @onclick="Recalculate">Recalculate</button>
+    </div>
+    @if (result != null)
+    {
+        <_ApiResponse T="PagedListDto<IssueAdminRatingValueCalculate>" result="result" />
+    }
+    @if (IssuePagedListDto != null)
+    {
+        <_PagedListWrapper PagedListDto="IssuePagedListDto" result="result">
+            <div class="content">
+                <div class="container">
+                    <div class="row align-content-center justify-content-center">
+                        @foreach (var dto in IssuePagedListDto.Items)
+                        {
+                            <div class="card m-1 p-1">
+                                <div class="row mb-3">
+                                    <div class="col-sm-4">
+                                        <p class="form-control-plaintext" id="Quarter-id">@dto.RatingValue</p>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <p class="form-control-plaintext" id="Quarter-id">@dto.Id</p>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <p class="form-control-plaintext" id="Quarter-id">@dto.Title.Truncate(5)</p>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        @if (IssuePagedListDto.Items.Count == 0)
+                        {
+                            <span>There is nothing to show...</span>
+                        }
+                    </div>
+                </div>
+            </div>
+        </_PagedListWrapper>
+    }
+</_AuthorizationWrapper>
+
+@code {
+    private PagedListDto<IssueAdminRatingValueCalculate>? IssuePagedListDto;
+    private ApiResponse<PagedListDto<IssueAdminRatingValueCalculate>> result = null;
+
+    private async Task Recalculate()
+    {
+        result = await adminService.CalculatePublishedIssueRatingForCurrentQuarter();
+        IssuePagedListDto = result.Data;
+    }
+}

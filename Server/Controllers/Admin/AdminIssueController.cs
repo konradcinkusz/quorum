@@ -1,6 +1,4 @@
-﻿using MR.Service.Features.Issues.Queries;
-
-namespace MR.Server.Controllers.Admin;
+﻿namespace MR.Server.Controllers.Admin;
 
 [Authorize(Policy = Constants.Policies.RequireAdminRole)]
 public sealed class AdminIssueController : MRBaseController
@@ -63,4 +61,11 @@ public sealed class AdminIssueController : MRBaseController
     [HttpDelete("force-delete-issue/{id}")]
     public async Task<ActionResult<ApiResponse<bool>>> ForceDeleteIssue([FromRoute] Guid id)
         => await HandleErrors(async () => await Mediator.Send(new ForceDeleteIssueCommand(id)));
+
+    [HttpPut("calculate-rating-for-published-issues")]
+    public async Task<ActionResult<ApiResponse<PagedListDto<IssueAdminRatingValueCalculate>>>> CalculatePublishedIssueRatingForCurrentQuarter()
+    {
+        var command = new CalculatePublishedIssueRatingForCurrentQuarter();
+        return await ProcessPagedRequest<CalculatePublishedIssueRatingForCurrentQuarter, IssueAdminRatingValueCalculate, Issue>(command);
+    }
 }

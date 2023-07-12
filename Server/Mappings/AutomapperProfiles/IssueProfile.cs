@@ -23,6 +23,8 @@ public class IssueProfile : Profile
             .ForMember(dest => dest.QuarterDTOs, opt => opt.MapFrom(src => src.QuarterIssues.Select(x => x.Quarter)))
             .PreserveReferences();
 
+        CreateMap<Issue, IssueAdminRatingValueCalculate>();
+
         CreateMap<Issue, PublicPublishedIssueRead>()
             .ForMember(dest => dest.ApplicationUserEmail, opt => opt.MapFrom(src => src.CreatedBy != null ? src.CreatedBy.Email : string.Empty))
             .PreserveReferences();

@@ -9,4 +9,3 @@ global using MR.Domain.Enum;
 global using MR.Persistence.Seeds;
 global using MR.Domain.Constants;
 global using Microsoft.EntityFrameworkCore.ChangeTracking;
-global using MR.Domain.Base;

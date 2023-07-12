@@ -46,6 +46,8 @@ public class AcceptIssueInitialPaymentCommand : IRequest<bool>
 
             issue.IssueProcess = IssueProcess.InAdminVerification;
 
+            _ = await _context.IssueRatingHistories.AddAsync(new IssueRatingHistory() { Issue = issue, Value = payment.PaymentValuePLN, Action= RatingAction.InitialPayment, RelatedObject = $"PaymentId: {request.PaymentId}" }, cancellationToken);
+
             int result = await _context.SaveChangesAsync(cancellationToken);
 
             return result > 0;

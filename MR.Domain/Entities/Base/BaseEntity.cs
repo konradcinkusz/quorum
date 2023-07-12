@@ -1,4 +1,4 @@
-﻿namespace MR.Domain.Base;
+﻿namespace MR.Domain.Entities.Base;
 
 public abstract class BaseEntity
 {
@@ -13,6 +13,7 @@ public abstract class BaseEntity<Tkey> : BaseEntity where Tkey : IEquatable<Tkey
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public virtual Tkey Id { get; set; }
 }
+
 public abstract class BaseEntityLog
 {
     [Key]

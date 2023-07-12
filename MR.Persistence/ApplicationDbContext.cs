@@ -1,4 +1,6 @@
-﻿namespace MR.Persistence;
+﻿using MR.Domain.Entities.Base;
+
+namespace MR.Persistence;
 
 public interface IApplicationDbContext
 {
@@ -13,6 +15,7 @@ public interface IApplicationDbContext
     DbSet<IssueProcessingHistory> IssueProcessingHistories { get; set; }
     DbSet<IssueVisibilityHistory> IssueVisibilityHistories { get; set; }
     DbSet<QuarterIssue> QuarterIssues { get; set; }
+    DbSet<IssueRatingHistory> IssueRatingHistories { get; set; }
 
     DbSet<TEntity> Set<TEntity>() where TEntity : class;
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
@@ -37,6 +40,7 @@ public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>, 
     public DbSet<IssueProcessingHistory> IssueProcessingHistories { get; set; }
     public DbSet<IssueVisibilityHistory> IssueVisibilityHistories { get; set; }
     public DbSet<QuarterIssue> QuarterIssues { get; set; }
+    public DbSet<IssueRatingHistory> IssueRatingHistories { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

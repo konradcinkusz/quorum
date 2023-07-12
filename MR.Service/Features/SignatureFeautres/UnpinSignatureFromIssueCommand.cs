@@ -17,14 +17,19 @@ public class UnpinSignatureFromIssueCommand : IRequest<bool>
         public override async Task<bool> Handle(UnpinSignatureFromIssueCommand request, CancellationToken cancellationToken)
         {
             bool result = false;
-            var signature = await _context.Signatures.FirstOrDefaultAsync(x => x.Id == request._signatureId, cancellationToken);
+            var signature = await _context.Signatures.Include(x => x.Issue).FirstOrDefaultAsync(x => x.Id == request._signatureId, cancellationToken);
 
             if (signature != null)
             {
+                var issue = signature.Issue;
+                if (issue != null)
+                {
+                    _ = await _context.IssueRatingHistories.AddAsync(new IssueRatingHistory() { Issue = issue, Value = -1, Action = RatingAction.UnpinSignatureByAdmin, RelatedObject = $"Signature: {request._signatureId} unpinned by admin from the IssueId: {issue.Id}" }, cancellationToken);
+                }
+
                 signature.Issue = null;
                 result = await _context.SaveChangesAsync(cancellationToken) > 0;
             }
-
             return result;
         }
     }

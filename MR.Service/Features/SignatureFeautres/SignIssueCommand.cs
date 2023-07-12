@@ -49,6 +49,9 @@ public class SignIssueCommand : IRequest<bool>
             }
 
             signature.Issue = issue;
+
+            _ = await _context.IssueRatingHistories.AddAsync(new IssueRatingHistory() { Issue = issue, Value = 1, Action = RatingAction.UserSign, RelatedObject = $"IssueId: {request._issueId} signed by userId: {request._applicationUserId}" }, cancellationToken);
+
             return await _context.SaveChangesAsync(cancellationToken) > 0;
         }
     }

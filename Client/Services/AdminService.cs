@@ -23,6 +23,7 @@ public interface IAdminService
     Task<ApiResponse<bool>> VerifyIssue(Guid issueId);
     Task<ApiResponse<bool>> ForceDeleteIssue(Guid issueId);
     Task<ApiResponse<bool>> DeleteQuarter(Guid issueId);
+    Task<ApiResponse<PagedListDto<IssueAdminRatingValueCalculate>>> CalculatePublishedIssueRatingForCurrentQuarter();
 }
 
 internal sealed class AdminService : DataServiceBase, IAdminService
@@ -167,5 +168,11 @@ internal sealed class AdminService : DataServiceBase, IAdminService
     {
         var endpoint = $"{_adminQuarterControllerPath}/delete-quarter/{quarterId}";
         return await HandleResponse<bool>(async () => await _httpClient.DeleteAsync(endpoint));
+    }
+
+    public async Task<ApiResponse<PagedListDto<IssueAdminRatingValueCalculate>>> CalculatePublishedIssueRatingForCurrentQuarter()
+    {
+        var endpoint = $"{_adminIssueControllerPath}/calculate-rating-for-published-issues";
+        return await HandleResponse<PagedListDto<IssueAdminRatingValueCalculate>>(async () => await _httpClient.PutAsync(endpoint, null));
     }
 }

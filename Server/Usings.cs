@@ -42,3 +42,4 @@ global using MR.Server.Controllers.Base;
 global using MR.Service.Features.Issues.Queries;
 global using MR.Service.DI;
 global using MR.Service.UserManagement;
+global using MR.Shared.DTOs.Issue.Admin;

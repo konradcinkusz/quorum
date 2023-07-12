@@ -13,13 +13,15 @@ public class Issue : BaseEntity<Guid>
     public IssueVisibility IssueVisibility { get; set; } = IssueVisibility.NotVisible;
     //bazujac na tym statusie ustawiamy widocznosc
     public IssueProcess IssueProcess { get; set; } = IssueProcess.InCreation;
-    //Rating value na podstawie którego okreslamy miejsce w top10
-    public int RatingValue { get; set; } = 0;
+    
+    public decimal RatingValue { get; set; } = 0;
+    [InverseProperty(nameof(IssueRatingHistory.Issue))]
+    public ICollection<IssueRatingHistory> IssueRatingHistories { get; set; }
 
     [ForeignKey(nameof(InitialPayment))]
     public Guid? InitialPaymentId { get; set; }
     public Payment? InitialPayment { get; set; }
-    
+
     public string? Icon { get; set; }
     public string? BackgroundColor { get; set; }
 

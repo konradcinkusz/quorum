@@ -28,6 +28,12 @@ public class UnsignIssueCommand : IRequest<bool>
                 throw new Exception($"There is no signature for unsign with Guid {request._issueId} for application user {request._applicationUserId}");
             }
 
+            var issue = signature.Issue;
+            if (issue != null)
+            {
+                _ = await _context.IssueRatingHistories.AddAsync(new IssueRatingHistory() { Issue = issue, Value = -1, Action = RatingAction.UserUnsign, RelatedObject = $"User: {request._applicationUserId} unpinned signature {signature.Id} from the IssueId: {issue.Id}" }, cancellationToken);
+            }
+
             signature.Issue = null;
             return await _context.SaveChangesAsync(cancellationToken) > 0;
         }
