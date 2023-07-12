@@ -1,6 +1,7 @@
 ﻿@inherits ListPageBase<UserSignaturePool, SignaturePoolSearchParamsDTO>
 @attribute [Authorize]
 @inject ISignaturePoolService signaturePoolService
+@inject ISignatureService signatureService
 @page "/signature-pools"
 
 <_AuthorizationWrapper PageTitle="Signature pools list">
@@ -8,7 +9,7 @@
         <BrowserSignaturePools Refresh="Refresh" SearchParams="searchParamsDTO" TotalPages="PagedListDTO.TotalPages" TotalItems="PagedListDTO.TotalItems" />
         <HeaderSignaturePool Refresh="Refresh" SearchParams="searchParamsDTO" />
         <_ForEachPagedListWrapper PagedListDto="PagedListDTO" result="apiResponse">
-            <ReadSignaturePool UserSignaturePool="@context" />
+            <ReadSignaturePool UserSignaturePool="@context" UnsignIssue="UnsignIssue" />
         </_ForEachPagedListWrapper>
     </_PagedListWrapper>
 </_AuthorizationWrapper>
@@ -18,4 +19,10 @@
 
     protected override async Task<ApiResponse<PagedListDto<UserSignaturePool>>> Get(SignaturePoolSearchParamsDTO searchParamsDTO)
         => await signaturePoolService.GetMySignaturePoolsBySearchParams(searchParamsDTO);
+
+    private async Task UnsignIssue(Guid issueId)
+    {
+        await signatureService.UnsignIssue(issueId);
+        await Refresh();
+    }
 }

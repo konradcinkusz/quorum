@@ -1,6 +1,4 @@
-﻿@inherits Read
-
-<div class="card m-1 p-1">
+﻿<div class="card m-1 p-1">
     <div class="row mb-3">
         <div class="col-sm-3">
             <p class="form-control-plaintext" id="Quarter-id">@UserSignaturePool.Year</p>
@@ -13,12 +11,14 @@
         </div>
         <div class="col-sm-3">
             <div class="btn-group my-2" role="group">
-                <button class="btn btn-primary btn-sm" type="button" @onclick="ToggleDetails">@ShowDetailsButtonText</button>
+                <button class="btn btn-primary btn-sm" type="button" @onclick="@(() => showDetails = !showDetails)">
+                    @(showDetails ? "Show Details" : "Hide Details")
+                </button>
             </div>
         </div>
     </div>
 
-    <div class="@DetailsCssClass">
+    <div class="@(showDetails ? "d-block" : "d-none")">
         <hr />
         <h5>Details</h5>
         <dl class="row mb-3">
@@ -34,7 +34,19 @@
             @foreach (var signature in UserSignaturePool.SignatureDTOs)
             {
                 <dt class="col-sm-3">Signed issue</dt>
-                <dd class="col-sm-9">@(signature.IssueDTO != null ? "singed" : "null")</dd>
+                <dd class="col-sm-9">@(signature.IssueDTO != null ? $"Signed: {signature.IssueDTO.Id}" : "null")</dd>
+                
+                @if (signature.IssueDTO != null && !signature.IssueDTO.Id.IsNullOrEmpty())
+                {
+                    <dt class="col-sm-3">Actions:</dt>
+                    <dd class="col-sm-9 separator-line">
+                        <div class="row">
+                            <button type="button" @onclick="@(async () => await UnsignIssue.InvokeAsync(signature.IssueDTO.Id))" class="btn btn-danger rounded-pill m-1" data-bs-toggle="tooltip">
+                                Unsign
+                            </button>
+                        </div>
+                    </dd>
+                }
             }
         </dl>
     </div>
@@ -45,5 +57,7 @@
     public UserSignaturePool UserSignaturePool { get; set; }
 
     [Parameter]
-    public EventCallback Refresh { get; set; }
+    public EventCallback<Guid> UnsignIssue { get; set; }
+
+    private bool showDetails = false;
 }

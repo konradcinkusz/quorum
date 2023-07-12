@@ -1,5 +1,4 @@
-﻿@inherits Read
-@inject IAdminService adminService
+﻿@inject IAdminService adminService
 
 <div class="card m-1 p-1">
     <div class="row mb-3">
@@ -24,7 +23,9 @@
         <div class="col-sm-2">
             <div class="btn-group my-2" role="group">
                 <a href="/admin/create-issue-by-admin/@dto.Id" class="btn btn-secondary btn-sm m-1">Edit</a>
-                <button class="btn btn-primary btn-sm m-1" type="button" @onclick="ToggleDetails">@ShowDetailsButtonText</button>
+                <button class="btn btn-primary btn-sm" type="button" @onclick="@(() => showDetails = !showDetails)">
+                    @(showDetails ? "Show Details" : "Hide Details")
+                </button>
                 @if (Delete.HasDelegate)
                 {
                     <button class="btn btn-danger btn-sm m-1" type="button" @onclick="@(async () => await Delete.InvokeAsync(dto.Id))">Delete</button>
@@ -33,7 +34,7 @@
         </div>
     </div>
 
-    <div class="@DetailsCssClass">
+    <div class="@(showDetails ? "d-block" : "d-none")">
         <hr />
         <h5>Details</h5>
         <dl class="row mb-3">
@@ -78,24 +79,24 @@
                     </dd>
                 }
             }
-            @*
-            <dt class="col-sm-3">Quarters</dt>
-            <dd class="col-sm-9 separator-line">@IssueDTO.QuarterDTOs.Count()</dd>
 
-            @foreach (var quarter in IssueDTO.QuarterDTOs)
+            <dt class="col-sm-3">Quarters</dt>
+            <dd class="col-sm-9 separator-line">@dto.QuarterDTOs.Count()</dd>
+
+            @foreach (var quarter in dto.QuarterDTOs)
             {
-            <dt class="col-sm-3">Quarter Y-M</dt>
-            <dd class="col-sm-9">@quarter.Year - @quarter.Month</dd>
+                <dt class="col-sm-3">Quarter Y-Q</dt>
+                <dd class="col-sm-9">@quarter.QuarterNumber quarter of @quarter.Year year</dd>
             }
 
             <dt class="col-sm-3">Signatures</dt>
-            <dd class="col-sm-9 separator-line">@IssueDTO.SignatureDTOs.Count()</dd>
+            <dd class="col-sm-9 separator-line">@dto.Signatures.Count()</dd>
 
-            @foreach (var signature in IssueDTO.SignatureDTOs)
+            @foreach (var signature in dto.Signatures)
             {
-            <dt class="col-sm-3">Signature ID</dt>
-            <dd class="col-sm-9">@signature.Id</dd>
-            }*@
+                <dt class="col-sm-3">Signature ID</dt>
+                <dd class="col-sm-9">@signature.Id</dd>
+            }
 
             <dt class="col-sm-3">Issue Status History:</dt>
             <dd class="col-sm-9">
@@ -196,6 +197,8 @@
 
     [Parameter]
     public EventCallback<Guid> SetPendingPaymentStatusByPaymentGuid { get; set; }
+
+    private bool showDetails = false;
 
     private bool confirmationCheckboxChecked;
 
