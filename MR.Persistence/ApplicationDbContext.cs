@@ -43,7 +43,6 @@ public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>, 
         modelBuilder.Seed();
 
         Logs_config(modelBuilder);
-        Logs_triggers_config(modelBuilder);
         SubscriptionPaymentConfig(modelBuilder);
         QuarterIssueConfig(modelBuilder);
         base.OnModelCreating(modelBuilder);
@@ -119,17 +118,6 @@ public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>, 
             .HasMany(s => s.Payment_Logs)
             .WithOne(sl => sl.Payment)
             .OnDelete(DeleteBehavior.Cascade);
-    }
-
-    private void Logs_triggers_config(ModelBuilder modelBuilder)
-    {
-        modelBuilder
-            .Entity<Payment>()
-            .ToTable(t => t.HasTrigger("trg_Payment_Log"));
-
-        modelBuilder
-            .Entity<Subscription>()
-            .ToTable(t => t.HasTrigger("trg_Subscription_Log"));
     }
 
     private void SubscriptionPaymentConfig(ModelBuilder modelBuilder)
