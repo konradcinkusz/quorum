@@ -1,4 +1,10 @@
 ﻿TODO:
+Różne typy subskrypcji - potwierdzenia konta
+Proces publikowania - widoczności przycisków
+
+Long Term TODO:
+Uploadowanie dokumentów w ogóle
+Uploadowanie dokumentów podpisanych podpisem zaufanym
 
 DONE:
 Dodać obsługę publikowania kwestii

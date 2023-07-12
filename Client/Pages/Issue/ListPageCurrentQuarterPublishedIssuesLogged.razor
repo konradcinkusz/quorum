@@ -1,14 +1,20 @@
 ﻿@inherits ListPageBase<PublicPublishedIssueRead, PublicPublishedIssueSearchParamsDTO>
-@inject IPublicService publicService
+@attribute [Authorize]
 @inject ISignatureService signatureService
 @inject IIssueService issueService
 @inject NavigationManager navigationManager
-@page "/issue/published-issues"
+@page "/issue/published-issues-logged"
 
 <_PagedListWrapper PagedListDto="PagedListDTO" result="apiResponse">
     <_ForEachPagedListWrapper PagedListDto="PagedListDTO" result="apiResponse">
         <_CustomPublishedIssueCard dto="@context" ShowButtons="true" ShowStatus="true">
-            @if (!context.Id.IsNullOrEmpty())
+            @if (!isActiveSubscription)
+            {
+                <button type="button" @onclick="@(() => navigationManager.NavigateTo("/subscription"))" class="btn btn-primary rounded-pill m-1" data-bs-toggle="tooltip">
+                    Sign
+                </button>
+            }
+            else if (!context.Id.IsNullOrEmpty())
             {
                 if (context.SignedByCurrentUser)
                 {
@@ -46,27 +52,17 @@
     protected override void InitializeSearchParams() => searchParamsDTO = new PublicPublishedIssueSearchParamsDTO();
 
     protected override async Task<ApiResponse<PagedListDto<PublicPublishedIssueRead>>> Get(PublicPublishedIssueSearchParamsDTO searchParamsDTO)
-    {
-        if (AuthHelper.IsLogged(await AuthTask, navigationManager))
-            return await issueService.GetCurrentQuarterIssues(searchParamsDTO);
-        return await publicService.GetCurrentQuarterIssues(searchParamsDTO);
-    }
+        => await issueService.GetCurrentQuarterIssues(searchParamsDTO);
 
     private async Task SignIssue(Guid issueId)
     {
-        if (AuthHelper.IsLogged(await AuthTask, navigationManager) && !issueId.IsNullOrEmpty() && isActiveSubscription)
-        {
-            await signatureService.SignIssue(issueId);
-            await Refresh();
-        }
+        await signatureService.SignIssue(issueId);
+        await Refresh();
     }
 
     private async Task UnsignIssue(Guid issueId)
     {
-        if (AuthHelper.IsLogged(await AuthTask, navigationManager) && !issueId.IsNullOrEmpty())
-        {
-            await signatureService.UnsignIssue(issueId);
-            await Refresh();
-        }
+        await signatureService.UnsignIssue(issueId);
+        await Refresh();
     }
 }
