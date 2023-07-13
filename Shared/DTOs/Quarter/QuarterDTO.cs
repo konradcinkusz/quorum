@@ -7,4 +7,6 @@ public class QuarterDTO : BaseDTO
     public List<IssueReadDTO> Issues { get; set; } = new List<IssueReadDTO>();
     public List<SignaturePoolAdminDTO> SignaturePools { get; set; } = new List<SignaturePoolAdminDTO>();
     public int PrimarySignatureCount { get; set; }
+    public bool QuarterResolved { get; set; }
+    public IssueReadDTO? QuarterWinner { get; set; }
 }

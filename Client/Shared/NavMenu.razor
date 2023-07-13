@@ -25,12 +25,17 @@
             </Authorized>
             <NotAuthorized>
                 <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="/issue/published-issues-public" Match="NavLinkMatch.All">
+                    <NavLink class="nav-link" href="/issue/published-issues-public">
                         <span class="oi oi-hard-drive" aria-hidden="true"></span> Issues
                     </NavLink>
                 </div>
             </NotAuthorized>
         </AuthorizeView>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/issue/winning-issues-for-the-quarter">
+                <span class="oi oi-bolt" aria-hidden="true"></span> Winners
+            </NavLink>
+        </div>
         <hr class="nav-divider" />
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="/issue/create-issue">
@@ -122,7 +127,12 @@
                 </div>
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="/admin/recalculate-issue-rating">
-                        <span class="oi oi-document"></span> Recalculate
+                        <span class="oi oi-calculator"></span> Recalculate
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="/admin/choose-the-winner-of-current-quarter">
+                        <span class="oi oi-person"></span> Winner
                     </NavLink>
                 </div>
                 <hr class="nav-divider" />

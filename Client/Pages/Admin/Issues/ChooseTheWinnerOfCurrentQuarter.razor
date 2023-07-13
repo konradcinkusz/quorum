@@ -1,0 +1,40 @@
+﻿@inherits BaseAdmin
+@page "/admin/choose-the-winner-of-current-quarter"
+
+<_AuthorizationWrapper PageTitle="Choose the winner of current quarter">
+
+    <div class="car MRCard">
+        <div class="form-group MRForm-group">
+            Choose the winner of current quarter
+        </div>
+        <button class="btn btn-primary MRBtn" @onclick="Recalculate">Choose</button>
+    </div>
+    @if (result != null)
+    {
+        <_ApiResponse T="IssueReadDTO" result="result" />
+    }
+    @if (Issue != null)
+    {
+        <div class="row justify-content-center">
+            <div class="col-12 text-center">
+                <hr />
+                <h5>Preview</h5>
+            </div>
+            <div class="row d-flex justify-content-center">
+                <_CustomIssueCard dto="Issue" ColsDefinition="col-12" />
+            </div>
+        </div>
+
+    }
+</_AuthorizationWrapper>
+
+@code {
+    private IssueReadDTO? Issue;
+    private ApiResponse<IssueReadDTO> result = null;
+
+    private async Task Recalculate()
+    {
+        result = await adminService.ChooseTheWinnerOfCurrentQuarter();
+        Issue = result.Data;
+    }
+}

@@ -1,4 +1,5 @@
 ﻿using MR.Service.Features.Issues.Queries;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace MR.Server.Mappings.SearchParamsMapping;
 
@@ -34,6 +35,23 @@ public static class SearchParamsExtension
 
     public static void AddPublicPublishedIssueSearchParamsToCommand(GetCurrentQuarterPublishedIssues command, PublicPublishedIssueSearchParamsDTO searchParams)
     {
+        AddSearchParamsToCommand(command, searchParams);
+    }
+
+    public static void AddPublicPublishedEndeedIssueSearchParamsToCommand(GetTheWinningIssuesForTheQuarterQuery command, IssueWinnersSearchParamsDTO searchParams)
+    {
+        command.QuarterYear = searchParams.QuarterYear;
+        command.QuarterNumber = searchParams.QuarterNumber;
+
+        AddSearchParamsToCommand(command, searchParams);
+    }
+
+    public static void AddAdminLogsSearchParamsToCommand(GetAdminLogsBySearchParamsQuery command, AdminLogSearchParamsDTO searchParams)
+    {
+        command.LastHour = searchParams.LastHour;
+        command.LastMonth = searchParams.LastMonth;
+        command.ValuesText = searchParams.ValuesText;
+        command.Action = searchParams.Action;
         AddSearchParamsToCommand(command, searchParams);
     }
 

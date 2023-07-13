@@ -31,6 +31,7 @@ public abstract class MRBaseController : ControllerBase
             return errorResponse;
         }
     }
+
     //D = DTO
     protected async Task<ActionResult<ApiResponse<D>>> HandleErrors<T, D>(Func<Task<T>> action, string message = "")
     {
@@ -46,15 +47,28 @@ public abstract class MRBaseController : ControllerBase
             return errorResponse;
         }
     }
-    protected void AddSearchParamsToCommand<T>(T command, SearchParamsDTO searchParamsDTO) where T : QueryBase
+
+    //D = DTO; E = Entity
+    protected async Task<ActionResult<ApiResponse<DTO>>> HandleErrors<Command, Entity, DTO>(Command command, string message = "") where Command : notnull where Entity : class
     {
-        command.SearchParams = new SearchParams
+        try
         {
-            CurrentPage = searchParamsDTO.CurrentPage,
-            PageSize = searchParamsDTO.PageSize
-        };
-        command.SortColumn = searchParamsDTO.SortColumn;
-        command.SortOrder = (Microsoft.Data.SqlClient.SortOrder)searchParamsDTO.SortOrder;
+            var result = await Mediator.Send(command) as Entity;
+
+            if (result is null)
+            {
+                // Handle the case when result is null, for example by returning an appropriate error response
+                return new ApiResponse<DTO>("Failed to process the issue request.", (int)HttpStatusCode.BadRequest);
+            }
+
+            var item = _mapper.Map<DTO>(result);
+            return new ApiResponse<DTO>(item) { Message = message };
+        }
+        catch (Exception ex)
+        {
+            var errorResponse = new ApiResponse<DTO>(new List<string> { ex.Message }, (int)HttpStatusCode.BadRequest);
+            return errorResponse;
+        }
     }
 
     protected virtual async Task<ActionResult<ApiResponse<PagedListDto<D>>>> ProcessPagedRequest<T, D, E>(T command) where T : notnull where D : class

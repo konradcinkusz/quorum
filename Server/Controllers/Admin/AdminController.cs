@@ -43,16 +43,8 @@ public class AdminController : MRBaseController
     [HttpGet("get-admin-logs-by-query")]
     public async Task<ActionResult<ApiResponse<AdminLogPagedListDTO>>> GetAdminLogsByQuery([FromQuery] AdminLogSearchParamsDTO query)
     {
-        var command = new GetAdminLogsBySearchParamsQuery
-        {
-            LastHour = query.LastHour,
-            LastMonth = query.LastMonth,
-            ValuesText = query.ValuesText,
-            Action = query.Action
-        };
-
-        AddSearchParamsToCommand(command, query);
-
+        var command = new GetAdminLogsBySearchParamsQuery();
+        SearchParamsExtension.AddAdminLogsSearchParamsToCommand(command, query);
         return await ProcessAdminRequest(command);
     }
 

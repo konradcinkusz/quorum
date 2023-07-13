@@ -64,8 +64,9 @@ public sealed class AdminIssueController : MRBaseController
 
     [HttpPut("calculate-rating-for-published-issues")]
     public async Task<ActionResult<ApiResponse<PagedListDto<IssueAdminRatingValueCalculate>>>> CalculatePublishedIssueRatingForCurrentQuarter()
-    {
-        var command = new CalculatePublishedIssueRatingForCurrentQuarter();
-        return await ProcessPagedRequest<CalculatePublishedIssueRatingForCurrentQuarter, IssueAdminRatingValueCalculate, Issue>(command);
-    }
+        => await ProcessPagedRequest<CalculatePublishedIssueRatingForCurrentQuarter, IssueAdminRatingValueCalculate, Issue>(new CalculatePublishedIssueRatingForCurrentQuarter());
+
+    [HttpPut("choose-the-winner-of-current-quarter")]
+    public async Task<ActionResult<ApiResponse<IssueReadDTO>>> ChooseTheWinnerOfCurrentQuarter()
+        => await HandleErrors<ChooseTheWinnerOfCurrentQuarter, Issue, IssueReadDTO>(new ChooseTheWinnerOfCurrentQuarter());
 }

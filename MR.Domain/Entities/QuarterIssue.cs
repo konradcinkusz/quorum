@@ -10,4 +10,9 @@ public class QuarterIssue
     [ForeignKey(nameof(Quarter)), Key, Column(Order = 1)]
     public Guid QuarterId { get; set; }
     public Quarter Quarter { get; set; }
+
+    /// <summary>
+    /// Indicates if Issue win the current quarter or not
+    /// </summary>
+    public bool? QuarterWinner { get; set; }
 }

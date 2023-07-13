@@ -23,9 +23,7 @@
         <div class="col-sm-2">
             <div class="btn-group my-2" role="group">
                 <a href="/admin/create-issue-by-admin/@dto.Id" class="btn btn-secondary btn-sm m-1">Edit</a>
-                <button class="btn btn-primary btn-sm" type="button" @onclick="@(() => showDetails = !showDetails)">
-                    @(showDetails ? "Show Details" : "Hide Details")
-                </button>
+                <_ShowDetailsButton ShowDetailsChanged="(bool showDetails) => _showDetails = showDetails" />
                 @if (Delete.HasDelegate)
                 {
                     <button class="btn btn-danger btn-sm m-1" type="button" @onclick="@(async () => await Delete.InvokeAsync(dto.Id))">Delete</button>
@@ -34,7 +32,7 @@
         </div>
     </div>
 
-    <div class="@(showDetails ? "d-block" : "d-none")">
+    <div class="@(_showDetails ? "d-block" : "d-none")">
         <hr />
         <h5>Details</h5>
         <dl class="row mb-3">
@@ -198,7 +196,7 @@
     [Parameter]
     public EventCallback<Guid> SetPendingPaymentStatusByPaymentGuid { get; set; }
 
-    private bool showDetails = false;
+    private bool _showDetails = false;
 
     private bool confirmationCheckboxChecked;
 

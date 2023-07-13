@@ -1,0 +1,20 @@
+﻿@inherits ListPageBase<PublicPublishedEndedIssueRead, IssueWinnersSearchParamsDTO>
+@inject IPublicService publicService
+@page "/issue/winning-issues-for-the-quarter"
+
+<_PagedListWrapper PagedListDto="PagedListDTO" result="apiResponse">
+    <BrowserIssueWinners Refresh="Refresh" SearchParams="searchParamsDTO" TotalPages="PagedListDTO.TotalPages" TotalItems="PagedListDTO.TotalItems" />
+    <_ForEachPagedListWrapper PagedListDto="PagedListDTO" result="apiResponse">
+        <_CustomPublishedIssueCard dto="@context" />
+    </_ForEachPagedListWrapper>
+    <div class="row">
+        <_Paging QueryBase="searchParamsDTO" RefreshList="Refresh" TotalPages="PagedListDTO.TotalPages" TotalItems="PagedListDTO.TotalItems" />
+    </div>
+</_PagedListWrapper>
+
+@code {
+    protected override void InitializeSearchParams() => searchParamsDTO = new IssueWinnersSearchParamsDTO();
+
+    protected override async Task<ApiResponse<PagedListDto<PublicPublishedEndedIssueRead>>> Get(IssueWinnersSearchParamsDTO searchParamsDTO)
+        => await publicService.GetIssueWinners(searchParamsDTO);
+}

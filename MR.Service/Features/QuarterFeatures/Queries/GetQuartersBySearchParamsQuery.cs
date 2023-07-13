@@ -14,8 +14,7 @@ public class GetQuartersBySearchParamsQuery : QueryBase, IRequest<PagedList<Quar
         {
         }
 
-        public override async Task<PagedList<Quarter>> Handle(GetQuartersBySearchParamsQuery request, 
-            CancellationToken cancellationToken)
+        public override async Task<PagedList<Quarter>> Handle(GetQuartersBySearchParamsQuery request, CancellationToken cancellationToken)
         {
             var query = _context.Quarters.AsQueryable();
 

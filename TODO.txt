@@ -1,11 +1,17 @@
-﻿TODO:
+﻿In progress:
+
+TODO:
+Dodać (pokazywać) QuarterYear i QuarterNumber do PublicPublishedEndedIssueRead w cely prezentacji kwartału na Issue.Winners.ListPage
 Różne typy subskrypcji - potwierdzenia konta
 Proces publikowania - widoczności przycisków
+Zamienić kwartał na czas trwania danej kwestii (np. miesiąc), żeby np. w przeciągu tygodnia roztrzygać kwestie
+Dodanie edycji
 
 Long Term TODO:
 Uploadowanie dokumentów w ogóle
 Uploadowanie dokumentów podpisanych podpisem zaufanym
 
 DONE:
+Dodanie roztrzygnięcia kwartału
 Dodać obsługę publikowania kwestii
 Poprawić kontroler public async Task<IActionResult> EditPayment([FromRoute] Guid id, [FromBody] PaymentUpdateDTO paymentDto)

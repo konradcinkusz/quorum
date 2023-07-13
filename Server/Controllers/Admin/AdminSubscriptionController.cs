@@ -12,8 +12,6 @@ public class AdminSubscriptionController : MRBaseController
     {
         var command = new GetSubscriptionsBySearchParamsQuery();
         SearchParamsExtension.AddSubscriptionsSearchParamsToCommand(command, searchParams);
-        AddSearchParamsToCommand(command, searchParams);
-
         var result = await ProcessPagedRequest<GetSubscriptionsBySearchParamsQuery, SubscriptionDTO, Subscription>(command);
         result.Value?.Data.Items.ForEach(x => x.PaymentDTOs = x.PaymentDTOs.OrderByDescending(p => p.CreatedAt).ToList());
 

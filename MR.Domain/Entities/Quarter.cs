@@ -8,7 +8,12 @@ public class Quarter : BaseEntity<Guid>
 
     //kwestie rozpatrywane w danym kwartale
     [InverseProperty(nameof(QuarterIssue.Quarter))]
-    public ICollection<QuarterIssue> QuarterIssues { get; set; }
+    public ICollection<QuarterIssue> QuarterIssues { get;  set; }
 
     public int PrimarySignatureCount { get; set; }
+
+    /// <summary>
+    /// Zakończenie i ustalenie zwycięzców kwartału obliguje go do definitywnego zamknięcia
+    /// </summary>
+    public bool QuarterResolved { get; set; }
 }

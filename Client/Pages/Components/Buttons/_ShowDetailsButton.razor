@@ -1,0 +1,16 @@
+﻿<button class="btn btn-primary btn-sm" type="button" @onclick="ToggleShowDetails">
+    @(_showDetails ? "Hide Details" : "Show Details")
+</button>
+
+@code {
+    private bool _showDetails { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> ShowDetailsChanged { get; set; }
+
+    private void ToggleShowDetails()
+    {
+        _showDetails = !_showDetails;
+        ShowDetailsChanged.InvokeAsync(_showDetails);
+    }
+}

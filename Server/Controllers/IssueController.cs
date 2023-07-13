@@ -37,6 +37,15 @@ public sealed class IssueController : MRBaseController
         return request;
     }
 
+    [AllowAnonymous]
+    [HttpGet("get-the-winning-issues-for-the-quarter")]
+    public async Task<ActionResult<ApiResponse<PagedListDto<PublicPublishedEndedIssueRead>>>> GetTheWinningIssuesForTheQuarter([FromQuery] IssueWinnersSearchParamsDTO searchParams)
+    {
+        var command = new GetTheWinningIssuesForTheQuarterQuery();
+        SearchParamsExtension.AddPublicPublishedEndeedIssueSearchParamsToCommand(command, searchParams);
+        return await ProcessPagedRequest<GetTheWinningIssuesForTheQuarterQuery, PublicPublishedEndedIssueRead, Issue>(command);
+    }
+
     [HttpGet("get-issue-by-id-for-edit")]
     public async Task<ActionResult<ApiResponse<IssueReadDTO>>> GetIssueByIdForEdit(Guid id)
         => await HandleErrors<Issue, IssueReadDTO>(async () => await Mediator.Send(new GetIssueByIdForEdit(id)));
