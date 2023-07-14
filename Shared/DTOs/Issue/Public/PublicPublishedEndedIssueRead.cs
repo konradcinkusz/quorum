@@ -1,4 +1,4 @@
-﻿namespace MR.Shared.DTOs.Issue;
+﻿namespace MR.Shared.DTOs.Issue.Public;
 
 /// <summary>
 /// After resolving the quarter we have to define prop indicates if the user win the quarter

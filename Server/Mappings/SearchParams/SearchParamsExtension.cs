@@ -1,7 +1,4 @@
-﻿using MR.Service.Features.Issues.Queries;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
-
-namespace MR.Server.Mappings.SearchParamsMapping;
+﻿namespace MR.Server.Mappings.SearchParamsMapping;
 
 public static class SearchParamsExtension
 {

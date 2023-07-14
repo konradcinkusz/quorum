@@ -28,3 +28,5 @@ global using Microsoft.AspNetCore.Components;
 global using MR.Shared.DTOs;
 global using MR.Client.DI;
 global using MR.Shared.DTOs.Issue.Admin;
+global using MR.Shared.DTOs.Issue.SearchParams;
+global using MR.Shared.DTOs.Issue.Public;

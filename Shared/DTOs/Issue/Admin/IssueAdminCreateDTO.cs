@@ -1,4 +1,4 @@
-﻿namespace MR.Shared.DTOs.Issue;
+﻿namespace MR.Shared.DTOs.Issue.Admin;
 
 public sealed class IssueAdminCreateDTO : IssueCreateDTO
 {

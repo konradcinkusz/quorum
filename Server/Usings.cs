@@ -43,3 +43,5 @@ global using MR.Service.Features.Issues.Queries;
 global using MR.Service.DI;
 global using MR.Service.UserManagement;
 global using MR.Shared.DTOs.Issue.Admin;
+global using MR.Shared.DTOs.Issue.SearchParams;
+global using MR.Shared.DTOs.Issue.Public;

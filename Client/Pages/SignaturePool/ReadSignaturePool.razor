@@ -35,7 +35,7 @@
             {
                 <dt class="col-sm-3">Signed issue</dt>
                 <dd class="col-sm-9">@(signature.IssueDTO != null ? $"Signed: {signature.IssueDTO.Id}" : "null")</dd>
-                
+
                 @if (signature.IssueDTO != null && !signature.IssueDTO.Id.IsNullOrEmpty())
                 {
                     <dt class="col-sm-3">Actions:</dt>
@@ -44,6 +44,16 @@
                             <button type="button" @onclick="@(async () => await UnsignIssue.InvokeAsync(signature.IssueDTO.Id))" class="btn btn-danger rounded-pill m-1" data-bs-toggle="tooltip">
                                 Unsign
                             </button>
+                        </div>
+                    </dd>
+                    <dt class="col-sm-3">Issue preview:</dt>
+                    <dd class="col-sm-9 separator-line">
+                        <div class="row justify-content-center">
+                            <div class="col-12 mt-5">
+                                <div class="row d-flex justify-content-center">
+                                    <_CustomIssueCard dto="signature.IssueDTO" />
+                                </div>
+                            </div>
                         </div>
                     </dd>
                 }

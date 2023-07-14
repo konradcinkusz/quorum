@@ -1,7 +1,8 @@
 ﻿In progress:
+Lista podpisanych kwestii, które zostały zakończone w danym kwartale i czekają na przesłania podpisu
 
 TODO:
-Różne typy subskrypcji - potwierdzenia konta
+Różne typy subskrypcji - potwierdzenia konta za pomocą uploadowanego dokumentu
 Proces publikowania - widoczności przycisków
 Zamienić kwartał na czas trwania danej kwestii (np. miesiąc), żeby np. w przeciągu tygodnia roztrzygać kwestie
 Dodanie edycji
