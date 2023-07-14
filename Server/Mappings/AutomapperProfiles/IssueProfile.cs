@@ -30,6 +30,8 @@ public class IssueProfile : Profile
 
         CreateMap<Issue, PublicPublishedEndedIssueRead>()
             .ForMember(dest => dest.ApplicationUserEmail, opt => opt.MapFrom(src => src.CreatedBy != null ? src.CreatedBy.Email : string.Empty))
+            .ForMember(dest => dest.QuarterNumber, opt => opt.MapFrom(src => src.QuarterIssues.FirstOrDefault(x => x.QuarterWinner.HasValue && x.QuarterWinner.Value).Quarter.QuarterNumber))
+            .ForMember(dest => dest.QuarterYear, opt => opt.MapFrom(src => src.QuarterIssues.FirstOrDefault(x => x.QuarterWinner.HasValue && x.QuarterWinner.Value).Quarter.Year))
             .PreserveReferences();
     }
 }

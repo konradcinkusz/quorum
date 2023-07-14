@@ -5,7 +5,20 @@
 <_PagedListWrapper PagedListDto="PagedListDTO" result="apiResponse">
     <BrowserIssueWinners Refresh="Refresh" SearchParams="searchParamsDTO" TotalPages="PagedListDTO.TotalPages" TotalItems="PagedListDTO.TotalItems" />
     <_ForEachPagedListWrapper PagedListDto="PagedListDTO" result="apiResponse">
-        <_CustomPublishedIssueCard dto="@context" />
+        <_CustomPublishedIssueCard dto="@context">
+            <div class="card m-1 p-1">
+                <div class="row mb-3">
+                    <div class="col-sm-6">
+                        <label for="quarter-year">Year</label>
+                        <p class="form-control-plaintext" id="quarter-year">@context.QuarterYear</p>
+                    </div>
+                    <div class="col-sm-6">
+                        <label for="quarter-number">Quarter</label>
+                        <p class="form-control-plaintext" id="quarter-number">@context.QuarterNumber.ConvertToQ()</p>
+                    </div>
+                </div>
+            </div>
+        </_CustomPublishedIssueCard>
     </_ForEachPagedListWrapper>
     <div class="row">
         <_Paging QueryBase="searchParamsDTO" RefreshList="Refresh" TotalPages="PagedListDTO.TotalPages" TotalItems="PagedListDTO.TotalItems" />

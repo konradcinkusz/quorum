@@ -6,6 +6,6 @@
 public class PublicPublishedEndedIssueRead : PublicPublishedIssueRead
 {
     public bool Winner { get; set; }
-    public int QuarterYear { get; set; }
-    public int QuarterNumber { get; set; }
+    public int? QuarterYear { get; set; }
+    public int? QuarterNumber { get; set; }
 }
