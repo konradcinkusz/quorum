@@ -11,6 +11,7 @@ public interface IIssueService
     Task<ApiResponse<bool>> PayForAnIssue(Guid issueId, IssuePayDTO issuePayDTO);
     Task<ApiResponse<bool>> ArchiveIssue(Guid issueId); 
     Task<ApiResponse<PagedListDto<PublicPublishedIssueRead>>> GetCurrentQuarterIssues(PublicPublishedIssueSearchParamsDTO searchParams);
+    Task<ApiResponse<PagedListDto<IssueSignedAndSubmittedDTO>>> GetSignSubmitIssues(IssueSignAndSubmitSearchParamsDTO searchParams);
 }
 
 internal class IssueService : DataServiceBase, IIssueService
@@ -76,5 +77,12 @@ internal class IssueService : DataServiceBase, IIssueService
         var q = BuildQuery(searchParams);
         var endpoint = $"{_issueControllerPath}/get-current-quarter-issues-published?{q}";
         return await HandleResponse<PagedListDto<PublicPublishedIssueRead>>(async () => await _httpClient.GetAsync(endpoint));
+    }
+
+    public async Task<ApiResponse<PagedListDto<IssueSignedAndSubmittedDTO>>> GetSignSubmitIssues(IssueSignAndSubmitSearchParamsDTO searchParams)
+    {
+        var q = BuildQuery(searchParams);
+        var endpoint = $"{_issueControllerPath}/get-signed-submitted-issues?{q}";
+        return await HandleResponse<PagedListDto<IssueSignedAndSubmittedDTO>>(async () => await _httpClient.GetAsync(endpoint));
     }
 }

@@ -35,6 +35,11 @@ public static class SearchParamsExtension
         AddSearchParamsToCommand(command, searchParams);
     }
 
+    public static void AddIssueSignAndSubmitSearchParamsToCommand(GetSignedSubmittedIssuesCommand command, IssueSignAndSubmitSearchParamsDTO searchParams)
+    {
+        AddSearchParamsToCommand(command, searchParams);
+    }
+
     public static void AddPublicPublishedEndeedIssueSearchParamsToCommand(GetTheWinningIssuesForTheQuarterQuery command, IssueWinnersSearchParamsDTO searchParams)
     {
         command.QuarterYear = searchParams.QuarterYear;

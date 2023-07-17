@@ -30,3 +30,4 @@ global using MR.Client.DI;
 global using MR.Shared.DTOs.Issue.Admin;
 global using MR.Shared.DTOs.Issue.SearchParams;
 global using MR.Shared.DTOs.Issue.Public;
+global using MR.Shared.DTOs.Issue.SignAndSubmit;

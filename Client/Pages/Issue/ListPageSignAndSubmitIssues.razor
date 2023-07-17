@@ -1,5 +1,53 @@
-﻿<h3>ListPageSignAndSubmitIssues</h3>
+﻿@inherits ListPageBase<IssueSignedAndSubmittedDTO, IssueSignAndSubmitSearchParamsDTO>
+@attribute [Authorize]
+@inject IIssueService issueService
+@page "/issue/signed-submitted"
+
+<_PagedListWrapper PagedListDto="PagedListDTO" result="apiResponse">
+    <_ForEachPagedListWrapper PagedListDto="PagedListDTO" result="apiResponse">
+        <_CustomPublishedIssueCard dto="@context" ShowButtons="true" ShowStatus="true">
+            @if (!context.Id.IsNullOrEmpty() && context.IssueSignedAndSubmittedProcess != IssueSignedAndSubmittedProcessEnum.Completed)
+            {
+                <button type="button" @onclick="@(async () => await DownloadFormForSign(context.Id))" class="btn btn-danger rounded-pill m-1" data-bs-toggle="tooltip">
+                    Download form for sign
+                </button>
+                if (context.IssueSignedAndSubmittedProcess == IssueSignedAndSubmittedProcessEnum.NotDownloaded || context.IssueSignedAndSubmittedProcess == IssueSignedAndSubmittedProcessEnum.Downloaded)
+                {
+                    <button type="button" @onclick="@(async () => await UploadSignedForm(context.Id))" class="btn btn-secondary rounded-pill m-1" data-bs-toggle="tooltip">
+                        Upload
+                    </button>
+                }
+                else if (context.IssueSignedAndSubmittedProcess == IssueSignedAndSubmittedProcessEnum.Uploaded)
+                {
+                    <button type="button" @onclick="@(async () => await UploadSignedForm(context.Id))" class="btn btn-danger rounded-pill m-1" data-bs-toggle="tooltip">
+                        Remove uploaded
+                    </button>
+                }
+            }
+            else if (context.IssueSignedAndSubmittedProcess == IssueSignedAndSubmittedProcessEnum.Completed)
+            {
+                <span>Processing ended. Not possible to change something.</span>
+            }
+        </_CustomPublishedIssueCard>
+    </_ForEachPagedListWrapper>
+    <div class="row">
+        <_Paging QueryBase="searchParamsDTO" RefreshList="Refresh" TotalPages="PagedListDTO.TotalPages" TotalItems="PagedListDTO.TotalItems" />
+    </div>
+</_PagedListWrapper>
 
 @code {
+    protected override void InitializeSearchParams() => searchParamsDTO = new IssueSignAndSubmitSearchParamsDTO();
 
+    protected override async Task<ApiResponse<PagedListDto<IssueSignedAndSubmittedDTO>>> Get(IssueSignAndSubmitSearchParamsDTO searchParamsDTO)
+        => await issueService.GetSignSubmitIssues(searchParamsDTO);
+
+    private async Task DownloadFormForSign(Guid issueId)
+    {
+        throw new NotImplementedException(nameof(DownloadFormForSign));
+    }
+
+    private async Task UploadSignedForm(Guid issueId)
+    {
+        throw new NotImplementedException(nameof(UploadSignedForm));
+    }
 }

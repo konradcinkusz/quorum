@@ -5,6 +5,6 @@ public enum IssueVisibility
     NotVisible,
     VisibleOnlyToMe,
     VisibleForAll,
-    OutOfCurrentQuarter,
+    OutOfCurrentQuarterVisibleForAll,
     OutOfCurrentQuarterVisibleOnlyToMe
 }

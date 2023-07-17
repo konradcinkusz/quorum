@@ -37,6 +37,20 @@ public sealed class IssueController : MRBaseController
         return request;
     }
 
+    [HttpGet("get-signed-submitted-issues")]
+    public async Task<ActionResult<ApiResponse<PagedListDto<IssueSignedAndSubmittedDTO>>>> GetSignSubmitIssues([FromQuery] IssueSignAndSubmitSearchParamsDTO searchParams)
+    {
+        var command = new GetSignedSubmittedIssuesCommand();
+        command.ApplicationUserId = GetUserId();
+        searchParams.SortColumn = "RatingValue";
+        searchParams.SortOrder = SortOrder.Descending;
+        searchParams.PageSize = 100;
+        searchParams.CurrentPage = 1;
+        SearchParamsExtension.AddIssueSignAndSubmitSearchParamsToCommand(command, searchParams);
+        var request = await ProcessPagedRequest<GetSignedSubmittedIssuesCommand, IssueSignedAndSubmittedDTO, Issue>(command);
+        return request;
+    }
+
     [AllowAnonymous]
     [HttpGet("get-the-winning-issues-for-the-quarter")]
     public async Task<ActionResult<ApiResponse<PagedListDto<PublicPublishedEndedIssueRead>>>> GetTheWinningIssuesForTheQuarter([FromQuery] IssueWinnersSearchParamsDTO searchParams)
@@ -118,4 +132,8 @@ public sealed class IssueController : MRBaseController
     [HttpDelete("archive-issue/{id}")]
     public async Task<ActionResult<ApiResponse<bool>>> ArchiveIssue([FromRoute] Guid id)
         => await HandleErrors(async () => await Mediator.Send(new ArchiveIssueCommand(id)));
+
+    [HttpGet("get-pdf-form-for-sign")]
+    public async Task<ActionResult<ApiResponse<string>>> GetPDFFormForSign([FromQuery] Guid id)
+        => await HandleErrors(async () => await Mediator.Send(new GetPDFForSignCommand(id)));
 }
