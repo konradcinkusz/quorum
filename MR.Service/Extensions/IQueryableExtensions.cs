@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-namespace MR.Service.Extensions;
+﻿namespace MR.Service.Extensions;
 
 internal static class IQueryableExtensions
 {

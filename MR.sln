@@ -21,6 +21,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentatio
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{F7DD1815-B9A1-40B5-A9A4-B7109E2FA17E}"
 	ProjectSection(SolutionItems) = preProject
+		docs\architecture_diagram.png = docs\architecture_diagram.png
 		docs\DropAllTablesInSchema.txt = docs\DropAllTablesInSchema.txt
 		docs\EFCommands.txt = docs\EFCommands.txt
 		docs\stripe.txt = docs\stripe.txt

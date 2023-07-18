@@ -11,8 +11,19 @@ public static class DependencyInjection
         public string connectionStringDEV { get; set; } = "DEV";
     }
 
-    public static void AddServiceLayer(this IServiceCollection services)
+    public class ConfigurationSectionNames
     {
+        public const string CloudinaryOptions = "CloudinaryOpt";
+    }
+
+    public static void AddServiceLayer(this IServiceCollection services, IConfiguration configuration)
+    {
+        var configSection = configuration.GetSection(ConfigurationSectionNames.CloudinaryOptions);
+        if (configSection != null)
+        {
+            services.Configure<CloudinaryOpt>(configSection);
+            services.AddScoped<ICloudinaryService, CloudinaryService>();
+        }
         // or you can use assembly in Extension method in Infra layer with below command
         services.AddMediatR(Assembly.GetExecutingAssembly());
     }

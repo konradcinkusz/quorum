@@ -1,4 +1,4 @@
-﻿namespace MR.Service.Features.Issues;
+﻿namespace MR.Service.Features.Issues.PDF;
 
 public class GetPDFForSignCommand : IRequest<string>
 {

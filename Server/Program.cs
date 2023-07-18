@@ -50,7 +50,7 @@ builder.Services.AddScopedServices();
 
 builder.Services.AddTransientServices();
 
-builder.Services.AddServiceLayer();
+builder.Services.AddServiceLayer(builder.Configuration);
 
 builder.Services.AddVersion();
 

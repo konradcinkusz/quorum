@@ -28,3 +28,4 @@ global using MR.Service.UserManagement;
 global using MR.Service.Features.Issues.Base;
 global using MR.Domain.Entities.Base;
 global using MR.Domain.Enum;
+global using MR.Service.FilesManagement;
