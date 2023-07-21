@@ -314,7 +314,7 @@ namespace MR.Persistence.Migrations
 
                     b.HasIndex("ApplicationUserId");
 
-                    b.ToTable("RefreshToken");
+                    b.ToTable("RefreshToken", (string)null);
                 });
 
             modelBuilder.Entity("MR.Domain.Entities.AdminLog", b =>
@@ -737,7 +737,7 @@ namespace MR.Persistence.Migrations
 
                     b.HasIndex("PaymentId");
 
-                    b.ToTable("SubscriptionPayment");
+                    b.ToTable("SubscriptionPayment", (string)null);
                 });
 
             modelBuilder.Entity("MR.Domain.Entities.Subscription_Log", b =>

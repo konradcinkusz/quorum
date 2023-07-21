@@ -132,8 +132,4 @@ public sealed class IssueController : MRBaseController
     [HttpDelete("archive-issue/{id}")]
     public async Task<ActionResult<ApiResponse<bool>>> ArchiveIssue([FromRoute] Guid id)
         => await HandleErrors(async () => await Mediator.Send(new ArchiveIssueCommand(id)));
-
-    [HttpGet("get-pdf-form-for-sign")]
-    public async Task<ActionResult<ApiResponse<string>>> GetPDFFormForSign([FromQuery] Guid id)
-        => await HandleErrors(async () => await Mediator.Send(new GetPDFForSignCommand(id)));
 }

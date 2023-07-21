@@ -151,6 +151,11 @@
                     <_Info Description="No issue process history available." />
                 }
             </dd>
+
+            <dt class="col-sm-3">Generate PDF for an issue</dt>
+            <dd class="col-sm-9">
+                <button class="btn btn-success btn-sm m-1" type="button" @onclick="@(async () => await adminService.GeneratePDFForAnIssue(dto.Id))">Generate</button>
+            </dd>
         </dl>
 
         <div class="row justify-content-center">

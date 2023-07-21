@@ -69,4 +69,8 @@ public sealed class AdminIssueController : MRBaseController
     [HttpPut("choose-the-winner-of-current-quarter")]
     public async Task<ActionResult<ApiResponse<IssueReadDTO>>> ChooseTheWinnerOfCurrentQuarter()
         => await HandleErrors<ChooseTheWinnerOfCurrentQuarter, Issue, IssueReadDTO>(new ChooseTheWinnerOfCurrentQuarter());
+
+    [HttpPut("generate-pdf-for-an-issue/{id}")]
+    public async Task<ActionResult<ApiResponse<string>>> GeneratePDFForAnIssue(Guid id)
+        => await HandleErrors(async () => await Mediator.Send(new GeneratePDFForAnIssueCommand(id)));
 }

@@ -53,6 +53,8 @@ public class ChooseTheWinnerOfCurrentQuarter : IRequest<Issue>
                 issue.IssueProcessingHistories = new List<IssueProcessingHistory>() { new IssueProcessingHistory { IssueProcess = IssueProcess.EndedInCurrentQuarter } };
             }
 
+            //Utworzenie pliku PDF do podpisywania przez zainteresowanych
+            
             var sum = await _context.SaveChangesAsync(cancellationToken);
 
             return issueWinner;

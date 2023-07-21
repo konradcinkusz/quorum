@@ -46,3 +46,4 @@ global using MR.Shared.DTOs.Issue.Admin;
 global using MR.Shared.DTOs.Issue.SearchParams;
 global using MR.Shared.DTOs.Issue.Public;
 global using MR.Shared.DTOs.Issue.SignAndSubmit;
+global using MR.Service.Features.Issues.PDF;

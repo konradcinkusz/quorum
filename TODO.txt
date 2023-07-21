@@ -8,6 +8,7 @@ Zamienić kwartał na czas trwania danej kwestii (np. miesiąc), żeby np. w prz
 Dodanie edycji
 Dodanie procesu do list page sign and submitted (tzn. użytkownik ma mieć możliwość kliknięcia complete, po czym nie będzei mógł nanosić nowych zmian)
 Uzupełnić w nav menu: Upload real sign oraz Assigned Issues
+Podczas wybierania kwartału (zwycięzcy) należy również utworzyć PDF do podpisywania przez ludzi
 
 Long Term TODO:
 Uploadowanie dokumentów w ogóle

@@ -25,6 +25,7 @@ public interface IAdminService
     Task<ApiResponse<bool>> DeleteQuarter(Guid issueId);
     Task<ApiResponse<PagedListDto<IssueAdminRatingValueCalculate>>> CalculatePublishedIssueRatingForCurrentQuarter();
     Task<ApiResponse<IssueReadDTO>> ChooseTheWinnerOfCurrentQuarter();
+    Task<ApiResponse<string>> GeneratePDFForAnIssue(Guid issueId);
 }
 
 internal sealed class AdminService : DataServiceBase, IAdminService
@@ -181,5 +182,11 @@ internal sealed class AdminService : DataServiceBase, IAdminService
     {
         var endpoint = $"{_adminIssueControllerPath}/choose-the-winner-of-current-quarter";
         return await HandleResponse<IssueReadDTO>(async () => await _httpClient.PutAsync(endpoint, null));
+    }
+
+    public async Task<ApiResponse<string>> GeneratePDFForAnIssue(Guid issueId)
+    {
+        var endpoint = $"{_adminIssueControllerPath}/generate-pdf-for-an-issue/{issueId}";
+        return await HandleResponse<string>(async () => await _httpClient.PutAsync(endpoint, null));
     }
 }
