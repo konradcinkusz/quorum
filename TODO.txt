@@ -9,14 +9,15 @@ Dodanie edycji
 Dodanie procesu do list page sign and submitted (tzn. użytkownik ma mieć możliwość kliknięcia complete, po czym nie będzei mógł nanosić nowych zmian)
 Uzupełnić w nav menu: Upload real sign oraz Assigned Issues
 Podczas wybierania kwartału (zwycięzcy) należy również utworzyć PDF do podpisywania przez ludzi
-dodać cancellation tokeny do cloudinary service
 
 Long Term TODO:
-Uploadowanie dokumentów w ogóle
+Uploadowanie dokumentów w ogóle (w sensie że użytkownik wgrywa do nas dokument)
 Uploadowanie dokumentów podpisanych podpisem zaufanym
+Sprawdzić które wartości mają iść do publiczności z query od issue
 
 DONE:
 Dodać (pokazywać) QuarterYear i QuarterNumber do PublicPublishedEndedIssueRead w cely prezentacji kwartału na Issue.Winners.ListPage
 Dodanie roztrzygnięcia kwartału
 Dodać obsługę publikowania kwestii
 Poprawić kontroler public async Task<IActionResult> EditPayment([FromRoute] Guid id, [FromBody] PaymentUpdateDTO paymentDto)
+dodać cancellation tokeny do cloudinary service

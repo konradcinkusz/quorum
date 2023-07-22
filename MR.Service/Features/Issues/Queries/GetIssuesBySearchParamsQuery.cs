@@ -29,6 +29,7 @@ public class GetIssuesBySearchParamsQuery : QueryBase, IRequest<PagedList<Issue>
                 .Include(x => x.IssueVisibilityHistories)
                 .Include(x => x.IssueProcessingHistories)
                 .Include(x => x.CreatedBy)
+                .Include(x => x.CloudinaryFileIssues).ThenInclude(y => y.CloudinaryFile)
                 .AsQueryable();
 
             if (request.IsDeleted.HasValue)

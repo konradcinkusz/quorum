@@ -83,7 +83,7 @@ public abstract class MRBaseController : ControllerBase
                 return new ApiResponse<PagedListDto<D>>("Failed to process the issue request.", (int)HttpStatusCode.BadRequest);
             }
 
-            var IssuePoolPagedListDto = new PagedListDto<D>
+            var pagedListDTO = new PagedListDto<D>
             {
                 Items = _mapper.Map<List<D>>(result),
                 CurrentPage = result.CurrentPage,
@@ -92,7 +92,7 @@ public abstract class MRBaseController : ControllerBase
                 TotalPages = result.TotalPages
             };
 
-            return new ApiResponse<PagedListDto<D>>(IssuePoolPagedListDto);
+            return new ApiResponse<PagedListDto<D>>(pagedListDTO);
         }
         catch (Exception ex)
         {

@@ -22,16 +22,18 @@ public class GeneratePDFForAnIssueCommand : IRequest<string>
         public override async Task<string> Handle(GeneratePDFForAnIssueCommand request, CancellationToken cancellationToken)
         {
             var issue = await _context.Issues.Include(x => x.CreatedBy).Include(x => x.IssueProcessingHistories)
-                .FirstOrDefaultAsync(x => x.Id == request._issueId, cancellationToken);
+                .FirstAsync(x => x.Id == request._issueId, cancellationToken);
 
             // Generate PDF bytes using the GeneratePdfBytes method
             byte[] pdfBytes = _issuePDFService.GeneratePdfBytes(issue);
 
+            var fileName = _issuePDFService.GetIssuePDFFileName(issue);
+
             // Create an UploadedFile object to represent the PDF file
-            UploadedFile uploadedFile = new UploadedFile(_issuePDFService.GetIssuePDFFileName(issue), pdfBytes);
+            UploadedFile uploadedFile = new UploadedFile(fileName, pdfBytes);
 
             // Upload the PDF to Cloudinary using the CloudinaryService
-            var fileData = await _cloudinaryService.UploadPdf(uploadedFile);
+            var fileData = await _cloudinaryService.UploadPdfAsync(uploadedFile, cancellationToken);
 
             var cloudinaryFile = new CloudinaryFile()
             {

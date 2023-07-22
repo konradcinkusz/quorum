@@ -6,8 +6,8 @@
 
     internal interface ICloudinaryService
     {
-        Task<ImageData> UploadImage(UploadedFile uploadedFile);
-        Task<FileData> UploadPdf(UploadedFile uploadedFile);
+        Task<ImageData> UploadImageAsync(UploadedFile uploadedFile, CancellationToken cancellationToken);
+        Task<FileData> UploadPdfAsync(UploadedFile uploadedFile, CancellationToken cancellationToken);
     }
 
     internal class CloudinaryService : ICloudinaryService
@@ -20,7 +20,7 @@
             cloudinary.Api.Secure = true;
         }
 
-        public async Task<ImageData> UploadImage(UploadedFile uploadedFile)
+        public async Task<ImageData> UploadImageAsync(UploadedFile uploadedFile, CancellationToken cancellationToken)
         {
             MemoryStream ms = new MemoryStream(uploadedFile.Content);
             var uploadParams = new ImageUploadParams()
@@ -28,7 +28,7 @@
                 File = new FileDescription(uploadedFile.Name, ms)
             };
 
-            var uploadResult = await cloudinary.UploadAsync(uploadParams);
+            var uploadResult = await cloudinary.UploadAsync(uploadParams, cancellationToken);
 
             return new(uploadResult, uploadedFile.Name)
             {
@@ -36,29 +36,22 @@
             };
         }
 
-        public async Task<FileData> UploadPdf(UploadedFile uploadedFile)
+        public async Task<FileData> UploadPdfAsync(UploadedFile uploadedFile, CancellationToken cancellationToken)
         {
-            try
+            var uploadParams = new ImageUploadParams
             {
-                var uploadParams = new ImageUploadParams
-                {
-                    File = new FileDescription(uploadedFile.Name, new MemoryStream(uploadedFile.Content)),
-                    Tags = "pdf_file" // Optional tags to associate with the uploaded file
-                };
+                File = new FileDescription(uploadedFile.Name, new MemoryStream(uploadedFile.Content)),
+                Tags = "pdf_file" // Optional tags to associate with the uploaded file
+            };
 
-                var uploadResult = await cloudinary.UploadAsync(uploadParams);
+            var uploadResult = await cloudinary.UploadAsync(uploadParams, cancellationToken);
 
-                if (uploadResult.Error != null)
-                {
-                    throw new Exception(uploadResult.Error.Message);
-                }
-
-                return new(uploadResult, uploadedFile.Name);
-            }
-            catch (Exception ex)
+            if (uploadResult.Error != null)
             {
-                return null;
+                throw new Exception(uploadResult.Error.Message);
             }
+
+            return new(uploadResult, uploadedFile.Name);
         }
     }
 }
