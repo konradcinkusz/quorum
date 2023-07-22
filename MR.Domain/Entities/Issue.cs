@@ -38,6 +38,7 @@ public class Issue : BaseEntity<Guid>
     [InverseProperty(nameof(IssueProcessingHistory.Issue))]
     public ICollection<IssueProcessingHistory> IssueProcessingHistories { get; set; }
 
-    [InverseProperty(nameof(CloudinaryFile.Issue))]
-    public ICollection<CloudinaryFile> CloudinaryFiles { get; set; }
+    [InverseProperty(nameof(CloudinaryFileIssue.Issue))]
+    public ICollection<CloudinaryFileIssue> CloudinaryFileIssues { get; set; }
+
 }

@@ -15,6 +15,7 @@ public interface IApplicationDbContext
     DbSet<QuarterIssue> QuarterIssues { get; set; }
     DbSet<IssueRatingHistory> IssueRatingHistories { get; set; }
     DbSet<CloudinaryFile> CloudinaryFiles { get; set; }
+    DbSet<CloudinaryFileIssue> CloudinaryFileIssues { get; set; }
 
     DbSet<TEntity> Set<TEntity>() where TEntity : class;
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
@@ -41,6 +42,7 @@ public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>, 
     public DbSet<QuarterIssue> QuarterIssues { get; set; }
     public DbSet<IssueRatingHistory> IssueRatingHistories { get; set; }
     public DbSet<CloudinaryFile> CloudinaryFiles { get; set; }
+    public DbSet<CloudinaryFileIssue> CloudinaryFileIssues { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -49,6 +51,8 @@ public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>, 
         Logs_config(modelBuilder);
         SubscriptionPaymentConfig(modelBuilder);
         QuarterIssueConfig(modelBuilder);
+        CloudinaryFileIssueConfig(modelBuilder);
+
         base.OnModelCreating(modelBuilder);
     }
 
@@ -85,7 +89,7 @@ public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>, 
         return base.SaveChangesAsync(cancellationToken);
     }
 
-    private void UpdateCreatedAtProperty()
+    void UpdateCreatedAtProperty()
     {
         var entities = ChangeTracker.Entries()
             .Where(e => e.State == EntityState.Added)
@@ -98,7 +102,7 @@ public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>, 
         }
     }
 
-    private void UpdateUpdatedAtProperty()
+    void UpdateUpdatedAtProperty()
     {
         var entities = ChangeTracker.Entries()
             .Where(e => e.State == EntityState.Modified)
@@ -111,7 +115,7 @@ public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>, 
         }
     }
 
-    private void Logs_config(ModelBuilder modelBuilder)
+    void Logs_config(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Subscription>()
             .HasMany(s => s.Subscription_Logs)
@@ -124,7 +128,7 @@ public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>, 
             .OnDelete(DeleteBehavior.Cascade);
     }
 
-    private void SubscriptionPaymentConfig(ModelBuilder modelBuilder)
+    void SubscriptionPaymentConfig(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<SubscriptionPayment>()
                     .HasKey(sp => new { sp.SubscriptionId, sp.PaymentId });
@@ -142,7 +146,7 @@ public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>, 
             .OnDelete(DeleteBehavior.Cascade);
     }
 
-    private void QuarterIssueConfig(ModelBuilder modelBuilder)
+    void QuarterIssueConfig(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<QuarterIssue>()
                     .HasKey(sp => new { sp.IssueId, sp.QuarterId });
@@ -157,6 +161,24 @@ public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>, 
             .HasOne(sp => sp.Quarter)
             .WithMany(p => p.QuarterIssues)
             .HasForeignKey(sp => sp.QuarterId)
+            .OnDelete(DeleteBehavior.Cascade);
+    }
+
+    void CloudinaryFileIssueConfig(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<CloudinaryFileIssue>()
+                    .HasKey(sp => new { sp.IssueId, sp.CloudinaryFileId });
+
+        modelBuilder.Entity<CloudinaryFileIssue>()
+            .HasOne(sp => sp.Issue)
+            .WithMany(s => s.CloudinaryFileIssues)
+            .HasForeignKey(sp => sp.IssueId)
+            .OnDelete(DeleteBehavior.Restrict);// remove cascading delete behavior on SubscriptionPayment -> Subscription relationship
+
+        modelBuilder.Entity<CloudinaryFileIssue>()
+            .HasOne(sp => sp.CloudinaryFile)
+            .WithMany(p => p.CloudinaryFileIssues)
+            .HasForeignKey(sp => sp.CloudinaryFileId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

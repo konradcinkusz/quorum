@@ -24,6 +24,9 @@ public static class DependencyInjection
             services.Configure<CloudinaryOpt>(configSection);
             services.AddScoped<ICloudinaryService, CloudinaryService>();
         }
+
+        services.AddScoped<IIssuePDFService, IssuePDFService>();
+
         // or you can use assembly in Extension method in Infra layer with below command
         services.AddMediatR(Assembly.GetExecutingAssembly());
     }

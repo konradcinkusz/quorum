@@ -7,6 +7,7 @@ public class TableNames
     public const string ImageDatas = "ImageDatas";
     public const string Issues = "Issues";
     public const string CloudinaryFiles = "CloudinaryFiles";
+    public const string CloudinaryFileIssues = "CloudinaryFileIssues";
     public const string IssueRatingHistory = "IssueRatingHistory";
     public const string IssueVisibilityHistory = "IssueVisibilityHistory";
     public const string IssueProcessingHistory = "IssueProcessingHistory";

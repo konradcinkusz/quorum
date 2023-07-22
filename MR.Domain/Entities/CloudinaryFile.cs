@@ -4,10 +4,9 @@
 public class CloudinaryFile : BaseEntity<Guid>
 {
     public string PublicId { get; set; }
-    public string Url { get; set; }
-    public string? Description { get; set; }
+    public string SecureUri { get; set; }
+    public string FileName { get; set; }
 
-    [ForeignKey(nameof(Issue))]
-    public Guid? IssueId { get; set; }
-    public Issue? Issue { get; set; }
+    [InverseProperty(nameof(CloudinaryFileIssue.CloudinaryFile))]
+    public ICollection<CloudinaryFileIssue> CloudinaryFileIssues { get; set; }
 }

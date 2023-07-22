@@ -4,84 +4,61 @@
     using CloudinaryDotNet;
     using CloudinaryDotNet.Actions;
 
-    public interface ICloudinaryService
+    internal interface ICloudinaryService
     {
-        string GetPdfUrl(string publicId);
         Task<ImageData> UploadImage(UploadedFile uploadedFile);
-        string UploadPdf(string filePath, string publicId);
+        Task<FileData> UploadPdf(UploadedFile uploadedFile);
     }
 
     internal class CloudinaryService : ICloudinaryService
     {
-        private readonly Cloudinary cloudinary;
-
+        readonly Cloudinary cloudinary;
         public CloudinaryService(IOptions<CloudinaryOpt> options)
         {
-            Account account = new Account(
-                               options.Value.Cloud,
-                               options.Value.ApiKey,
-                               options.Value.ApiSecret);
-
+            Account account = new Account(options.Value.Cloud, options.Value.ApiKey, options.Value.ApiSecret);
             cloudinary = new Cloudinary(account);
             cloudinary.Api.Secure = true;
         }
 
         public async Task<ImageData> UploadImage(UploadedFile uploadedFile)
         {
-            MemoryStream ms = new MemoryStream(uploadedFile.FileContent);
+            MemoryStream ms = new MemoryStream(uploadedFile.Content);
             var uploadParams = new ImageUploadParams()
             {
-                File = new FileDescription(uploadedFile.FileName, ms)
+                File = new FileDescription(uploadedFile.Name, ms)
             };
 
             var uploadResult = await cloudinary.UploadAsync(uploadParams);
 
-            return new()
+            return new(uploadResult, uploadedFile.Name)
             {
-                DateAdded = DateTime.Now,
-                Description = uploadedFile.FileName,
-                IsMain = true,
-                Public_Id = uploadResult.PublicId,
-                Url = cloudinary.Api.UrlImgUp.Transform(new Transformation().Width(150).Crop("scale")).Secure(true).BuildUrl(uploadResult.PublicId)
+                TransformedUrl = cloudinary.Api.UrlImgUp.Transform(new Transformation().Width(150).Crop("scale")).Secure(true).BuildUrl(uploadResult.PublicId)
             };
         }
 
-        public string UploadPdf(string filePath, string publicId)
+        public async Task<FileData> UploadPdf(UploadedFile uploadedFile)
         {
-            var uploadParams = new ImageUploadParams()
+            try
             {
-                File = new FileDescription(filePath),
-                PublicId = publicId,
-                RawConvert = "pdf",
-                Tags = "pdf_file" // Optional tags to associate with the uploaded file
-            };
+                var uploadParams = new ImageUploadParams
+                {
+                    File = new FileDescription(uploadedFile.Name, new MemoryStream(uploadedFile.Content)),
+                    Tags = "pdf_file" // Optional tags to associate with the uploaded file
+                };
 
-            var uploadResult = cloudinary.Upload(uploadParams);
+                var uploadResult = await cloudinary.UploadAsync(uploadParams);
 
-            if (uploadResult.Error != null)
-            {
-                throw new Exception(uploadResult.Error.Message);
+                if (uploadResult.Error != null)
+                {
+                    throw new Exception(uploadResult.Error.Message);
+                }
+
+                return new(uploadResult, uploadedFile.Name);
             }
-
-            return uploadResult.SecureUrl.AbsoluteUri;
-        }
-
-        public string GetPdfUrl(string publicId)
-        {
-            var getParams = new GetResourceParams(publicId)
+            catch (Exception ex)
             {
-                ResourceType = ResourceType.Raw
-            };
-
-            var getResult = cloudinary.GetResource(getParams);
-
-            if (getResult.Error != null)
-            {
-                throw new Exception(getResult.Error.Message);
+                return null;
             }
-
-            return getResult.SecureUrl;
         }
-
     }
 }
