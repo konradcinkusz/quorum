@@ -1,27 +1,21 @@
 ﻿@inherits ListPageBase<IssueSignedAndSubmittedDTO, IssueSignAndSubmitSearchParamsDTO>
 @attribute [Authorize]
 @inject IIssueService issueService
-@page "/issue/signed-submitted"
+@page "/issue/your-winners"
 
 <_PagedListWrapper PagedListDto="PagedListDTO" result="apiResponse">
     <_ForEachPagedListWrapper PagedListDto="PagedListDTO" result="apiResponse">
         <_CustomPublishedIssueCard dto="@context" ShowButtons="true" ShowStatus="true">
             @if (!context.Id.IsNullOrEmpty() && context.IssueSignedAndSubmittedProcess != IssueSignedAndSubmittedProcessEnum.Completed)
             {
-                <button type="button" @onclick="@(async () => await DownloadFormForSign(context.Id))" class="btn btn-danger rounded-pill m-1" data-bs-toggle="tooltip">
-                    Download form for sign
-                </button>
-                if (context.IssueSignedAndSubmittedProcess == IssueSignedAndSubmittedProcessEnum.NotDownloaded || context.IssueSignedAndSubmittedProcess == IssueSignedAndSubmittedProcessEnum.Downloaded)
+                <a href="@context.PDF.SecureUri" download="@context.PDF.FileName" target="_blank">Download PDF: @context.PDF.FileName</a>
+                @if (context.IssueSignedAndSubmittedProcess == IssueSignedAndSubmittedProcessEnum.NotDownloaded || context.IssueSignedAndSubmittedProcess == IssueSignedAndSubmittedProcessEnum.Downloaded)
                 {
-                    <button type="button" @onclick="@(async () => await UploadSignedForm(context.Id))" class="btn btn-secondary rounded-pill m-1" data-bs-toggle="tooltip">
-                        Upload
-                    </button>
+                    <input type="file" @onchange="@(async () => await OnFileChange(context.Id))" />
                 }
                 else if (context.IssueSignedAndSubmittedProcess == IssueSignedAndSubmittedProcessEnum.Uploaded)
                 {
-                    <button type="button" @onclick="@(async () => await UploadSignedForm(context.Id))" class="btn btn-danger rounded-pill m-1" data-bs-toggle="tooltip">
-                        Remove uploaded
-                    </button>
+                    <button type="button" class="btn btn-danger rounded-pill m-1" @onclick="@(async () => await RemoveUploadedFile(context.Id))">Remove uploaded</button>
                 }
             }
             else if (context.IssueSignedAndSubmittedProcess == IssueSignedAndSubmittedProcessEnum.Completed)
@@ -41,13 +35,19 @@
     protected override async Task<ApiResponse<PagedListDto<IssueSignedAndSubmittedDTO>>> Get(IssueSignAndSubmitSearchParamsDTO searchParamsDTO)
         => await issueService.GetSignSubmitIssues(searchParamsDTO);
 
-    private async Task DownloadFormForSign(Guid issueId)
+    async Task OnFileChange(Guid issueId)
     {
-        throw new NotImplementedException(nameof(DownloadFormForSign));
+        //var file = await fileService.UploadFileAsync(file); // Assuming you have a service method for file upload
+        //if (file != null)
+        //{
+        //    // Assuming the service method to update the issue with the uploaded file exists
+        //    await issueService.UpdateIssueWithUploadedFile(issueId, file.FileName);
+        //}
     }
 
-    private async Task UploadSignedForm(Guid issueId)
+    async Task RemoveUploadedFile(Guid issueId)
     {
-        throw new NotImplementedException(nameof(UploadSignedForm));
+        // Assuming the service method to remove the uploaded file exists
+        //await issueService.RemoveUploadedFile(issueId);
     }
 }

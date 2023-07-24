@@ -15,10 +15,10 @@ public class GetSignedSubmittedIssuesCommand : QueryBase, IRequest<PagedList<Iss
         {
             // Retrieve signed winner issues
             var query = _context.Issues
+                .Include(x => x.CloudinaryFileIssues).ThenInclude(y => y.CloudinaryFile)
                 .Where(issue => issue.Signatures.Any(signature => signature.SignaturePool.ApplicationUserId == request.ApplicationUserId))
                 .Where(issue => issue.IssueProcess == IssueProcess.EndedInCurrentQuarter)
                 .Where(issue => issue.IssueVisibility == IssueVisibility.VisibleForAll);
-
 
             var pagedList = await PagedList<Issue>.CreateAsync(query, request.SearchParams, cancellationToken);
 

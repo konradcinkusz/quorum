@@ -1,0 +1,31 @@
+﻿@inherits ListPageBase<PublicPublishedIssueRead, PublicPublishedIssueSearchParamsDTO>
+@attribute [Authorize]
+@inject ISignatureService signatureService
+@inject IIssueService issueService
+@page "/issue/signed-issues"
+
+<_PagedListWrapper PagedListDto="PagedListDTO" result="apiResponse">
+    <_ForEachPagedListWrapper PagedListDto="PagedListDTO" result="apiResponse">
+        <_CustomPublishedIssueCard dto="@context" ShowButtons="true" ShowStatus="true">
+            <button type="button" @onclick="@(async () => await UnsignIssue(context.Id))" class="btn btn-danger rounded-pill m-1" data-bs-toggle="tooltip">
+                Unsign
+            </button>
+        </_CustomPublishedIssueCard>
+    </_ForEachPagedListWrapper>
+    <div class="row">
+        <_Paging QueryBase="searchParamsDTO" RefreshList="Refresh" TotalPages="PagedListDTO.TotalPages" TotalItems="PagedListDTO.TotalItems" />
+    </div>
+</_PagedListWrapper>
+
+@code {
+    protected override void InitializeSearchParams() => searchParamsDTO = new PublicPublishedIssueSearchParamsDTO();
+
+    protected override async Task<ApiResponse<PagedListDto<PublicPublishedIssueRead>>> Get(PublicPublishedIssueSearchParamsDTO searchParamsDTO)
+        => await issueService.GetSignedIssues(searchParamsDTO);
+
+    private async Task UnsignIssue(Guid issueId)
+    {
+        await signatureService.UnsignIssue(issueId);
+        await Refresh();
+    }
+}

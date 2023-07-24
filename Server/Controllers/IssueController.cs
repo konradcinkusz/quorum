@@ -132,4 +132,12 @@ public sealed class IssueController : MRBaseController
     [HttpDelete("archive-issue/{id}")]
     public async Task<ActionResult<ApiResponse<bool>>> ArchiveIssue([FromRoute] Guid id)
         => await HandleErrors(async () => await Mediator.Send(new ArchiveIssueCommand(id)));
+
+    [HttpGet("get-signed-issues")]
+    public async Task<ActionResult<ApiResponse<PagedListDto<PublicPublishedIssueRead>>>> GetSignedIssues([FromQuery] PublicPublishedIssueSearchParamsDTO searchParams)
+    {
+        var request = await ProcessPagedRequest<GetSignedIssuesCommand, PublicPublishedIssueRead, Issue>(new GetSignedIssuesCommand { ApplicationUserId = GetUserId() });
+
+        return request;
+    }
 }

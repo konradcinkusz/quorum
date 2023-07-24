@@ -1,5 +1,5 @@
 ﻿In progress:
-Lista podpisanych kwestii, które zostały zakończone w danym kwartale i czekają na przesłania podpisu
+Lista podpisanych kwestii, które zostały zakończone w danym kwartale i czekają na przesłania podpisu (Your Winners)
 
 TODO:
 Różne typy subskrypcji - potwierdzenia konta za pomocą uploadowanego dokumentu
@@ -7,7 +7,6 @@ Proces publikowania - widoczności przycisków
 Zamienić kwartał na czas trwania danej kwestii (np. miesiąc), żeby np. w przeciągu tygodnia roztrzygać kwestie
 Dodanie edycji
 Dodanie procesu do list page sign and submitted (tzn. użytkownik ma mieć możliwość kliknięcia complete, po czym nie będzei mógł nanosić nowych zmian)
-Uzupełnić w nav menu: Upload real sign oraz Assigned Issues
 Podczas wybierania kwartału (zwycięzcy) należy również utworzyć PDF do podpisywania przez ludzi
 
 Long Term TODO:
@@ -21,3 +20,4 @@ Dodanie roztrzygnięcia kwartału
 Dodać obsługę publikowania kwestii
 Poprawić kontroler public async Task<IActionResult> EditPayment([FromRoute] Guid id, [FromBody] PaymentUpdateDTO paymentDto)
 dodać cancellation tokeny do cloudinary service
+Uzupełnić w nav menu: Upload real sign oraz Assigned Issues
