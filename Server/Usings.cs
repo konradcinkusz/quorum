@@ -48,3 +48,4 @@ global using MR.Shared.DTOs.Issue.Public;
 global using MR.Shared.DTOs.Issue.SignAndSubmit;
 global using MR.Service.Features.Issues.PDF;
 global using MR.Shared.DTOs.CloudinaryFile;
+global using MR.Domain.Enum;

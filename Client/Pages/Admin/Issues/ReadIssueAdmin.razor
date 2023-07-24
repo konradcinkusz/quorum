@@ -154,13 +154,9 @@
 
             <dt class="col-sm-3">Generate PDF for an issue</dt>
             <dd class="col-sm-9">
-                @if(dto.FileReadDTOs.Any())
+                @if (dto.PDF != null)
                 {
-                    <span>@dto.FileReadDTOs.First().SecureUri</span>
-                }
-                else if (!string.IsNullOrEmpty(pDFUrl))
-                {
-                    <span>@pDFUrl</span>
+                    <a href="@dto.PDF.SecureUri" download="@dto.PDF.FileName" target="_blank">Download PDF: @dto.PDF.FileName</a>
                 }
                 else
                 {
@@ -190,7 +186,6 @@
                 </button>
             </div>
         </div>
-
         @if (result != null)
         {
             <hr />
@@ -212,6 +207,9 @@
     [Parameter]
     public EventCallback<Guid> SetPendingPaymentStatusByPaymentGuid { get; set; }
 
+    [Parameter]
+    public EventCallback Refresh { get; set; }
+
     bool _showDetails = false;
 
     bool confirmationCheckboxChecked;
@@ -225,10 +223,10 @@
             result = await adminService.VerifyIssue(dto.Id);
         }
     }
-    string pDFUrl = string.Empty;
+
     async Task GeneratePdfAsync()
     {
         var response = await adminService.GeneratePDFForAnIssue(dto.Id);
-        pDFUrl = response.Data;
+        await Refresh.InvokeAsync();
     }
 }

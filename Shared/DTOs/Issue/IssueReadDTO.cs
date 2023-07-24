@@ -17,5 +17,5 @@ public class IssueReadDTO : BaseDTO
     public List<IssueProcessingHistoryDTO> IssueProcessingHistories { get; set; } = new List<IssueProcessingHistoryDTO>();
     public List<QuarterDTO> QuarterDTOs { get; set; } = new List<QuarterDTO>();
     public List<SignatureDTO> Signatures { get; set; } = new List<SignatureDTO>();
-    public List<FileReadDTO> FileReadDTOs { get; set; } = new List<FileReadDTO>();
+    public FileReadDTO PDF { get; set; }
 }

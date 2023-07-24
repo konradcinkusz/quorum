@@ -10,4 +10,6 @@ public class CloudinaryFileIssue
     [ForeignKey(nameof(CloudinaryFile)), Key, Column(Order = 1)]
     public Guid CloudinaryFileId { get; set; }
     public CloudinaryFile CloudinaryFile { get; set; }
+
+    public CloudinaryFileIssueType CloudinaryFileIssueType { get; set; }
 }

@@ -10,7 +10,7 @@
                 <div class="row align-content-center justify-content-center">
                     @foreach (var p in IssuePagedListDto.Items)
                     {
-                        <ReadIssueAdmin dto="p" Delete="Delete" AcceptInitialPaymentByPaymentGuid="AcceptPaymentByPaymentGuid" SetPendingPaymentStatusByPaymentGuid="SetPendingPaymentStatusByPaymentGuid" />
+                        <ReadIssueAdmin dto="p" Delete="Delete" AcceptInitialPaymentByPaymentGuid="AcceptPaymentByPaymentGuid" SetPendingPaymentStatusByPaymentGuid="SetPendingPaymentStatusByPaymentGuid" Refresh="_refresh" />
                     }
                     @if (IssuePagedListDto.Items.Count == 0)
                     {
