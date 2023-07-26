@@ -22,7 +22,7 @@ public class IssueProfile : Profile
             .ForMember(dest => dest.InitialPayment, opt => opt.MapFrom(src => src.InitialPayment))
             .ForMember(dest => dest.ApplicationUserId, opt => opt.MapFrom(src => src.CreatedBy != null ? src.CreatedBy.Id : string.Empty))
             .ForMember(dest => dest.ApplicationUserEmail, opt => opt.MapFrom(src => src.CreatedBy != null ? src.CreatedBy.Email : string.Empty))
-            .ForMember(dest => dest.PDF, opt => opt.MapFrom(src => src.CloudinaryFileIssues != null && src.CloudinaryFileIssues.Any(x => x.CloudinaryFileIssueType == CloudinaryFileIssueType.Main) ? src.CloudinaryFileIssues.Where(x => x.CloudinaryFileIssueType == CloudinaryFileIssueType.Main).Select(x => x.CloudinaryFile).First() : new CloudinaryFile()))
+            .ForMember(dest => dest.PDF, opt => opt.MapFrom(src => src.CloudinaryFileIssues != null && src.CloudinaryFileIssues.Any(x => x.CloudinaryFileIssueType == CloudinaryFileIssueType.General) ? src.CloudinaryFileIssues.Where(x => x.CloudinaryFileIssueType == CloudinaryFileIssueType.General).Select(x => x.CloudinaryFile).First() : new CloudinaryFile()))
             .PreserveReferences();
 
         CreateMap<Issue, IssueAdminRatingValueCalculate>();
@@ -41,7 +41,7 @@ public class IssueProfile : Profile
             .ForMember(dest => dest.ApplicationUserEmail, opt => opt.MapFrom(src => src.CreatedBy != null ? src.CreatedBy.Email : string.Empty))
             .ForMember(dest => dest.QuarterNumber, opt => opt.MapFrom(src => src.QuarterIssues.FirstOrDefault(x => x.QuarterWinner.HasValue && x.QuarterWinner.Value).Quarter.QuarterNumber))
             .ForMember(dest => dest.QuarterYear, opt => opt.MapFrom(src => src.QuarterIssues.FirstOrDefault(x => x.QuarterWinner.HasValue && x.QuarterWinner.Value).Quarter.Year))
-            .ForMember(dest => dest.PDF, opt => opt.MapFrom(src => src.CloudinaryFileIssues != null && src.CloudinaryFileIssues.Any(x => x.CloudinaryFileIssueType == CloudinaryFileIssueType.Main) ? src.CloudinaryFileIssues.Where(x => x.CloudinaryFileIssueType == CloudinaryFileIssueType.Main).Select(x => x.CloudinaryFile).First() : new CloudinaryFile()))
+            .ForMember(dest => dest.PDF, opt => opt.MapFrom(src => src.CloudinaryFileIssues != null && src.CloudinaryFileIssues.Any(x => x.CloudinaryFileIssueType == CloudinaryFileIssueType.General) ? src.CloudinaryFileIssues.Where(x => x.CloudinaryFileIssueType == CloudinaryFileIssueType.General).Select(x => x.CloudinaryFile).First() : new CloudinaryFile()))
             .PreserveReferences();
     }
 }

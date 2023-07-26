@@ -3,15 +3,15 @@
 /// <summary>
 /// Get issues that requires sign real form
 /// </summary>
-public class GetSignedSubmittedIssuesCommand : QueryBase, IRequest<PagedList<Issue>>
+public class GetYourWinnersCommand : QueryBase, IRequest<PagedList<Issue>>
 {
-    internal class GetSignedSubmittedIssuesCommandHandler : CommandQueryHandlerBase<GetSignedSubmittedIssuesCommand, PagedList<Issue>>
+    internal class GetYourWinnersCommandHandler : CommandQueryHandlerBase<GetYourWinnersCommand, PagedList<Issue>>
     {
-        public GetSignedSubmittedIssuesCommandHandler(IApplicationDbContext context, ILogger<GetSignedSubmittedIssuesCommand> logger) : base(context, logger)
+        public GetYourWinnersCommandHandler(IApplicationDbContext context, ILogger<GetYourWinnersCommand> logger) : base(context, logger)
         {
         }
 
-        public override async Task<PagedList<Issue>> Handle(GetSignedSubmittedIssuesCommand request, CancellationToken cancellationToken)
+        public override async Task<PagedList<Issue>> Handle(GetYourWinnersCommand request, CancellationToken cancellationToken)
         {
             // Retrieve signed winner issues
             var query = _context.Issues

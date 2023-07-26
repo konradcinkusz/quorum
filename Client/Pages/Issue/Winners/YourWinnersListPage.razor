@@ -33,7 +33,7 @@
     protected override void InitializeSearchParams() => searchParamsDTO = new IssueSignAndSubmitSearchParamsDTO();
 
     protected override async Task<ApiResponse<PagedListDto<IssueSignedAndSubmittedDTO>>> Get(IssueSignAndSubmitSearchParamsDTO searchParamsDTO)
-        => await issueService.GetSignSubmitIssues(searchParamsDTO);
+        => await issueService.GetYourWinners(searchParamsDTO);
 
     async Task OnFileChange(Guid issueId)
     {

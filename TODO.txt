@@ -1,5 +1,4 @@
 ﻿In progress:
-Lista podpisanych kwestii, które zostały zakończone w danym kwartale i czekają na przesłania podpisu (Your Winners)
 
 TODO:
 Różne typy subskrypcji - potwierdzenia konta za pomocą uploadowanego dokumentu
@@ -21,3 +20,4 @@ Dodać obsługę publikowania kwestii
 Poprawić kontroler public async Task<IActionResult> EditPayment([FromRoute] Guid id, [FromBody] PaymentUpdateDTO paymentDto)
 dodać cancellation tokeny do cloudinary service
 Uzupełnić w nav menu: Upload real sign oraz Assigned Issues
+Lista podpisanych kwestii, które zostały zakończone w danym kwartale i czekają na przesłania podpisu (Your Winners)

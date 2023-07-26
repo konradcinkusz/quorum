@@ -12,7 +12,8 @@ public interface IIssueService
     Task<ApiResponse<bool>> ArchiveIssue(Guid issueId); 
     Task<ApiResponse<PagedListDto<PublicPublishedIssueRead>>> GetCurrentQuarterIssues(PublicPublishedIssueSearchParamsDTO searchParams);
     Task<ApiResponse<PagedListDto<PublicPublishedIssueRead>>> GetSignedIssues(PublicPublishedIssueSearchParamsDTO searchParams);
-    Task<ApiResponse<PagedListDto<IssueSignedAndSubmittedDTO>>> GetSignSubmitIssues(IssueSignAndSubmitSearchParamsDTO searchParams);
+    Task<ApiResponse<PagedListDto<IssueSignedAndSubmittedDTO>>> GetYourWinners(IssueSignAndSubmitSearchParamsDTO searchParams);
+    Task<ApiResponse<bool>> UploadSignedDocument(Guid issueId, MultipartFormDataContent content);
 }
 
 internal class IssueService : DataServiceBase, IIssueService
@@ -80,10 +81,10 @@ internal class IssueService : DataServiceBase, IIssueService
         return await HandleResponse<PagedListDto<PublicPublishedIssueRead>>(async () => await _httpClient.GetAsync(endpoint));
     }
 
-    public async Task<ApiResponse<PagedListDto<IssueSignedAndSubmittedDTO>>> GetSignSubmitIssues(IssueSignAndSubmitSearchParamsDTO searchParams)
+    public async Task<ApiResponse<PagedListDto<IssueSignedAndSubmittedDTO>>> GetYourWinners(IssueSignAndSubmitSearchParamsDTO searchParams)
     {
         var q = BuildQuery(searchParams);
-        var endpoint = $"{_issueControllerPath}/get-signed-submitted-issues?{q}";
+        var endpoint = $"{_issueControllerPath}/get-your-winners?{q}";
         return await HandleResponse<PagedListDto<IssueSignedAndSubmittedDTO>>(async () => await _httpClient.GetAsync(endpoint));
     }
 
@@ -92,5 +93,11 @@ internal class IssueService : DataServiceBase, IIssueService
         var q = BuildQuery(searchParams);
         var endpoint = $"{_issueControllerPath}/get-signed-issues?{q}";
         return await HandleResponse<PagedListDto<PublicPublishedIssueRead>>(async () => await _httpClient.GetAsync(endpoint));
+    }
+
+    public async Task<ApiResponse<bool>> UploadSignedDocument(Guid issueId, MultipartFormDataContent content)
+    {
+        var endpoint = $"{_issueControllerPath}/upload-signed-document/{issueId}";
+        return await HandleResponse<bool>(async () => await _httpClient.PutAsJsonAsync(endpoint, content));
     }
 }

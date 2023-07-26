@@ -11,5 +11,9 @@ public class CloudinaryFileIssue
     public Guid CloudinaryFileId { get; set; }
     public CloudinaryFile CloudinaryFile { get; set; }
 
+    [ForeignKey(nameof(ApplicationUser))]
+    public string? ApplicationUserId { get; set; }
+    public ApplicationUser? ApplicationUser { get; set; }
+
     public CloudinaryFileIssueType CloudinaryFileIssueType { get; set; }
 }

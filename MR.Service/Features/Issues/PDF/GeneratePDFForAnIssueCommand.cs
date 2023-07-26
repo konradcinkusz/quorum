@@ -42,7 +42,7 @@ public class GeneratePDFForAnIssueCommand : IRequest<string>
                 FileName = fileData.FileName,
             };
 
-            _ = await _context.CloudinaryFileIssues.AddAsync(new CloudinaryFileIssue() { Issue = issue, CloudinaryFile = cloudinaryFile }, cancellationToken);
+            _ = await _context.CloudinaryFileIssues.AddAsync(new CloudinaryFileIssue() { Issue = issue, CloudinaryFile = cloudinaryFile, CloudinaryFileIssueType = CloudinaryFileIssueType.General }, cancellationToken);
 
             var sum = await _context.SaveChangesAsync(cancellationToken);
 

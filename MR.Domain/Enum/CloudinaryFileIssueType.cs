@@ -2,6 +2,7 @@
 
 public enum CloudinaryFileIssueType
 {
-    Main,
-    UserForSign
+    General,
+    UserForSign,
+    UserSigned
 }

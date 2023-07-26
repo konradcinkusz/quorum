@@ -35,7 +35,7 @@ public static class SearchParamsExtension
         AddSearchParamsToCommand(command, searchParams);
     }
 
-    public static void AddIssueSignAndSubmitSearchParamsToCommand(GetSignedSubmittedIssuesCommand command, IssueSignAndSubmitSearchParamsDTO searchParams)
+    public static void AddIssueSignAndSubmitSearchParamsToCommand(GetYourWinnersCommand command, IssueSignAndSubmitSearchParamsDTO searchParams)
     {
         AddSearchParamsToCommand(command, searchParams);
     }

@@ -10,8 +10,7 @@ public abstract class MRBaseController : ControllerBase
     private IMediator _mediator;
     protected IMediator Mediator => _mediator ??= HttpContext.RequestServices.GetService<IMediator>();
 
-    public MRBaseController(
-        IMapper mapper)
+    public MRBaseController(IMapper mapper)
     {
         _mapper = mapper;
     }
@@ -99,5 +98,4 @@ public abstract class MRBaseController : ControllerBase
             return new ApiResponse<PagedListDto<D>>(new PagedListDto<D>()) { Message = ex.Message, StatusCode = (int)HttpStatusCode.BadRequest };
         }
     }
-
 }

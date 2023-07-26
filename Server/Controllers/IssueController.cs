@@ -37,17 +37,17 @@ public sealed class IssueController : MRBaseController
         return request;
     }
 
-    [HttpGet("get-signed-submitted-issues")]
-    public async Task<ActionResult<ApiResponse<PagedListDto<IssueSignedAndSubmittedDTO>>>> GetSignSubmitIssues([FromQuery] IssueSignAndSubmitSearchParamsDTO searchParams)
+    [HttpGet("get-your-winners")]
+    public async Task<ActionResult<ApiResponse<PagedListDto<IssueSignedAndSubmittedDTO>>>> GetYourWinners([FromQuery] IssueSignAndSubmitSearchParamsDTO searchParams)
     {
-        var command = new GetSignedSubmittedIssuesCommand();
+        var command = new GetYourWinnersCommand();
         command.ApplicationUserId = GetUserId();
         searchParams.SortColumn = "RatingValue";
         searchParams.SortOrder = SortOrder.Descending;
         searchParams.PageSize = 100;
         searchParams.CurrentPage = 1;
         SearchParamsExtension.AddIssueSignAndSubmitSearchParamsToCommand(command, searchParams);
-        var request = await ProcessPagedRequest<GetSignedSubmittedIssuesCommand, IssueSignedAndSubmittedDTO, Issue>(command);
+        var request = await ProcessPagedRequest<GetYourWinnersCommand, IssueSignedAndSubmittedDTO, Issue>(command);
         return request;
     }
 
@@ -137,7 +137,10 @@ public sealed class IssueController : MRBaseController
     public async Task<ActionResult<ApiResponse<PagedListDto<PublicPublishedIssueRead>>>> GetSignedIssues([FromQuery] PublicPublishedIssueSearchParamsDTO searchParams)
     {
         var request = await ProcessPagedRequest<GetSignedIssuesCommand, PublicPublishedIssueRead, Issue>(new GetSignedIssuesCommand { ApplicationUserId = GetUserId() });
-
         return request;
     }
+
+    [HttpPut("upload-signed-document/{id}")]
+    public async Task<ActionResult<ApiResponse<string>>> UploadSignedDocument([FromRoute] Guid id, [FromForm] IFormFile file)
+        => await HandleErrors(async () => await Mediator.Send(new UploadSignedDocumentCommand(id, file, GetUserId())));
 }
