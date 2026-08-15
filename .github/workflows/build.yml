@@ -46,5 +46,22 @@ jobs:
       - name: Build
         run: dotnet build MR.sln --configuration Release --no-restore
 
+      # Run the test project directly rather than the solution. `dotnet test MR.sln` walks
+      # every project, and the resulting output is dominated by MSBuild noise from the seven
+      # non-test ones — the run summary gets buried, and a run that discovered zero tests
+      # looks identical to a run that passed.
       - name: Test
-        run: dotnet test MR.sln --configuration Release --no-build --verbosity normal
+        run: |
+          set -euo pipefail
+          dotnet test tests/MR.Tests/MR.Tests.csproj \
+            --configuration Release --no-build \
+            --logger "console;verbosity=normal" | tee test-output.log
+
+          # A suite that silently discovers nothing is the failure mode this guard exists
+          # for: the job goes green, the badge says tests pass, and nothing has been
+          # verified. Assert a positive pass count rather than trusting the exit code.
+          if ! grep -qE 'Passed!.*Passed:[[:space:]]*[1-9]' test-output.log; then
+            echo "::error::No passing tests were reported. A green build that ran zero tests is not a green build."
+            exit 1
+          fi
+          grep -E 'Passed!|Failed!|Total tests' test-output.log || true
