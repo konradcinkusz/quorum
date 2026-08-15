@@ -1,3 +1,4 @@
+using MR.Domain.Auth;
 using MR.Domain.Entities;
 using Xunit;
 
