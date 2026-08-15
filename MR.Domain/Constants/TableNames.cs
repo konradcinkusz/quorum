@@ -23,6 +23,7 @@ public class TableNames
     public const string Admin_Logs = "Admin_Logs";
     public const string Subscription_Logs = "Subscription_Logs";
     public const string Subscriptions = "Subscriptions";
+    public const string MrUsers = "MrUsers";
     #endregion
 
     #region MRPayments

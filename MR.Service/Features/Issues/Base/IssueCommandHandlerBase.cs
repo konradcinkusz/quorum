@@ -9,12 +9,12 @@ public interface IIssueCommandData
 public abstract class IssueCommandHandlerBase<TCommand, TResult> : CommandHandlerBase<TCommand, TResult>
     where TCommand : IRequest<TResult>
 {
-    private readonly MRUserManager _MRUserManager;
+    private readonly IMrUserService _users;
 
     protected IssueCommandHandlerBase(
-        MRUserManager MRUserManager, IApplicationDbContext context, ILogger<TCommand> logger) : base(context, logger)
+        IMrUserService users, IApplicationDbContext context, ILogger<TCommand> logger) : base(context, logger)
     {
-        _MRUserManager = MRUserManager;
+        _users = users;
     }
 
     /// <summary>
@@ -29,7 +29,7 @@ public abstract class IssueCommandHandlerBase<TCommand, TResult> : CommandHandle
     /// </summary>
     protected async Task<Issue> CheckBasicConditionsAndReturnIssue(IIssueCommandData request, CancellationToken cancellationToken)
     {
-        var isActiveSub = await _MRUserManager.HasActiveSubscription(request.CreatedById);
+        var isActiveSub = await _users.HasActiveSubscriptionAsync(request.CreatedById, cancellationToken);
 
         if (!isActiveSub)
         {

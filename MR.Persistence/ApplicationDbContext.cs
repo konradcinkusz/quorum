@@ -16,6 +16,7 @@ public interface IApplicationDbContext
     DbSet<IssueRatingHistory> IssueRatingHistories { get; set; }
     DbSet<CloudinaryFile> CloudinaryFiles { get; set; }
     DbSet<CloudinaryFileIssue> CloudinaryFileIssues { get; set; }
+    DbSet<MrUser> MrUsers { get; set; }
 
     DbSet<TEntity> Set<TEntity>() where TEntity : class;
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
@@ -43,6 +44,7 @@ public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>, 
     public DbSet<IssueRatingHistory> IssueRatingHistories { get; set; }
     public DbSet<CloudinaryFile> CloudinaryFiles { get; set; }
     public DbSet<CloudinaryFileIssue> CloudinaryFileIssues { get; set; }
+    public DbSet<MrUser> MrUsers { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

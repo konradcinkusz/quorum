@@ -49,6 +49,10 @@ public static class DependencyInjection
 
         services.AddScoped<IIssuePDFService, IssuePDFService>();
 
+        // MR's own view of a user — subscription state, the roster, per-user provisioning.
+        // Deliberately independent of whether identity is local or lives in authservice.
+        services.AddScoped<IMrUserService, MrUserService>();
+
         // or you can use assembly in Extension method in Infra layer with below command
         services.AddMediatR(Assembly.GetExecutingAssembly());
     }

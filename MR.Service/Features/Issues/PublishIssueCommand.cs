@@ -12,7 +12,7 @@ public class PublishIssueCommand : IRequest<bool>, IIssueCommandData
 
     public class PublishIssueCommandHandler : IssueCommandHandlerBase<PublishIssueCommand, bool>
     {
-        public PublishIssueCommandHandler(MRUserManager MRUserManager, IApplicationDbContext context, ILogger<PublishIssueCommand> logger) : base(MRUserManager, context, logger)
+        public PublishIssueCommandHandler(IMrUserService users, IApplicationDbContext context, ILogger<PublishIssueCommand> logger) : base(users, context, logger)
         {
         }
 
