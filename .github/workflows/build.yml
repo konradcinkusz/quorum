@@ -8,13 +8,21 @@ name: build
 # See docs/architecture/ARCHITECTURE_REVIEW.md F8.
 
 on:
+  # Only the default branch on push. Every other branch is covered by pull_request, and
+  # listening to both fired two identical runs per push to a PR branch — doubling queue
+  # time and Actions minutes for no extra signal.
   push:
-    branches: ["**"]
+    branches: [master]
   pull_request:
   workflow_dispatch:
 
 permissions:
   contents: read
+
+# A superseded commit's run tells you nothing. Cancel it and keep the queue for the tip.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
