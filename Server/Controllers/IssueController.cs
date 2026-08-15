@@ -1,7 +1,7 @@
-﻿namespace MR.Server.Controllers;
+﻿namespace Quorum.Server.Controllers;
 
 [Authorize]
-public sealed class IssueController : MRBaseController
+public sealed class IssueController : QuorumBaseController
 {
     public IssueController(IMapper mapper) : base(mapper)
     {

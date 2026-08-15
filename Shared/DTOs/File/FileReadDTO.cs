@@ -1,4 +1,4 @@
-﻿namespace MR.Shared.DTOs.CloudinaryFile;
+﻿namespace Quorum.Shared.DTOs.CloudinaryFile;
 
 public class FileReadDTO : BaseDTO
 {

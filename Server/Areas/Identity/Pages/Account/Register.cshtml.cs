@@ -20,7 +20,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using static Duende.IdentityServer.Models.IdentityResources;
 
-namespace MR.Server.Areas.Identity.Pages.Account
+namespace Quorum.Server.Areas.Identity.Pages.Account
 {
     public class RegisterModel : PageModel
     {

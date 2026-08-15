@@ -1,4 +1,4 @@
-﻿namespace MR.Shared.DTOs;
+﻿namespace Quorum.Shared.DTOs;
 
 public class BaseDTO
 {

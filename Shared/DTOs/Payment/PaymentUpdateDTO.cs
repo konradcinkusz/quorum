@@ -1,4 +1,4 @@
-﻿namespace MR.Shared.DTOs.Payment;
+﻿namespace Quorum.Shared.DTOs.Payment;
 
 public class PaymentUpdateDTO
 {

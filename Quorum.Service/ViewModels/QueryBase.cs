@@ -1,0 +1,10 @@
+﻿namespace Quorum.Service.ViewModels;
+
+public abstract class QueryBase
+{
+    public SearchParams SearchParams { get; set; } = new SearchParams();
+    public string? SortColumn { get; set; }
+    public SortOrder SortOrder { get; set; }
+    public string? ApplicationUserId { get; set; }
+    public string? ApplicationUserEmail { get; set; }
+}

@@ -1,4 +1,4 @@
-# gitleaks configuration for MR.
+﻿# gitleaks configuration for MR.
 #
 # The point of the allowlist below is that it is SHORT and every entry is dated, explained
 # and tied to a remediation. A scanner that fails permanently on known history gets muted,
@@ -55,7 +55,7 @@ regexes = [
   '''QCth6u4bryHasG8YCohWCHggbzY''',
 
   # The seeded account password hash, as it appears in history outside the migrations path
-  # above — MR.Persistence/Seeds/DefaultUser.cs (deleted 2026-08-15) and, in commit
+  # above — Quorum.Persistence/Seeds/DefaultUser.cs (deleted 2026-08-15) and, in commit
   # 4b425b7 only, quoted in the architecture review before that document was redacted.
   #
   # Closed by: nothing further — see the migrations note above.

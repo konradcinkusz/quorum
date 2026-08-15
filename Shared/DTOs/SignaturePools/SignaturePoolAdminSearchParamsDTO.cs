@@ -1,4 +1,4 @@
-﻿namespace MR.Shared.DTOs.SignaturePools;
+﻿namespace Quorum.Shared.DTOs.SignaturePools;
 
 public class SignaturePoolAdminSearchParamsDTO : SearchParamsDTO
 {

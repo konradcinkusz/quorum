@@ -1,4 +1,4 @@
-﻿namespace MR.Client.Pages.Components;
+﻿namespace Quorum.Client.Pages.Components;
 
 public class InputSelectBoolean<T> : InputSelect<T>
 {

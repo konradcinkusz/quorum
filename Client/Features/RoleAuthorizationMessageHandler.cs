@@ -1,4 +1,4 @@
-﻿namespace MR.Client.Features;
+﻿namespace Quorum.Client.Features;
 
 public class RoleAuthorizationMessageHandler : DelegatingHandler
 {

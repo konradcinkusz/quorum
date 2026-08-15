@@ -1,7 +1,7 @@
-﻿namespace MR.Server.Controllers.Admin;
+﻿namespace Quorum.Server.Controllers.Admin;
 
 [Authorize(Policy = Constants.Policies.RequireAdminRole)]
-public sealed class AdminIssueController : MRBaseController
+public sealed class AdminIssueController : QuorumBaseController
 {
     public AdminIssueController(IMapper mapper) : base(mapper)
     {

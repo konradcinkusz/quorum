@@ -1,0 +1,17 @@
+﻿global using AutoMapper;
+global using Quorum.Domain.Entities;
+global using Quorum.Infrastructure.ViewModel;
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.Extensions.Configuration;
+global using Microsoft.Extensions.DependencyInjection;
+global using Microsoft.Extensions.Diagnostics.HealthChecks;
+global using Quorum.Domain.Settings;
+global using Quorum.Infrastructure.Mapping;
+global using Quorum.Persistence;
+global using Microsoft.AspNetCore.Builder;
+global using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+global using Microsoft.AspNetCore.Http;
+global using Microsoft.Extensions.Logging;
+global using Quorum.Service.Middleware;
+global using Microsoft.AspNetCore.Mvc;
+global using System.Linq.Expressions;

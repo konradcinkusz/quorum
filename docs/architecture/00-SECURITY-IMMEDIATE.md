@@ -1,8 +1,8 @@
-# 00 — Security: immediate actions
+﻿# 00 — Security: immediate actions
 
-> Credential exposure found while reviewing MR against
+> Credential exposure found while reviewing Quorum against
 > [`architecture-standards`](https://github.com/konradcinkusz/architecture-standards).
-> This document covers **all four mreferenda-lineage repositories**, not just MR, because
+> This document covers **all four mreferenda-lineage repositories**, not just Quorum, because
 > the credentials are shared between them and rotating one without the others leaves the
 > account exposed.
 >
@@ -46,7 +46,7 @@ existing databases.
 
 **A Stripe *live* secret key (`sk_live_…`) was committed to `docs/stripe.txt`** in `e43abc8`
 (2023-06-05) and sat in `HEAD` until it was deleted on 2026-08-15. It was also listed as a
-solution item in `MR.sln`, so it opened in Visual Studio's Solution Explorer.
+solution item in `Quorum.sln`, so it opened in Visual Studio's Solution Explorer.
 
 This outranks everything else in this document. A live Stripe secret key is not a
 credential for *this* application — it is full API access to the Stripe **account**: create
@@ -74,8 +74,8 @@ a short, dated allowlist in `.gitleaks.toml` are what keep that true.
 
 | # | Secret | Repo | Location | Introduced |
 |---|---|---|---|---|
-| 0 | **Stripe live secret key** — see above | **MR** | `docs/stripe.txt` (deleted 2026-08-15) | `e43abc8`, 2023-06-05 |
-| 1 | Cloudinary API key + secret (cloud `dho08…`) | **MR** | `Server/appsettings.json` — **still in HEAD** | `f0fca15`, 2023-07-18 |
+| 0 | **Stripe live secret key** — see above | **Quorum** | `docs/stripe.txt` (deleted 2026-08-15) | `e43abc8`, 2023-06-05 |
+| 1 | Cloudinary API key + secret (cloud `dho08…`) | **Quorum** | `Server/appsettings.json` — **still in HEAD** | `f0fca15`, 2023-07-18 |
 | 2 | The same Cloudinary key + secret | `mreferendaInternal` | `mreferenda/Server/appsettings.json` | `103699f`, 2023-03-16 |
 | 3 | Azure SQL admin password for `konradcinkusz.database.windows.net`, database `mreferenda`, user `konradcinkusz` | `mreferendaInternal` | `mreferenda/Server/appsettings.json`, full ADO.NET connection string | `f7e1663`, 2023-03-26 |
 | 4 | Seed-user password (`UserPassword`) | `mreferendaInternal` | `mreferenda/Server/appsettings.json` | `7fb6849`, 2023-03-19 |
@@ -98,12 +98,12 @@ compromised.
    "allow Azure services" is a fully open door) and its audit log.
 3. **Signing certificate** — the `.pfx` is compromised along with its password. Issue a new
    certificate; any token ever signed with the old one should be considered forgeable.
-   Nothing in the current MR line uses this certificate (MR uses the development signing
+   Nothing in the current Quorum line uses this certificate (Quorum uses the development signing
    key), so this is a cleanup of a retired system rather than a live break — but the
    certificate is still valid material until it is replaced or revoked.
 4. **Seeded application accounts** — `superadmin@gmail.com` / `basicuser@gmail.com` with
-   password `Password@123` are seeded via `HasData` into every migration in **MR**
-   (`MR.Persistence/Seeds/DefaultUser.cs:18`) and its predecessors, with
+   password `Password@123` are seeded via `HasData` into every migration in **Quorum**
+   (`Quorum.Persistence/Seeds/DefaultUser.cs:18`) and its predecessors, with
    `EmailConfirmed = true` so they bypass the confirmation gate. Delete these rows from any
    database created from these migrations, in every environment, and remove the seed. See
    [`ARCHITECTURE_REVIEW.md`](ARCHITECTURE_REVIEW.md) F4.
@@ -114,18 +114,18 @@ compromised.
   enforced mechanically, not by review, and every one of the six rows above passed a human
   review at the time. `gitleaks` or GitHub push protection both work; the point is that
   something runs on every commit.
-- **Remove `Server/appsettings.json`'s secret section from MR** and move it to
+- **Remove `Server/appsettings.json`'s secret section from Quorum** and move it to
   `dotnet user-secrets` locally and the platform secret store in deployment. The
-  `UserSecretsId` is already declared in `Server/MR.Server.csproj:8`, so the local half
+  `UserSecretsId` is already declared in `Server/Quorum.Server.csproj:8`, so the local half
   costs one command.
 - **Note the doc-comment case.** `OPEN-SOURCE-RELEASE.md` §2 flags XML doc comments as the
   most easily missed hiding place, because they explain what a value *is* and often quote
-  it. `MR.Persistence/Seeds/DefaultUser.cs:18` is exactly that pattern here — a `// Password@123`
+  it. `Quorum.Persistence/Seeds/DefaultUser.cs:18` is exactly that pattern here — a `// Password@123`
   comment above the hash. A scanner catches it; a reviewer reads past it.
 
 ## Before this repo could ever be made public (P3)
 
-Rotation ends the exposure but does not remove the values from history. If MR is ever to be
+Rotation ends the exposure but does not remove the values from history. If Quorum is ever to be
 published, the history must be rewritten (`git filter-repo`) or the repo re-created from a
 squashed tree — and rotation must still happen first, because rewriting history does not
 recall the clones that already exist. See

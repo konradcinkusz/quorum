@@ -1,4 +1,4 @@
-﻿namespace MR.Shared.DTOs.Subscription;
+﻿namespace Quorum.Shared.DTOs.Subscription;
 
 public class SubscriptionPagedListDTO : PagedListDto<SubscriptionDTO>
 {

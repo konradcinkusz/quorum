@@ -1,4 +1,4 @@
-﻿namespace MR.Client.Services;
+﻿namespace Quorum.Client.Services;
 
 public interface ISignatureService
 {
