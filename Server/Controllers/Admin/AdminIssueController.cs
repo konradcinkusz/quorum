@@ -13,6 +13,11 @@ public sealed class AdminIssueController : MRBaseController
         var id = await Mediator.Send(new CreateIssueCommand
         {
             CreatedById = string.IsNullOrEmpty(dto.ApplicationUserId) ? GetUserId() : dto.ApplicationUserId,
+            // Only when the admin is creating it for themselves. Creating on another user's
+            // behalf leaves this null rather than stamping the admin's own address onto
+            // someone else's initiative; the backfill in the migration covers existing rows,
+            // and step 3 of ADR 0001's plan decides how the admin console displays it.
+            CreatedByEmail = string.IsNullOrEmpty(dto.ApplicationUserId) ? GetUserEmail() : null,
             IssueVisibility = (IssueVisibility)dto.IssueVisibility,
             IssueProcess = (IssueProcess)dto.IssueProcess,
             IsVerifyByAdmin = dto.IsVerifyByAdmin,

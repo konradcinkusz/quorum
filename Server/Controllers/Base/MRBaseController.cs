@@ -17,6 +17,21 @@ public abstract class MRBaseController : ControllerBase
 
     protected virtual string GetUserId() => User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
+    /// <summary>
+    /// The caller's email from their token. Read from the claim rather than looked up: once
+    /// identity moves to <c>authservice</c> (ADR 0001) there is no local user table to look
+    /// it up in, and IDENTITY-AND-ACCOUNTS §1 is explicit that a service holding a token does
+    /// not call back to ask about the user.
+    /// <para>
+    /// Both claim types are checked because the two identity stacks spell it differently:
+    /// ASP.NET Core Identity uses <see cref="ClaimTypes.Email"/>, while a JWT carries the
+    /// short <c>email</c> claim. Accepting both means this keeps working across the cutover
+    /// rather than needing to change on the same commit.
+    /// </para>
+    /// </summary>
+    protected virtual string? GetUserEmail() =>
+        User.FindFirst(ClaimTypes.Email)?.Value ?? User.FindFirst("email")?.Value;
+
     protected async Task<ActionResult<ApiResponse<T>>> HandleErrors<T>(Func<Task<T>> action, string message = "")
     {
         try

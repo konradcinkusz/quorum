@@ -109,6 +109,7 @@ public sealed class IssueController : MRBaseController
         var id = await Mediator.Send(new CreateIssueCommand
         {
             CreatedById = userId,
+            CreatedByEmail = GetUserEmail(),
             IssueVisibility = IssueVisibility.VisibleOnlyToMe,
             IssueProcess = IssueProcess.InCreation,
             Question = issueDTO.Question,

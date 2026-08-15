@@ -3,6 +3,14 @@
 public class CreateIssueCommand : IRequest<Guid>
 {
     public required string CreatedById { get; set; }
+
+    /// <summary>
+    /// The creator's email, taken from the caller's <c>email</c> claim rather than looked up.
+    /// Optional so an administrator creating an issue on someone else's behalf can leave it
+    /// unset — see <see cref="Issue.CreatedByEmail"/> for why this is stored at all.
+    /// </summary>
+    public string? CreatedByEmail { get; set; }
+
     public required string Title { get; set; }
     public required string Question { get; set; }
     public bool IsVerifyByAdmin { get; set; } = false;
@@ -21,6 +29,7 @@ public class CreateIssueCommand : IRequest<Guid>
         {
             var issue = await base.MakeAsync(command, cancellationToken);
             issue.CreatedById = command.CreatedById;
+            issue.CreatedByEmail = command.CreatedByEmail;
 
             if (command.IssueVisibility.HasValue && issue.IssueVisibility != command.IssueVisibility.Value)
             {

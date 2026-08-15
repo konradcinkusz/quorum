@@ -51,8 +51,18 @@
             questionCell.PaddingBottom = 10;
             table.AddCell(questionCell);
 
-            // Add the email and verification status to the table
-            PdfPCell emailCell = new PdfPCell(new Phrase(issue.CreatedBy.Email));
+            // Add the email and verification status to the table.
+            //
+            // The denormalised column is preferred over the navigation on purpose, and this
+            // is the site where the difference matters most: this document is printed, signed
+            // by hand, and submitted. It must show the address of whoever filed the initiative
+            // at the time of filing, not whatever that account's email happens to be when the
+            // PDF is regenerated. See Issue.CreatedByEmail and ADR 0001.
+            //
+            // Previously this dereferenced issue.CreatedBy.Email with no null check, so any
+            // issue whose creator had been removed threw here rather than producing a sheet.
+            var createdByEmail = issue.CreatedByEmail ?? issue.CreatedBy?.Email ?? string.Empty;
+            PdfPCell emailCell = new PdfPCell(new Phrase(createdByEmail));
             PdfPCell verificationCell = new PdfPCell(new Phrase(issue.IsVerifyByAdmin ? "Verified" : "Not Verified"));
             table.AddCell(emailCell);
             table.AddCell(verificationCell);
