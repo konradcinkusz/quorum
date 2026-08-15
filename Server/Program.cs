@@ -1,5 +1,7 @@
 var builder = WebApplication.CreateBuilder(args);
 
+builder.ConfigureOpenTelemetry();
+
 builder.Services.AddDbContextService(builder.Configuration);
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
@@ -54,6 +56,8 @@ builder.Services.AddServiceLayer(builder.Configuration);
 
 builder.Services.AddVersion();
 
+builder.Services.AddDefaultHealthChecks();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -62,6 +66,10 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var app = builder.Build();
+
+// Translates the service layer's exception types into API responses. The middleware existed
+// and was never added to the pipeline, so handler exceptions surfaced unhandled.
+app.ConfigureCustomExceptionMiddleware();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -89,6 +97,11 @@ app.UseAuthorization();
 
 app.MapRazorPages();
 app.MapControllers();
+
+// Before MapFallbackToFile, which would otherwise answer /health with index.html and a 200
+// — a health probe that passes no matter what the application is doing.
+app.MapDefaultEndpoints();
+
 app.MapFallbackToFile("index.html");
 
 app.UseSwaggerUI(c =>

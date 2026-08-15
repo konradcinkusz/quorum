@@ -39,17 +39,4 @@ public static class ConfigureServiceContainer
             config.ReportApiVersions = true;
         });
     }
-
-    public static void AddHealthCheck(this IServiceCollection serviceCollection, AppSettings appSettings, IConfiguration configuration)
-    {
-        serviceCollection.AddHealthChecks()
-            .AddDbContextCheck<ApplicationDbContext>(name: "Application DB Context", failureStatus: HealthStatus.Degraded)
-            .AddUrlGroup(new Uri(appSettings.ApplicationDetail.ContactWebsite), name: "My personal website", failureStatus: HealthStatus.Degraded)
-            .AddSqlServer(configuration.GetConnectionString("OnionArchConn"));
-
-        serviceCollection.AddHealthChecksUI(setupSettings: setup =>
-        {
-            setup.AddHealthCheckEndpoint("Basic Health Check", $"/healthz");
-        }).AddInMemoryStorage();
-    }
 }
