@@ -26,9 +26,7 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           # Read the version from global.json rather than restating it here, so the two
-          # cannot drift. global.json currently pins 7.0.203; .NET 7 is out of support
-          # (see review F12) and this is the workflow that will tell us when the SDK stops
-          # being installable.
+          # cannot drift.
           global-json-file: global.json
 
       - name: Report SDK
