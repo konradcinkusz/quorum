@@ -28,7 +28,9 @@ public sealed class AdminIssueController : MRBaseController
     [HttpPut("edit-issue-by-admin/{id}")]
     public async Task<ActionResult<ApiResponse<int>>> EditIssueByAdmin([FromRoute] Guid id, [FromBody] IssueAdminCreateDTO dto)
     {
-        var changedPropertiesCount = await Mediator.Send(new EditIssueCommand(id)
+        // Administrator scope: this route is gated by the class-level RequireAdminRole
+        // policy, so it deliberately edits issues belonging to any user.
+        var changedPropertiesCount = await Mediator.Send(new EditIssueCommand(id, IssueOwnerScope.Administrator())
         {
             IssueVisibility = (IssueVisibility)dto.IssueVisibility,
             IssueProcess = (IssueProcess)dto.IssueProcess,

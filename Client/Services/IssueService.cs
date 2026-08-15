@@ -4,7 +4,6 @@ public interface IIssueService
 {
     Task<ApiResponse<int>> EditIssue(Guid issueId, IssueCreateDTO issueDTO);
     Task<ApiResponse<Guid>> CreateIssue(IssueCreateDTO issueDTO);
-    Task<ApiResponse<PagedListDto<IssueReadDTO>>> GetIssuesBySearchParams(IssueSearchParamsDTO searchParams);
     Task<ApiResponse<PagedListDto<IssueReadDTO>>> GetMyIssuesBySearchParams(IssueSearchParamsDTO searchParams);
     Task<ApiResponse<IssueReadDTO>> GetIssueByIdForEdit(Guid id);
     Task<ApiResponse<bool>> PublishIssue(Guid issueId);
@@ -32,14 +31,6 @@ internal class IssueService : DataServiceBase, IIssueService
     {
         var endpoint = $"{_issueControllerPath}/publish-issue/{issueId}";
         return await HandleResponse<bool>(async () => await _httpClient.PutAsync(endpoint, null));
-    }
-
-    public async Task<ApiResponse<PagedListDto<IssueReadDTO>>> GetIssuesBySearchParams
-        (IssueSearchParamsDTO searchParams)
-    {
-        var q = BuildQuery(searchParams);
-        var endpoint = $"{_issueControllerPath}/get-issues-by-search-params?{q}";
-        return await HandleResponse<PagedListDto<IssueReadDTO>>(async () => await _httpClient.GetAsync(endpoint));
     }
 
     public async Task<ApiResponse<bool>> PayForAnIssue(Guid issueId, IssuePayDTO issuePayDTO)

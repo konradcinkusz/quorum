@@ -7,9 +7,6 @@ public static partial class Constants
     public static readonly string Moderator ="91F6299F-59AC-4538-8DFD-4E891200E162";
     public static readonly string Basic = "D17D4635-9015-422B-AE84-A399601DED81";
 
-    public static readonly string SuperAdminUser = "E97336F4-CF5A-4C72-8C61-997E5C621143";
-    public static readonly string BasicUser = "B2BED4FF-47C0-47A1-9AE0-7AEF44CC14BB";
-
 
     public static readonly string RequireAdminRole = "RequireAdminRole";
 }

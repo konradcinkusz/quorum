@@ -7,13 +7,13 @@ public sealed class IssueController : MRBaseController
     {
     }
 
-    [HttpGet("get-issues-by-search-params")]
-    public async Task<ActionResult<ApiResponse<PagedListDto<IssueReadDTO>>>> GetIssuesBySearchParams([FromQuery] IssueSearchParamsDTO searchParams)
-    {
-        var command = new GetIssuesBySearchParamsQuery();
-        SearchParamsExtension.AddIssueSearchParamsToCommand(command, searchParams);
-        return await ProcessPagedRequest<GetIssuesBySearchParamsQuery, IssueReadDTO, Issue>(command);
-    }
+    // "get-issues-by-search-params" used to live here: [Authorize] only, no owner filter and
+    // no visibility filter, eager-loading CreatedBy — so any registered user could page
+    // through every other user's unpublished drafts along with the author's contact details.
+    // It had no caller; the client's user-facing pages use get-my-issues-by-search-params
+    // and the admin console uses AdminIssueController's get-issues-by-search-params-admin.
+    // Removed rather than gated, because an unscoped listing with an admin-scoped twin
+    // already existing is a duplicate, not a missing policy.
 
     [AllowAnonymous]
     [HttpGet("get-current-quarter-issues-published")]
@@ -62,7 +62,7 @@ public sealed class IssueController : MRBaseController
 
     [HttpGet("get-issue-by-id-for-edit")]
     public async Task<ActionResult<ApiResponse<IssueReadDTO>>> GetIssueByIdForEdit(Guid id)
-        => await HandleErrors<Issue, IssueReadDTO>(async () => await Mediator.Send(new GetIssueByIdForEdit(id)));
+        => await HandleErrors<Issue, IssueReadDTO>(async () => await Mediator.Send(new GetIssueByIdForEdit(id, IssueOwnerScope.OwnedBy(GetUserId()))));
 
     [HttpGet("get-my-issues-by-search-params")]
     public async Task<ActionResult<ApiResponse<PagedListDto<IssueReadDTO>>>> GetMyIssuesBySearchParams([FromQuery] IssueSearchParamsDTO searchParams)
@@ -91,17 +91,15 @@ public sealed class IssueController : MRBaseController
 
     [HttpPut("edit-issue/{id}")]
     public async Task<ActionResult<ApiResponse<int>>> EditIssue([FromRoute] Guid id, [FromBody] IssueCreateDTO issueDTO)
-    {
-        var countOfChangedProperties = await Mediator.Send(new EditIssueCommand(id)
+        // Wrapped in HandleErrors because the command now throws NotFoundException when the
+        // issue is not the caller's; unwrapped, that would surface as an unhandled 500.
+        => await HandleErrors(async () => await Mediator.Send(new EditIssueCommand(id, IssueOwnerScope.OwnedBy(GetUserId()))
         {
             Question = issueDTO.Question,
             Title = issueDTO.Title,
             Icon = issueDTO.Icon,
             BackgroundColor = issueDTO.BackgroundColor,
-        });
-
-        return new ApiResponse<int> { Data = countOfChangedProperties, Message = "Edited" };
-    }
+        }), "Edited");
 
     [HttpPost("create-issue")]
     public async Task<ActionResult<ApiResponse<Guid>>> CreateIssue([FromBody] IssueCreateDTO issueDTO)
@@ -131,7 +129,7 @@ public sealed class IssueController : MRBaseController
 
     [HttpDelete("archive-issue/{id}")]
     public async Task<ActionResult<ApiResponse<bool>>> ArchiveIssue([FromRoute] Guid id)
-        => await HandleErrors(async () => await Mediator.Send(new ArchiveIssueCommand(id)));
+        => await HandleErrors(async () => await Mediator.Send(new ArchiveIssueCommand(id, IssueOwnerScope.OwnedBy(GetUserId()))));
 
     [HttpGet("get-signed-issues")]
     public async Task<ActionResult<ApiResponse<PagedListDto<PublicPublishedIssueRead>>>> GetSignedIssues([FromQuery] PublicPublishedIssueSearchParamsDTO searchParams)

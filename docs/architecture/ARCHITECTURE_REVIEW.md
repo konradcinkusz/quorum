@@ -6,6 +6,8 @@
 > principles; it references them.
 >
 > **Reviewed:** 2026-08-14, against `master` @ `737060a` (last commit 2023-07-26).
+> **Findings F1–F4 fixed:** 2026-08-15 — see the status ledger in §4. The findings below are
+> left as written, describing the code as reviewed, so the ledger has something to refer to.
 > **Scope:** static review of the repository as committed. No build was run (no .NET SDK
 > in the review environment) and no deployed instance was exercised. Per
 > [`SECURITY-REVIEW.md`](https://github.com/konradcinkusz/architecture-standards/blob/main/docs/guides/SECURITY-REVIEW.md)
@@ -517,18 +519,74 @@ Time windows per
 [`SECURITY-REVIEW.md`](https://github.com/konradcinkusz/architecture-standards/blob/main/docs/guides/SECURITY-REVIEW.md)
 §3 — P1 immediately, P2 within a week, P3 within two weeks, P4 long-term.
 
+Legend: **FIXED** · **OPEN** · **OPEN (owner action)** — needs something outside the
+repository, so no commit can close it.
+
 ### Blocks any deployment
 
-| P | Action | Finding | Context that makes it cheap |
+| P | Action | Finding | Status |
 |---|---|---|---|
-| P1 | Rotate the Cloudinary key/secret; move to user-secrets + platform store | F1 | `CloudinaryOpt` is already an options class bound from a named section — only the source of the values changes |
-| P1 | Rotate the Azure SQL password in `mreferendaInternal` history | [`00-SECURITY-IMMEDIATE.md`](00-SECURITY-IMMEDIATE.md) | — |
-| P1 | Delete the seeded superadmin/basic users | F4 | `ContextSeed.Seed()` is one call site (`ApplicationDbContext.cs:49`) |
-| P1 | Add ownership filters to edit / archive / read-for-edit / publish / pay | F2 | `GetUserId()` already exists on `MRBaseController`; `IIssueCommandData` already carries `CreatedById` |
-| P1 | Gate or delete `get-issues-by-search-params` | F3 | `RequireAdminRole` policy already defined; admin equivalents already exist |
-| P2 | Validate upload type/size; make signed documents non-public | F6 | `ICloudinaryService` is the single choke point |
-| P2 | Fix the DEV/PROD connection-string switch; guard `EnableSensitiveDataLogging`; `DbContext` → `Scoped` | F5 | three lines in one method |
-| P2 | Add a secret scanner as a pre-commit hook and a CI job | F1 | — |
+| P1 | Remove the Cloudinary secret from `appsettings.json`; read it from user-secrets / the environment instead | F1 | **FIXED** — 2026-08-15 |
+| P1 | **Rotate** the Cloudinary key/secret | F1 | **OPEN (owner action)** — the committed value stays valid until rotated in the Cloudinary console, and stays in git history regardless |
+| P1 | Rotate the Azure SQL password and signing certificate in `mreferendaInternal` history | [`00-SECURITY-IMMEDIATE.md`](00-SECURITY-IMMEDIATE.md) | **OPEN (owner action)** |
+| P1 | Delete the seeded superadmin/basic users | F4 | **FIXED** — 2026-08-15, seed removed and `20260815000000_RemoveSeededIdentityAccounts` deletes the rows |
+| P1 | Apply that migration to every existing database | F4 | **OPEN (owner action)** — nothing applies migrations at startup (F7), so `dotnet ef database update` must be run per environment |
+| P1 | Add ownership filters to edit / archive / read-for-edit / publish / pay | F2 | **FIXED** — 2026-08-15 |
+| P1 | Gate or delete `get-issues-by-search-params` | F3 | **FIXED** — 2026-08-15, deleted |
+| P2 | Validate upload type/size; make signed documents non-public | F6 | **OPEN** — `ICloudinaryService` is the single choke point |
+| P2 | Fix the DEV/PROD connection-string switch; guard `EnableSensitiveDataLogging`; `DbContext` → `Scoped` | F5 | **OPEN** — three lines in one method |
+| P2 | Add a secret scanner as a pre-commit hook and a CI job | F1 | **OPEN** |
+
+### How F2 and F3 were fixed
+
+Both findings had the same root cause — authorization declared at the controller and then
+re-derived, inconsistently, per handler — so the fix is a type rather than five predicates.
+
+`IssueOwnerScope` (`MR.Service/Features/Issues/Base/IssueOwnerScope.cs`) has no public
+constructor and exactly two factories: `OwnedBy(userId)`, which restricts to one user and
+throws if the id is absent, and `Administrator()`, which does not restrict. Every command
+and query that resolves an issue by id now **requires** one as a constructor argument, so
+the compiler rejects a new call site that has not made the choice, and a reader of a
+controller action can see which scope is in force without opening the handler. The
+restriction itself is applied by one `RestrictToOwner` query extension.
+
+`CheckBasicConditionsAndReturnIssue` — the shared base that `publish` and `pay` route
+through, and which previously looked like a policy enforcement point while checking only
+the subscription — now scopes to `request.CreatedById`. It was the single most valuable
+place to put the check, because both commands inherit it.
+
+Three secondary changes fell out of this and are worth knowing about:
+
+- **Not-found and not-yours return the same result.** Every one of these handlers now
+  reports `NotFoundException` (or `false`, for archive) whether the issue does not exist or
+  belongs to someone else, so the endpoints cannot be used to probe for other users' issue
+  ids.
+- **`EditIssue` is now wrapped in `HandleErrors`.** It was the one action on
+  `IssueController` that was not, which was harmless while the handler could not throw and
+  would have produced an unhandled 500 the moment it could.
+- **`FirstAsync` → `FirstOrDefaultAsync`** in all four handlers. The former throws
+  `InvalidOperationException` on a miss, which was the pre-existing behaviour for a
+  non-existent id and is not a usable authorization signal.
+
+`get-issues-by-search-params` was deleted rather than gated. It had no caller — the client's
+user-facing pages use `get-my-issues-by-search-params`, and the admin console uses
+`AdminIssueController`'s `get-issues-by-search-params-admin` — so an unscoped listing whose
+admin-scoped twin already exists is a duplicate, not a missing policy. Its orphaned client
+method went with it.
+
+### Two things the F1 and F4 fixes deliberately do *not* do
+
+- **Removing the secret from `appsettings.json` does not remove it from git history**, and
+  does not make it invalid. Until it is rotated in the Cloudinary console, the value in
+  commit `f0fca15` still works. This is the reason "rotate" is tracked as a separate,
+  still-open row above rather than being folded into the code fix.
+- **The Cloudinary fallback throws rather than no-ops.** P8 asks optional integrations to
+  degrade, and the usual shape is a no-op that logs. That is wrong here:
+  `CloudinaryNotConfiguredService` throws with an explanatory message, because the files
+  crossing this interface are wet-signature petition documents and a stub that accepted an
+  upload and discarded it would tell a user their signature sheet was stored when it had
+  been thrown away. The application still starts and every other feature still works, which
+  is the part of P8 that matters.
 
 ### Should be done before deployment
 
@@ -547,9 +605,19 @@ Time windows per
 
 ### Residual risks — deliberately not addressed here
 
-- **This review is static.** No build, no run, no penetration test. F6's `FindAsync` bug is
-  the clearest signal that some of these paths have not executed recently; a build is the
-  first thing that should happen after this document.
+- **This review is static, and so are the fixes.** No build, no run, no penetration test —
+  there is no .NET SDK in the review environment and NuGet is unreachable from it, so the
+  2026-08-15 changes are **not compile-verified**. They were written against the existing
+  code's own idioms and reviewed by hand, but `dotnet build` is the first thing that should
+  happen to this branch. F6's `FindAsync` bug is the clearest signal that some of these
+  paths have not executed recently.
+- **A user editing their own issue silently un-verifies it.** `EditIssueCommand.IsVerifyByAdmin`
+  defaults to `false` rather than `null`, and the handler's `request.IsVerifyByAdmin ?? issue.IsVerifyByAdmin`
+  therefore writes `false` on every user-facing edit. This is pre-existing behaviour, it
+  fails safe (an edit invalidating admin verification is defensible), and it was left alone
+  by the P1 pass — but it is almost certainly accidental rather than designed, and the
+  `= false` initializer should become `= null` once there is a test to prove what the
+  publish flow expects.
 - **F1's secret remains in git history** after rotation. Rewriting history is a separate,
   disruptive operation and is only strictly required before the repo goes public.
 - **Payments were not reviewed against

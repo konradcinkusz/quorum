@@ -18,11 +18,26 @@ public static class DependencyInjection
 
     public static void AddServiceLayer(this IServiceCollection services, IConfiguration configuration)
     {
+        // GetSection never returns null — it returns an empty section for a missing key — so
+        // the old `if (configSection != null)` was always true and the registration was not
+        // actually conditional. Now that the credentials live outside appsettings.json, that
+        // matters: without this check the Cloudinary client would be constructed with empty
+        // strings and fail with an opaque argument error at the first upload.
         var configSection = configuration.GetSection(ConfigurationSectionNames.CloudinaryOptions);
-        if (configSection != null)
+        services.Configure<CloudinaryOpt>(configSection);
+
+        var isCloudinaryConfigured =
+            !string.IsNullOrWhiteSpace(configSection[nameof(CloudinaryOpt.Cloud)]) &&
+            !string.IsNullOrWhiteSpace(configSection[nameof(CloudinaryOpt.ApiKey)]) &&
+            !string.IsNullOrWhiteSpace(configSection[nameof(CloudinaryOpt.ApiSecret)]);
+
+        if (isCloudinaryConfigured)
         {
-            services.Configure<CloudinaryOpt>(configSection);
             services.AddScoped<ICloudinaryService, CloudinaryService>();
+        }
+        else
+        {
+            services.AddScoped<ICloudinaryService, CloudinaryNotConfiguredService>();
         }
 
         services.AddScoped<IIssuePDFService, IssuePDFService>();

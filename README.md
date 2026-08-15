@@ -12,7 +12,8 @@ earlier versions of the same system and are deprecated — see
 > and runs locally against SQL Server; it has no container, no CI and no deployment
 > pipeline. Before it is run anywhere other than a development machine, read
 > [`docs/architecture/00-SECURITY-IMMEDIATE.md`](docs/architecture/00-SECURITY-IMMEDIATE.md)
-> — there are credentials to rotate and a seeded administrator account to remove.
+> — credentials that were committed to this repository are still valid until they are
+> rotated, which is not something a code change can do for you.
 
 ## What it does
 
@@ -61,9 +62,24 @@ Requires the .NET 7 SDK (pinned in `global.json`) and a reachable SQL Server ins
    ```
 3. Set `MR.Server` as the startup project and run. Swagger is at `/swagger`.
 
-Cloudinary credentials are needed only for the document-upload and PDF paths; without them
-those endpoints will fail rather than degrade. Supply them through user-secrets under
-`CloudinaryOpt`, never in `appsettings.json`.
+Cloudinary credentials are needed only for the document-upload and PDF paths. Without them
+the application starts and everything else works; those two endpoints fail with a message
+telling you what to set. Supply them through user-secrets, never in `appsettings.json`:
+
+```sh
+dotnet user-secrets --project Server set "CloudinaryOpt:Cloud"     "<cloud name>"
+dotnet user-secrets --project Server set "CloudinaryOpt:ApiKey"    "<api key>"
+dotnet user-secrets --project Server set "CloudinaryOpt:ApiSecret" "<api secret>"
+```
+
+In a deployed environment the same values are `CloudinaryOpt__Cloud`, `__ApiKey` and
+`__ApiSecret`.
+
+> **If you have a database created before 2026-08-15**, step 2 also applies migration
+> `20260815000000_RemoveSeededIdentityAccounts`, which deletes the seeded
+> `superadmin@gmail.com` and `basicuser@gmail.com` accounts. Those accounts share one
+> password that was written in a source comment, so run it against every environment. The
+> migration is deliberately not reversible.
 
 ## Architecture documentation
 

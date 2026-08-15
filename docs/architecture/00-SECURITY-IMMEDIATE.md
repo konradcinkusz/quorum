@@ -22,6 +22,26 @@ action. A credential that has been committed is a credential that has left your 
 it is present in every clone, every fork, every IDE workspace backup and every CI cache
 that ever touched the repo. Rotation is the only thing that ends the exposure.
 
+## What the 2026-08-15 commit did and did not do
+
+The code half of this document is done; the operational half is not, and only you can do it.
+
+**Done in the repository:** the Cloudinary section is gone from `Server/appsettings.json`
+and is now read from user-secrets or the environment; the seeded `superadmin@gmail.com` and
+`basicuser@gmail.com` accounts are removed from the model, and migration
+`20260815000000_RemoveSeededIdentityAccounts` deletes them and their role mappings from
+existing databases.
+
+**Not done, and not doable from here:**
+
+- **Every rotation in the table below.** Removing a secret from the working tree does not
+  invalidate it. Until you rotate, the Cloudinary credentials in commit `f0fca15` still
+  authenticate, and so does everything in `mreferendaInternal`'s history.
+- **Applying the migration.** Nothing in this repo applies migrations at startup, so
+  `dotnet ef database update` has to be run against each environment that was ever created
+  from these migrations. Until it runs, the known-password superadmin still exists there.
+- **Rewriting history.** All six rows below remain in git history after rotation.
+
 ## Rotate now (P1)
 
 | # | Secret | Repo | Location | Introduced |
