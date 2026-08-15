@@ -1,73 +1,55 @@
-﻿using Quorum.Domain.Auth;
-using Quorum.Domain.Entities;
+﻿using Quorum.Domain.Entities;
 using Xunit;
 
 namespace Quorum.Tests;
 
 /// <summary>
-/// Pins the resolution rule for an issue's creator email — the denormalised
-/// <see cref="Issue.CreatedByEmail"/> first, the <see cref="Issue.CreatedBy"/> navigation only
-/// as a fallback for rows written before that column existed.
+/// Pins the resolution rule for an issue's creator email: the denormalised
+/// <see cref="Issue.CreatedByEmail"/>, captured from the <c>email</c> claim at filing time,
+/// with an empty string when the column is empty.
 /// <para>
-/// Step 2 of ADR 0001's plan. These are characterisation tests in the P13 sense: written
-/// before the behaviour moves, so that when the navigation is deleted along with local
-/// identity, the fallback arm can be removed and these tests say whether anything else
-/// changed. The rule is expressed here as the single expression the production sites use.
+/// These began as characterisation tests for step 3 of ADR 0001, when the rule still fell
+/// back to the <c>CreatedBy</c> navigation for pre-column rows. The cutover deleted local
+/// identity and the navigation with it, so the rule is now the column alone — which is the
+/// point of the design: a signature sheet records who filed the initiative at the time of
+/// filing, and no later account change rewrites it.
 /// </para>
 /// </summary>
 public class IssueCreatorEmailTests
 {
     /// <summary>The rule as written in IssuePDFService, AutoMapper and the query layer.</summary>
     private static string Resolve(Issue issue)
-        => issue.CreatedByEmail ?? issue.CreatedBy?.Email ?? string.Empty;
+        => issue.CreatedByEmail ?? string.Empty;
 
     [Fact]
-    public void The_denormalised_value_is_preferred()
+    public void The_denormalised_value_is_used()
     {
         var issue = new Issue
         {
             CreatedByEmail = "filed-as@example.test",
-            CreatedBy = new ApplicationUser { Email = "renamed-since@example.test" },
         };
 
-        // The point of the whole design: a signature sheet records who filed the initiative
-        // at the time of filing. A later email change must not rewrite it.
         Assert.Equal("filed-as@example.test", Resolve(issue));
     }
 
     [Fact]
-    public void The_navigation_is_used_when_the_column_is_empty()
+    public void An_issue_without_a_captured_email_resolves_to_empty_not_null()
     {
-        // Rows created before the column existed, and not covered by the migration's backfill
-        // because their account had already gone.
-        var issue = new Issue
-        {
-            CreatedByEmail = null,
-            CreatedBy = new ApplicationUser { Email = "legacy@example.test" },
-        };
-
-        Assert.Equal("legacy@example.test", Resolve(issue));
-    }
-
-    [Fact]
-    public void An_issue_with_neither_resolves_to_empty_rather_than_throwing()
-    {
-        // This is a real regression, not a hypothetical: IssuePDFService dereferenced
-        // issue.CreatedBy.Email with no null check, so an issue whose creator had been
-        // deleted threw while generating the signature sheet instead of producing one.
-        var issue = new Issue { CreatedByEmail = null, CreatedBy = null };
+        // Rows written before the column existed, or by a token without an email claim.
+        // Consumers print this onto a PDF; they get an empty string, never a null.
+        var issue = new Issue { CreatedByEmail = null };
 
         Assert.Equal(string.Empty, Resolve(issue));
     }
 
     [Fact]
-    public void The_navigation_is_not_consulted_when_the_column_is_set()
+    public void The_capture_happens_at_creation_and_nothing_updates_it()
     {
-        // Once identity moves to authservice there is no navigation to consult — it will be
-        // null on every row. This pins that the primary path never depends on it, so removing
-        // it is a deletion rather than a behaviour change.
-        var issue = new Issue { CreatedByEmail = "only-source@example.test", CreatedBy = null };
+        // The property is an ordinary settable snapshot; this documents that no entity
+        // logic recomputes it. Staleness against the identity service is accepted and
+        // intended (ADR 0001).
+        var issue = new Issue { CreatedByEmail = "original@example.test" };
 
-        Assert.Equal("only-source@example.test", Resolve(issue));
+        Assert.Equal("original@example.test", Resolve(issue));
     }
 }

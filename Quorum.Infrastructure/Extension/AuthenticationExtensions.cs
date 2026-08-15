@@ -42,6 +42,14 @@ public static class AuthenticationExtensions
                 "environment.");
         }
 
+        // Resolved eagerly, not inside the options lambda: the lambda runs at the first
+        // authentication, which would move "fail at startup naming the setting" to "fail
+        // at the first request". Both are required rather than merely validated-if-present:
+        // a token accepted without checking who issued it and who it was for is a token
+        // any other service's identity provider can mint.
+        var issuer = Require(section, "Issuer");
+        var audience = Require(section, "Audience");
+
         services
             .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
@@ -55,14 +63,11 @@ public static class AuthenticationExtensions
 
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    // Both are required rather than merely validated-if-present: a token
-                    // accepted without checking who issued it and who it was for is a token
-                    // any other service's identity provider can mint.
                     ValidateIssuer = true,
-                    ValidIssuer = Require(section, "Issuer"),
+                    ValidIssuer = issuer,
 
                     ValidateAudience = true,
-                    ValidAudience = Require(section, "Audience"),
+                    ValidAudience = audience,
 
                     ValidateIssuerSigningKey = true,
                     ValidateLifetime = true,

@@ -3,17 +3,20 @@
 [Table(TableNames.Issues, Schema = SchemasNames.MRBasics)]
 public class Issue : BaseEntity<Guid>
 {
-    [ForeignKey(nameof(CreatedBy))]
+    /// <summary>
+    /// The subject id of the user who filed the issue, as issued by the identity service.
+    /// A plain string key on purpose: identity lives in <c>authservice</c> (ADR 0001) and
+    /// P3 forbids a navigation into another service's database.
+    /// </summary>
     public string? CreatedById { get; set; }
-    public ApplicationUser? CreatedBy { get; set; }
 
     /// <summary>
     /// The creator's email address as it stood when the issue was filed, captured from the
     /// authenticated caller's <c>email</c> claim.
     /// <para>
-    /// Denormalised deliberately. Once identity moves to <c>authservice</c>
-    /// (<see href="https://github.com/konradcinkusz/MR/blob/master/docs/architecture/0001-identity-via-authservice.md">ADR 0001</see>)
-    /// the <see cref="CreatedBy"/> navigation cannot resolve — P3 forbids reaching into
+    /// Denormalised deliberately. Identity lives in <c>authservice</c>
+    /// (<see href="https://github.com/konradcinkusz/quorum/blob/master/docs/architecture/0001-identity-via-authservice.md">ADR 0001</see>)
+    /// so there is no user row here to join to — P3 forbids reaching into
     /// another service's database, and IDENTITY-AND-ACCOUNTS §1 is explicit that a service
     /// holding a token does not call back to ask about the user.
     /// </para>

@@ -1,0 +1,56 @@
+# Local development backing services: Postgres (quorumdb + authdb) and Quorum's own
+# instance of authservice, the same pinned image the deployed estate runs.
+#
+#   scripts/dev-up.sh          # generates a dev signing key if missing, then compose up
+#   dotnet run --project Server
+#
+# The dev RSA key lives in .dev/ (git-ignored) so authservice signs RS256 locally too —
+# Quorum validates via JWKS in every environment, and an HS256 shortcut here would hide
+# exactly the class of bug (empty JWKS, wrong issuer) the deploy assertions exist for.
+# A key generated here is a development convenience, not a trust root: never promote it.
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: quorum
+      POSTGRES_PASSWORD: quorum
+      POSTGRES_DB: quorumdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./scripts/dev-create-auth-db.sh:/docker-entrypoint-initdb.d/01-create-auth-db.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U quorum -d quorumdb"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  authservice:
+    image: ghcr.io/konradcinkusz/authservice:v0.3.1
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      DatabaseProvider: PostgreSQL
+      ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=authdb;Username=quorum;Password=quorum
+      # Must match Quorum's Auth__Issuer / Auth__Audience (appsettings default: Quorum).
+      Jwt__Issuer: Quorum
+      Jwt__Audience: Quorum
+      Jwt__PublicBaseUrl: http://localhost:8080
+      Jwt__PrivateKeyPath: /keys/authservice-dev.pem
+      # First local admin; sign in with these on the app's /login page.
+      InitialAdmin__Email: admin@quorum.local
+      InitialAdmin__Password: Admin123!
+      FrontendBaseUrl: https://localhost:7134
+      App__Name: Quorum (dev)
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./.dev/keys:/keys:ro
+
+volumes:
+  pgdata:

@@ -1,6 +1,6 @@
 ﻿# ADR 0001 — Identity moves to `authservice`
 
-**Status:** Proposed
+**Status:** Accepted — implemented 2026-08-15 (all eight steps; see the annotated plan below)
 **Date:** 2026-08-15
 **Closes:** [`ARCHITECTURE_REVIEW.md`](ARCHITECTURE_REVIEW.md) F13, and unblocks F12
 **Depends on:** [`konradcinkusz/authservice`](https://github.com/konradcinkusz/authservice)
@@ -190,16 +190,16 @@ Had there been live accounts this ADR would need an export/import preserving use
 
 Ordered so that each step is independently reviewable and nothing is half-migrated for long.
 
-| # | Step | Notes |
+| # | Step | Status |
 |---|---|---|
-| 1 | Deploy `authservice` with PostgreSQL, RS256 keypair, `InitialAdmin` seeded | `openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048`, then the PEM into a platform secret. Verify `/.well-known/jwks.json` returns a non-empty key set — an empty one means it is still on HS256 |
-| 2 | Add `CreatedByEmail` to `Issue` + migration; populate at creation from the `email` claim | Additive and independent: can land before anything else changes |
-| 3 | Repoint the five `.Include(CreatedBy)` sites, six mappings, the search filter, the sort key and `IssuePDFService` at `CreatedByEmail` | The bulk of the diff. Characterisation tests first, per P13 |
-| 4 | Replace `AddIdentityServer`/`AddApiAuthorization` with `AddJwtBearer` + `MetadataAddress` | Quorum now validates and cannot mint |
-| 5 | Add the BFF routes and HttpOnly cookie session; repoint the Blazor client | `FRONTEND-BFF.md` §3 |
-| 6 | Delete `ApplicationUser`, `QuorumUserManager`, `CustomClaimsPrincipalFactory`, the Identity Razor pages, and the Identity tables; `ApplicationDbContext` stops deriving from `ApiAuthorizationDbContext` | A migration drops `AspNet*`. Safe only because there are no real accounts |
-| 7 | Drop `Microsoft.AspNetCore.ApiAuthorization.IdentityServer` | The moment F12 becomes reachable |
-| 8 | Upgrade to the current LTS | Previously blocked; retry the `net10.0` bump that produced NU1102 |
+| 1 | Deploy `authservice` with PostgreSQL, RS256 keypair, `InitialAdmin` seeded | **DONE** — `flyio/quorum-authservice.fly.toml` pins `ghcr.io/konradcinkusz/authservice:v0.3.1`; the flyio workflow refuses to deploy without a PKCS#8 key in `AUTH_JWT_PRIVATE_KEY_PEM` and asserts post-deploy that `/.well-known/jwks.json` is non-empty. Key generation shipped as `scripts/generate-jwt-signing-key.{sh,ps1}` (the PowerShell one exists because `openssl` is not a command on Windows) |
+| 2 | Add `CreatedByEmail` to `Issue` + migration; populate at creation from the `email` claim | **DONE** (pre-cutover) |
+| 3 | Repoint the five `.Include(CreatedBy)` sites, six mappings, the search filter, the sort key and `IssuePDFService` at `CreatedByEmail` | **DONE** — the navigation and its fallback arm are deleted; `IssueCreatorEmailTests` pins the column-only rule. The open question below is answered: the admin lists for payments/subscriptions/pools resolve display emails from the `QuorumUsers` projection in one batch query per page (`UserEmailEnrichment`), not from a denormalised column — those rows are provisioning artifacts, not signed documents, so a live cache is the correct source |
+| 4 | Replace `AddIdentityServer`/`AddApiAuthorization` with `AddJwtBearer` + `MetadataAddress` | **DONE** — `AddExternalJwtAuthentication` wired in `Server/Program.cs`; issuer/audience/metadata validated eagerly at startup |
+| 5 | Add the BFF routes and HttpOnly cookie session; repoint the Blazor client | **DONE** — `BffAuthController` (`/bff/auth/*`), `BffSessionService` (cookie pair, serialized refresh with a rotation-grace cache so a raced refresh cannot burn the token family), `TokenCookieBridgeMiddleware` (cookie → bearer before `UseAuthentication`), client `BffAuthenticationStateProvider` + login/register/forgot/reset/verify pages. The old `isActiveSubscription` claim became a field on the session payload, computed from Quorum's own table |
+| 6 | Delete `ApplicationUser`, `QuorumUserManager`, `CustomClaimsPrincipalFactory`, the Identity Razor pages, and the Identity tables; `ApplicationDbContext` stops deriving from `ApiAuthorizationDbContext` | **DONE** — with one deliberate departure: instead of a migration dropping `AspNet*`, the migration history was **re-baselined** (fresh `InitialCreate` per provider in `Quorum.Persistence.Migrations.{PostgreSQL,SqlServer}`). Same justification the drop-migration had — no deployed environment, no real accounts — and it leaves no Identity/Duende model snapshot to carry forever. Existing local databases are dropped and recreated |
+| 7 | Drop `Microsoft.AspNetCore.ApiAuthorization.IdentityServer` | **DONE** — gone from every project; `Quorum.Domain` has no package references at all |
+| 8 | Upgrade to the current LTS | **DONE** — `net10.0` across all projects, SDK pinned in `global.json`; the NU1102 that blocked F12 cannot recur because the package is gone |
 
 **Subscriptions stay in Quorum.** `QuorumUserManager.HasActiveSubscription` reads Quorum's own
 `Subscription` table keyed by user id, and subscriptions are Quorum's domain, not identity's —

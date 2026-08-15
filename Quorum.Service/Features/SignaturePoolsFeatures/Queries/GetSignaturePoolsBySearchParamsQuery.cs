@@ -16,7 +16,7 @@ public class GetSignaturePoolsBySearchParamsQuery : QueryBase, IRequest<PagedLis
         public override async Task<PagedList<SignaturePool>> Handle(GetSignaturePoolsBySearchParamsQuery request, CancellationToken cancellationToken)
         {
             var query = _context.SignaturePools
-                .Include(x=>x.Signatures).Include(x=>x.Quarter).Include(x=>x.ApplicationUser).AsQueryable();
+                .Include(x=>x.Signatures).Include(x=>x.Quarter).AsQueryable();
 
             query = ApplyUserFilter(query, request);
 
@@ -47,6 +47,9 @@ public class GetSignaturePoolsBySearchParamsQuery : QueryBase, IRequest<PagedLis
             query = ApplySorting(query, request.SortColumn, request.SortOrder);
 
             var pagedList = await PagedList<SignaturePool>.CreateAsync(query, request.SearchParams, cancellationToken);
+
+            await _context.PopulateUserEmailsAsync(
+                pagedList, x => x.ApplicationUserId, (x, email) => x.ApplicationUserEmail = email, cancellationToken);
 
             return pagedList;
         }

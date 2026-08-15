@@ -24,7 +24,6 @@ public class GetSubscriptionsBySearchParamsQuery : QueryBase, IRequest<PagedList
         {
             var query =
                 _context.Subscriptions
-                .Include(x => x.ApplicationUser)
                 .Include(x => x.SubscriptionPayments).ThenInclude(sp => sp.Payment).ThenInclude(spH => spH.PaymentStatusHistories)
                 .AsQueryable();
 
@@ -56,7 +55,12 @@ public class GetSubscriptionsBySearchParamsQuery : QueryBase, IRequest<PagedList
 
             query = ApplySorting(query, request.SortColumn, request.SortOrder);
 
-            return await PagedList<Subscription>.CreateAsync(query, request.SearchParams, cancellationToken);
+            var pagedList = await PagedList<Subscription>.CreateAsync(query, request.SearchParams, cancellationToken);
+
+            await _context.PopulateUserEmailsAsync(
+                pagedList, x => x.ApplicationUserId, (x, email) => x.ApplicationUserEmail = email, cancellationToken);
+
+            return pagedList;
         }
     }
 }

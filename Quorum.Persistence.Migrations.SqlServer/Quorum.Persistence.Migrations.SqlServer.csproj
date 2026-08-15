@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Holds the SQL Server migration set, and nothing else. See the PostgreSQL twin for why
+    each provider gets its own assembly.
+
+    SQL Server is the local-development path (the repository predates the move to
+    PostgreSQL); the deployed estate runs PostgreSQL. Regenerate with
+    scripts/generate-migrations.sh after model changes.
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Quorum.Persistence.Migrations.SqlServer</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Quorum.Persistence\Quorum.Persistence.csproj" />
+  </ItemGroup>
+
+</Project>

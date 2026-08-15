@@ -19,7 +19,7 @@ public static class AuthHelper
     {
         if (!authState.User.Identity.IsAuthenticated)
         {
-            navigationManager.NavigateTo("/authentication/login");
+            navigationManager.NavigateTo("/login");
             return false;
         }
         return true;

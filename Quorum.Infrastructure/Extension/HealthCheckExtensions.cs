@@ -26,9 +26,27 @@ public static class HealthCheckExtensions
             // would make the orchestrator kill and restart otherwise-healthy processes,
             // turning a dependency outage into an outage of its own.
             .AddCheck(LiveTag, () => HealthCheckResult.Healthy(), tags: new[] { LiveTag })
-            .AddDbContextCheck<ApplicationDbContext>("database", tags: new[] { ReadyTag });
+            .AddDbContextCheck<ApplicationDbContext>("database", tags: new[] { ReadyTag })
+            // Readiness stays unhealthy until MigrationBackgroundService has applied the
+            // schema. Without this, the platform routes traffic at a machine whose tables
+            // do not exist yet — /health answers 200 the moment Kestrel binds.
+            .AddCheck<MigrationsHealthCheck>("migrations", tags: new[] { ReadyTag });
 
         return services;
+    }
+
+    private sealed class MigrationsHealthCheck : IHealthCheck
+    {
+        private readonly Quorum.Infrastructure.Persistence.IMigrationCompletionSignal _signal;
+
+        public MigrationsHealthCheck(Quorum.Infrastructure.Persistence.IMigrationCompletionSignal signal)
+            => _signal = signal;
+
+        public Task<HealthCheckResult> CheckHealthAsync(
+            HealthCheckContext context, CancellationToken cancellationToken = default)
+            => Task.FromResult(_signal.IsCompleted
+                ? HealthCheckResult.Healthy("Schema applied")
+                : HealthCheckResult.Unhealthy("Schema initialization has not completed yet"));
     }
 
     public static WebApplication MapDefaultEndpoints(this WebApplication app)

@@ -1,4 +1,7 @@
-﻿@inject NavigationManager Navigation
+﻿@using Quorum.Client.Features.Auth
+@inject NavigationManager Navigation
+@inject IBffAuthClient Auth
+@inject BffAuthenticationStateProvider AuthState
 
 <AuthorizeView>
     <Authorized>
@@ -13,20 +16,18 @@
             }
         </div>
 
-        <a href="authentication/profile">Hello, @context.User.Identity?.Name!</a>
+        <span class="nav-link d-inline">Hello, @context.User.Identity?.Name!</span>
         <button class="nav-link btn btn-link" @onclick="BeginLogOut">Log out</button>
     </Authorized>
     <NotAuthorized>
-        <a href="authentication/register">Register</a>
-        <a href="authentication/login">Log in</a>
+        <a href="register">Register</a>
+        <a href="login">Log in</a>
     </NotAuthorized>
 </AuthorizeView>
 
 @code {
-    [CascadingParameter] 
+    [CascadingParameter]
     public Task<AuthenticationState> AuthTask { get; set; }
-
-    private System.Security.Claims.ClaimsPrincipal user;
 
     private bool IsActiveSubscription = false;
 
@@ -34,13 +35,16 @@
     {
         await base.OnParametersSetAsync();
 
-        await base.OnParametersSetAsync();
         var tuple = AuthHelper.IsActiveSubscription(await AuthTask);
         IsActiveSubscription = tuple.Item1;
     }
 
-    private void BeginLogOut()
+    private async Task BeginLogOut()
     {
-        Navigation.NavigateToLogout("authentication/logout");
+        // The BFF revokes the upstream session and deletes the HttpOnly cookies; the
+        // provider then flips the UI to anonymous.
+        await Auth.LogoutAsync();
+        await AuthState.ReloadSessionAsync();
+        Navigation.NavigateTo("/");
     }
 }

@@ -3,9 +3,13 @@
 [Table(TableNames.SignaturePools, Schema = SchemasNames.MRBasics)]
 public class SignaturePool : BaseEntity<Guid>
 {
-    [ForeignKey(nameof(ApplicationUser))]
+    /// <summary>Subject id from the identity service; no navigation on purpose (ADR 0001).</summary>
     public string ApplicationUserId { get; set; }
-    public ApplicationUser ApplicationUser { get; set; }
+
+    /// <summary>Display email resolved from the <see cref="QuorumUser"/> projection by the
+    /// query layer; not a column, and never authoritative.</summary>
+    [NotMapped]
+    public string? ApplicationUserEmail { get; set; }
     [InverseProperty(nameof(Signature.SignaturePool))]
     public ICollection<Signature> Signatures { get; set; }
     [ForeignKey(nameof(Quarter))]

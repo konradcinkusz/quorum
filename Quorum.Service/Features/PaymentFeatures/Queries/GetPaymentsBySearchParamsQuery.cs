@@ -24,7 +24,7 @@ public class GetPaymentsBySearchParamsQuery : QueryBase, IRequest<PagedList<Paym
             IQueryable<Payment> query = _context.Payments
                 .Include(x => x.RelatedIssue)
                 .Include(x => x.PaymentStatusHistories)
-                .Include(x => x.ApplicationUser).AsQueryable();
+                .AsQueryable();
 
             query = ApplyUserFilter(query, request);
 
@@ -72,7 +72,12 @@ public class GetPaymentsBySearchParamsQuery : QueryBase, IRequest<PagedList<Paym
 
             query = ApplySorting(query, request.SortColumn, request.SortOrder);
 
-            return await PagedList<Payment>.CreateAsync(query, request.SearchParams, cancellationToken);
+            var pagedList = await PagedList<Payment>.CreateAsync(query, request.SearchParams, cancellationToken);
+
+            await _context.PopulateUserEmailsAsync(
+                pagedList, x => x.ApplicationUserId, (x, email) => x.ApplicationUserEmail = email, cancellationToken);
+
+            return pagedList;
         }
     }
 }

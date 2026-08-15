@@ -1,12 +1,10 @@
-﻿global using Microsoft.AspNetCore.Identity;
-global using System.Text.Json.Serialization;
+﻿global using System.Text.Json.Serialization;
 global using System.ComponentModel.DataAnnotations;
 global using System.Net;
 global using System.Net.Sockets;
 global using System.ComponentModel.DataAnnotations.Schema;
 global using Quorum.Domain.Entities.Base;
 global using Quorum.Domain.Constants;
-global using Quorum.Domain.Auth;
 global using Quorum.Domain.Enums;
 global using Quorum.Domain.Entities;
 global using Quorum.Domain.Enum;

@@ -26,7 +26,6 @@ public class SignIssueCommand : IRequest<bool>
             }
 
             var signaturePool = await _context.SignaturePools
-                .Include(x => x.ApplicationUser)
                 .Include(x => x.Quarter)
                 .Include(x => x.Signatures).ThenInclude(x => x.Issue)
                 .Where(x => x.ApplicationUserId == request._applicationUserId).ToListAsync(cancellationToken);

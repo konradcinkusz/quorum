@@ -19,7 +19,7 @@ public class UnsignIssueCommand : IRequest<bool>
         public override async Task<bool> Handle(UnsignIssueCommand request, CancellationToken cancellationToken)
         {
             var signature = await _context.Signatures
-                .Include(x => x.SignaturePool).ThenInclude(x => x.ApplicationUser)
+                .Include(x => x.SignaturePool)
                 .Include(x => x.Issue)
                 .FirstOrDefaultAsync(x => x.IssueId == request._issueId && x.SignaturePool.ApplicationUserId == request._applicationUserId, cancellationToken);
 

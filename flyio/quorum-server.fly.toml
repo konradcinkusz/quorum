@@ -1,0 +1,55 @@
+# Quorum.Server — the hosted Blazor WASM app: API, BFF auth proxy, and static client.
+#
+# Paths in [build] are relative to THIS FILE. The Dockerfile needs the repository root as
+# context (it copies per-project csproj files before the source).
+
+app = "quorum-server"
+primary_region = "waw"
+
+[build]
+  dockerfile = "../Server/Dockerfile"
+  context = ".."
+
+[env]
+  ASPNETCORE_ENVIRONMENT = "Production"
+  ASPNETCORE_URLS = "http://+:8080"
+  DATABASE_PROVIDER = "PostgreSQL"
+  # P5: Quorum holds no key material. It validates bearer tokens against this system's own
+  # authservice instance (quorum-authservice) via its published JWKS, and the BFF proxies
+  # login/register/refresh to the same instance. The public URL is deliberate: the JWKS
+  # fetch must work from anywhere, and the proxy can wake a stopped machine (.internal
+  # cannot).
+  Auth__MetadataAddress = "https://quorum-authservice.fly.dev/.well-known/openid-configuration"
+  Auth__ServiceBaseUrl = "https://quorum-authservice.fly.dev"
+  Auth__Issuer = "Quorum"
+  Auth__Audience = "Quorum"
+
+# Secrets (set by the deploy workflow, never here):
+#   ConnectionStrings__Default — quorumdb on quorum-postgres, over 6PN
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  # 0 because this app is entered only from a browser: a cold start is a slow first page,
+  # not a failed synchronous call (P7).
+  min_machines_running = 0
+
+  [http_service.concurrency]
+    type = "requests"
+    hard_limit = 250
+    soft_limit = 200
+
+  [[http_service.checks]]
+    # /health is readiness: it stays unhealthy until the migration hosted service has
+    # applied the schema, so the proxy never routes at a machine whose tables are missing.
+    # grace_period covers the .NET cold start plus that first-boot schema work.
+    path = "/health"
+    interval = "30s"
+    timeout = "5s"
+    grace_period = "60s"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"

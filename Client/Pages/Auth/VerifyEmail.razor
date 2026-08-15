@@ -1,0 +1,78 @@
+﻿@page "/verify-email"
+@using Quorum.Client.Features.Auth
+@using Quorum.Shared.DTOs.Auth
+@inject IBffAuthClient Auth
+
+<PageTitle>Verify email</PageTitle>
+
+<div class="container" style="max-width: 28rem;">
+    <h1 class="h3 my-4">Email verification</h1>
+
+    @if (_busy)
+    {
+        <p>Verifying…</p>
+    }
+    else if (_succeeded)
+    {
+        <div class="alert alert-success" role="alert">@_message</div>
+        <a class="btn btn-primary" href="login">Log in</a>
+    }
+    else
+    {
+        <div class="alert alert-danger" role="alert">@(_message ?? "The verification link is invalid or has expired.")</div>
+
+        <EditForm Model="_resend" OnValidSubmit="ResendAsync">
+            <DataAnnotationsValidator />
+            <div class="mb-3">
+                <label class="form-label" for="email">Email</label>
+                <InputText id="email" class="form-control" type="email" @bind-Value="_resend.Email" />
+                <ValidationMessage For="() => _resend.Email" />
+            </div>
+            <button class="btn btn-secondary" type="submit">Resend verification email</button>
+        </EditForm>
+    }
+</div>
+
+@code {
+    private sealed class ResendModel
+    {
+        [Required, EmailAddress]
+        public string Email { get; set; } = string.Empty;
+    }
+
+    private readonly ResendModel _resend = new();
+    private bool _busy = true;
+    private bool _succeeded;
+    private string? _message;
+
+    [Parameter, SupplyParameterFromQuery(Name = "email")]
+    public string? Email { get; set; }
+
+    [Parameter, SupplyParameterFromQuery(Name = "token")]
+    public string? Token { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (string.IsNullOrEmpty(Email) || string.IsNullOrEmpty(Token))
+        {
+            _busy = false;
+            _message = "The verification link is incomplete. Use the link from the email, or request a new one below.";
+            _resend.Email = Email ?? string.Empty;
+            return;
+        }
+
+        var result = await Auth.VerifyEmailAsync(new BffVerifyEmailRequest(Email, Token));
+        _succeeded = result.Succeeded;
+        _message = result.Succeeded ? result.Value : result.ErrorMessage;
+        _resend.Email = Email;
+        _busy = false;
+    }
+
+    private async Task ResendAsync()
+    {
+        var result = await Auth.ResendVerificationAsync(new BffResendVerificationRequest(_resend.Email));
+        _message = result.Succeeded ? result.Value : result.ErrorMessage;
+        _succeeded = false;
+        StateHasChanged();
+    }
+}

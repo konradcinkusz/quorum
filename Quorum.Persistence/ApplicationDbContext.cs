@@ -22,9 +22,15 @@ public interface IApplicationDbContext
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }
 
-public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>, IApplicationDbContext
+/// <summary>
+/// Quorum's own schema, and nothing else. Identity lives in <c>authservice</c> (ADR 0001):
+/// there are no user, role or token tables here, no <c>IdentityDbContext</c> base, and no
+/// IdentityServer operational store. Users appear only as string subject ids plus the
+/// non-authoritative <see cref="QuorumUser"/> projection.
+/// </summary>
+public class ApplicationDbContext : DbContext, IApplicationDbContext
 {
-    public ApplicationDbContext(DbContextOptions options, IOptions<OperationalStoreOptions> operationalStoreOptions) : base(options, operationalStoreOptions)
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     {
     }
 
@@ -48,8 +54,6 @@ public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>, 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Seed();
-
         Logs_config(modelBuilder);
         SubscriptionPaymentConfig(modelBuilder);
         QuarterIssueConfig(modelBuilder);

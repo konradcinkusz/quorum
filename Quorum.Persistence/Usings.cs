@@ -1,12 +1,6 @@
-﻿global using Duende.IdentityServer.EntityFramework.Options;
-global using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
-global using Microsoft.EntityFrameworkCore;
-global using Microsoft.Extensions.Options;
-global using Quorum.Domain.Auth;
+﻿global using Microsoft.EntityFrameworkCore;
 global using Quorum.Domain.Entities;
-global using Microsoft.AspNetCore.Identity;
 global using Quorum.Domain.Enum;
-global using Quorum.Persistence.Seeds;
 global using Quorum.Domain.Constants;
 global using Microsoft.EntityFrameworkCore.ChangeTracking;
 global using Quorum.Domain.Entities.Base;

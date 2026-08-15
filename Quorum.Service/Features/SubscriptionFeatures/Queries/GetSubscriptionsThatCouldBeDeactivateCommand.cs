@@ -17,7 +17,6 @@ public class GetSubscriptionsThatCouldBeDeactivateCommand :
             var currentDate = DateTime.UtcNow;
 
             var query = _context.Subscriptions
-                        .Include(x => x.ApplicationUser)
                         .Include(x => x.SubscriptionPayments)
                             .ThenInclude(x => x.Payment)
                         .Where(x => x.SubscriptionPayments.Any(sp =>
@@ -26,7 +25,6 @@ public class GetSubscriptionsThatCouldBeDeactivateCommand :
                         .Select(x => new Subscription
                         {
                             ApplicationUserId = x.ApplicationUserId,
-                            ApplicationUser = x.ApplicationUser,
                             Begin = x.Begin,
                             End = x.End,
                             CreatedAt = x.CreatedAt,
@@ -35,7 +33,12 @@ public class GetSubscriptionsThatCouldBeDeactivateCommand :
                                 .ToList()
                         });
 
-            return await PagedList<Subscription>.CreateAsync(query, new(), cancellationToken);
+            var pagedList = await PagedList<Subscription>.CreateAsync(query, new(), cancellationToken);
+
+            await _context.PopulateUserEmailsAsync(
+                pagedList, x => x.ApplicationUserId, (x, email) => x.ApplicationUserEmail = email, cancellationToken);
+
+            return pagedList;
         }
     }
 }

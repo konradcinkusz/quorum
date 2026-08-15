@@ -2,39 +2,24 @@
 
 builder.ConfigureOpenTelemetry();
 
+// P4: provider behind a configuration switch (PostgreSQL deployed, SQL Server locally,
+// InMemory with nothing configured), schema applied by a hosted service after Kestrel is
+// up so a slow migration is never read as a failed deploy.
 builder.Services.AddDbContextService(builder.Configuration);
+builder.Services.AddDatabaseSchemaMigration();
 
-builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+// P5: identity lives in authservice (ADR 0001). Quorum validates bearer tokens against
+// that instance's published JWKS and holds no key material — it can verify a token and
+// cannot mint one. The BFF half proxies login/register/refresh and keeps the tokens in
+// HttpOnly cookies so the browser never holds them.
+builder.Services.AddExternalJwtAuthentication(builder.Configuration);
+builder.Services.AddBffAuthentication(builder.Configuration);
 
-builder.Services.AddDefaultIdentity<ApplicationUser>
-    (options => options.SignIn.RequireConfirmedAccount = true)
-    .AddUserManager<QuorumUserManager>()
-    .AddRoles<IdentityRole>()
-    .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddClaimsPrincipalFactory<CustomClaimsPrincipalFactory>();
-
-builder.Services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, CustomClaimsPrincipalFactory>();
-
-//https://stackoverflow.com/q/70563303
-//https://github.com/dotnet/AspNetCore.Docs/issues/14944
-builder.Services.AddIdentityServer()
-    .AddApiAuthorization<ApplicationUser, ApplicationDbContext>(opt => {
-        opt.IdentityResources["openid"].UserClaims.Add("name");
-        opt.ApiResources.Single().UserClaims.Add("name");
-        opt.IdentityResources["openid"].UserClaims.Add("role");
-        opt.ApiResources.Single().UserClaims.Add("role");
-        opt.IdentityResources["openid"].UserClaims.Add("isActiveSubscription");
-        opt.ApiResources.Single().UserClaims.Add("isActiveSubscription");
-    });
-
-
-builder.Services.AddAuthentication()
-    .AddIdentityServerJwt();
-
-//Roles not working - erroneously appears as if User is not in a Role, .NET 6 (upgrading from .Net Core 3.2)
-//https://stackoverflow.com/a/73930254/4510954
 builder.Services.AddAuthorization(options =>
 {
+    // RequireClaim rather than RequireRole, so the policy states the claim type it reads
+    // (ClaimTypes.Role — what the JWT handler's inbound mapping produces from `role`).
+    // authservice's platform roles include Admin and SuperAdmin, same names as before.
     options.AddPolicy(Constants.Policies.RequireAdminRole, policy =>
     {
         policy.RequireClaim(ClaimTypes.Role, new[] { Constants.Claims.Admin, Constants.Claims.SuperAdmin });
@@ -46,7 +31,6 @@ builder.Services.AddRazorPages();
 builder.Services.AddController();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-//builder.Services.AddInfrastructureAutoMapper();
 
 builder.Services.AddScopedServices();
 
@@ -58,7 +42,6 @@ builder.Services.AddVersion();
 
 builder.Services.AddDefaultHealthChecks();
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -67,14 +50,11 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-// Translates the service layer's exception types into API responses. The middleware existed
-// and was never added to the pipeline, so handler exceptions surfaced unhandled.
+// Translates the service layer's exception types into API responses.
 app.ConfigureCustomExceptionMiddleware();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseMigrationsEndPoint();
     app.UseWebAssemblyDebugging();
 }
 else
@@ -92,7 +72,11 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseIdentityServer();
+// The BFF's HttpOnly access-token cookie becomes the Authorization header here, so the
+// one authentication path below — bearer JWT against authservice's JWKS — serves browser
+// and API callers alike.
+app.UseTokenCookieBridge();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();

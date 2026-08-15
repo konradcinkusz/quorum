@@ -697,8 +697,8 @@ repository, so no commit can close it.
 | P2 | Add a secret scanner in CI | F1 | **FIXED** — 2026-08-15, `secret-scan` workflow over tree and full history |
 | P2 | Add a secret scanner as a **pre-commit hook** | F1 | **OPEN** — CI catches it after the commit exists; the hook is what stops it being written |
 | P2 | Add a CI workflow running `dotnet build` | F8 | **FIXED** — 2026-08-15, and it is now the only thing that compiles this repo |
-| P2 | Upgrade `net7.0` → current LTS | F12 | **BLOCKED** — attempted 2026-08-15 and reverted; see F13 |
-| P1 | **Decide what replaces `Microsoft.AspNetCore.ApiAuthorization.IdentityServer`** | F13 | **DECIDED** — 2026-08-15, adopt `authservice`; see [ADR 0001](0001-identity-via-authservice.md). Implementation not started |
+| P2 | Upgrade `net7.0` → current LTS | F12 | **FIXED** — 2026-08-15, `net10.0` everywhere; unblocked by F13's fix |
+| P1 | **Decide what replaces `Microsoft.AspNetCore.ApiAuthorization.IdentityServer`** | F13 | **FIXED** — 2026-08-15, `authservice` adopted per [ADR 0001](0001-identity-via-authservice.md) and implemented: the package is gone, Quorum validates against the instance's JWKS and holds no key material, the browser holds no token (BFF + HttpOnly cookies), and the estate deploys to Fly.io by tag |
 | P2 | Bump `AutoMapper` 12.0.1 (High severity advisory) | F14 | **OPEN** |
 | P3 | Replace `iTextSharp` 5.x — .NET Framework-only, AGPL, drags in vulnerable BouncyCastle | F14 | **OPEN** |
 | P3 | Wire health checks; split `/health` and `/alive`; add the exception middleware | F7 | **FIXED** — 2026-08-15 |

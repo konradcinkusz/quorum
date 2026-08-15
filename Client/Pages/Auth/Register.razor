@@ -1,0 +1,126 @@
+﻿@page "/register"
+@using Quorum.Client.Features.Auth
+@using Quorum.Shared.DTOs.Auth
+@inject IBffAuthClient Auth
+@inject BffAuthenticationStateProvider AuthState
+@inject NavigationManager Navigation
+
+<PageTitle>Register</PageTitle>
+
+<div class="container" style="max-width: 28rem;">
+    <h1 class="h3 my-4">Create an account</h1>
+
+    @if (_pendingMessage is not null)
+    {
+        <div class="alert alert-success" role="alert">@_pendingMessage</div>
+        <p>Once your email is verified you can <a href="login">log in</a>.</p>
+    }
+    else
+    {
+        @if (!string.IsNullOrEmpty(_error))
+        {
+            <div class="alert alert-danger" role="alert">@_error</div>
+        }
+
+        @if (_versions is null)
+        {
+            <p>Loading…</p>
+        }
+        else
+        {
+            <EditForm Model="_model" OnValidSubmit="RegisterAsync">
+                <DataAnnotationsValidator />
+                <div class="mb-3">
+                    <label class="form-label" for="email">Email</label>
+                    <InputText id="email" class="form-control" type="email" autocomplete="username" @bind-Value="_model.Email" />
+                    <ValidationMessage For="() => _model.Email" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="password">Password</label>
+                    <InputText id="password" class="form-control" type="password" autocomplete="new-password" @bind-Value="_model.Password" />
+                    <div class="form-text">At least 8 characters, with an upper-case letter, a lower-case letter, a digit and a symbol.</div>
+                    <ValidationMessage For="() => _model.Password" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="confirm">Confirm password</label>
+                    <InputText id="confirm" class="form-control" type="password" autocomplete="new-password" @bind-Value="_model.ConfirmPassword" />
+                    <ValidationMessage For="() => _model.ConfirmPassword" />
+                </div>
+                <div class="form-check mb-3">
+                    <InputCheckbox id="consent" class="form-check-input" @bind-Value="_model.AcceptsTerms" />
+                    <label class="form-check-label" for="consent">
+                        I accept the terms of service (version @_versions.Terms) and the privacy policy (version @_versions.Privacy)
+                    </label>
+                    <ValidationMessage For="() => _model.AcceptsTerms" />
+                </div>
+                <button class="btn btn-primary w-100" type="submit" disabled="@_busy">
+                    @(_busy ? "Creating account…" : "Register")
+                </button>
+            </EditForm>
+        }
+
+        <div class="mt-3">
+            <a href="login">Already have an account? Log in</a>
+        </div>
+    }
+</div>
+
+@code {
+    private sealed class RegisterModel
+    {
+        [Required, EmailAddress]
+        public string Email { get; set; } = string.Empty;
+
+        [Required, MinLength(8, ErrorMessage = "The password must be at least 8 characters long.")]
+        public string Password { get; set; } = string.Empty;
+
+        [Required, Compare(nameof(Password), ErrorMessage = "The passwords do not match.")]
+        public string ConfirmPassword { get; set; } = string.Empty;
+
+        [Range(typeof(bool), "true", "true", ErrorMessage = "You must accept the terms and the privacy policy.")]
+        public bool AcceptsTerms { get; set; }
+    }
+
+    private readonly RegisterModel _model = new();
+    private BffConsentVersions? _versions;
+    private string? _error;
+    private string? _pendingMessage;
+    private bool _busy;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // The identity service rejects a registration whose consent versions do not match
+        // its current ones exactly, so the form asks it first instead of hardcoding them.
+        _versions = await Auth.GetConsentVersionsAsync();
+        if (_versions is null)
+        {
+            _error = "Registration is unavailable right now. Please try again shortly.";
+        }
+    }
+
+    private async Task RegisterAsync()
+    {
+        _busy = true;
+        _error = null;
+
+        var result = await Auth.RegisterAsync(new BffRegisterRequest(
+            _model.Email, _model.Password, _versions!.Terms, _versions!.Privacy));
+
+        if (!result.Succeeded)
+        {
+            _error = result.ErrorMessage;
+        }
+        else if (result.Value!.RequiresEmailVerification)
+        {
+            _pendingMessage = result.Value.Message
+                ?? "Registration accepted. Check your email to verify the account before signing in.";
+        }
+        else
+        {
+            AuthState.NotifySessionChanged(result.Value.Session!);
+            Navigation.NavigateTo("/");
+        }
+
+        _busy = false;
+    }
+}

@@ -1,0 +1,56 @@
+# Tears the estate down, behind a typed confirmation — a workflow that destroys data on a
+# single click eventually gets a single click. Destroys in reverse dependency order so
+# nothing is left serving requests against an app that has already gone. The data volume
+# is kept by default; destroying quorum-postgres with the volume is the irreversible step.
+
+name: flyio-destroy
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: Type "destroy-quorum" to confirm
+        type: string
+        required: true
+      destroy_database:
+        description: Also destroy quorum-postgres AND its data volume (irreversible)
+        type: boolean
+        required: true
+        default: false
+
+jobs:
+  destroy:
+    runs-on: ubuntu-latest
+    environment: flyio
+    steps:
+      - name: Check the confirmation phrase
+        run: |
+          set -euo pipefail
+          if [ "${{ inputs.confirm }}" != "destroy-quorum" ]; then
+            echo "Confirmation phrase does not match; refusing."
+            exit 1
+          fi
+
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Destroy in reverse dependency order
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          destroy() {
+            if flyctl apps list --json | jq -e --arg a "$1" '.[] | select((.Name // .name) == $a)' >/dev/null; then
+              flyctl apps destroy "$1" --yes
+            else
+              echo "App $1 does not exist; nothing to destroy."
+            fi
+          }
+
+          destroy quorum-server
+          destroy quorum-authservice
+
+          if [ "${{ inputs.destroy_database }}" = "true" ]; then
+            destroy quorum-postgres
+          else
+            echo "Keeping quorum-postgres and its volume (destroy_database=false)."
+          fi

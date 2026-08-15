@@ -31,7 +31,6 @@ public class GetIssueByIdForEdit : IRequest<Issue>
                 .Include(x => x.QuarterIssues).ThenInclude(qi => qi.Quarter)
                 .Include(x => x.IssueVisibilityHistories)
                 .Include(x => x.IssueProcessingHistories)
-                .Include(x => x.CreatedBy)
                 .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
 
             // Same result whether the issue does not exist or belongs to someone else, so

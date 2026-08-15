@@ -39,33 +39,19 @@
 
     async Task Next()
     {
-        try
+        if (QueryBase.CurrentPage < TotalPages)
         {
-            if (QueryBase.CurrentPage < TotalPages)
-            {
-                QueryBase.CurrentPage++;
-                await RefreshList.InvokeAsync();
-            }
-        }
-        catch (AccessTokenNotAvailableException exception)
-        {
-            exception.Redirect();
+            QueryBase.CurrentPage++;
+            await RefreshList.InvokeAsync();
         }
     }
 
     async Task Previous()
     {
-        try
+        if (QueryBase.CurrentPage > 1)
         {
-            if (QueryBase.CurrentPage > 1)
-            {
-                QueryBase.CurrentPage--;
-                await RefreshList.InvokeAsync();
-            }
-        }
-        catch (AccessTokenNotAvailableException exception)
-        {
-            exception.Redirect();
+            QueryBase.CurrentPage--;
+            await RefreshList.InvokeAsync();
         }
     }
 }
