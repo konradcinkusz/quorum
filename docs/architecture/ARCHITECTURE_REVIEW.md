@@ -6,8 +6,10 @@
 > principles; it references them.
 >
 > **Reviewed:** 2026-08-14, against `master` @ `737060a` (last commit 2023-07-26).
-> **Findings F1–F4 fixed:** 2026-08-15 — see the status ledger in §4. The findings below are
-> left as written, describing the code as reviewed, so the ledger has something to refer to.
+> **Findings F0–F6 and F8 fixed or partly fixed:** 2026-08-15 — see the status ledger in §4.
+> The findings below are left as written, describing the code as reviewed, so the ledger has
+> something to refer to. F0 was added *after* first publication: it was found by the CI
+> secret scanner this review recommended, not by the review.
 > **Scope:** static review of the repository as committed. No build was run (no .NET SDK
 > in the review environment) and no deployed instance was exercised. Per
 > [`SECURITY-REVIEW.md`](https://github.com/konradcinkusz/architecture-standards/blob/main/docs/guides/SECURITY-REVIEW.md)
@@ -688,12 +690,14 @@ yet. It stays a P2 open row, not a closed one.
 
 ### Residual risks — deliberately not addressed here
 
-- **This review is static, and so are the fixes.** No build, no run, no penetration test —
-  there is no .NET SDK in the review environment and NuGet is unreachable from it, so the
-  2026-08-15 changes are **not compile-verified**. They were written against the existing
-  code's own idioms and reviewed by hand, but `dotnet build` is the first thing that should
-  happen to this branch. F6's `FindAsync` bug is the clearest signal that some of these
-  paths have not executed recently.
+- **The fixes compile; they have not been run.** The review environment has no .NET SDK and
+  cannot reach NuGet, so the `build` workflow added for F8 is what verifies this branch —
+  `dotnet restore` and a Release build of all seven projects, green on every commit since it
+  was added. That closes the "does it compile" question and nothing beyond it: the
+  application has still never been started, no request has been made against a changed
+  endpoint, and no migration has been applied to a real database. F6's `FindAsync` bug is the
+  reminder of what that gap can hide — code that compiles fine and throws on first execution.
+  Every behavioural claim in this document is read from source, not observed.
 - **A user editing their own issue silently un-verifies it.** `EditIssueCommand.IsVerifyByAdmin`
   defaults to `false` rather than `null`, and the handler's `request.IsVerifyByAdmin ?? issue.IsVerifyByAdmin`
   therefore writes `false` on every user-facing edit. This is pre-existing behaviour, it
