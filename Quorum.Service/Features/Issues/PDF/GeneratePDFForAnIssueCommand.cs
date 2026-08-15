@@ -21,7 +21,7 @@ public class GeneratePDFForAnIssueCommand : IRequest<string>
 
         public override async Task<string> Handle(GeneratePDFForAnIssueCommand request, CancellationToken cancellationToken)
         {
-            var issue = await _context.Issues.Include(x => x.CreatedBy).Include(x => x.IssueProcessingHistories)
+            var issue = await _context.Issues.Include(x => x.IssueProcessingHistories)
                 .FirstAsync(x => x.Id == request._issueId, cancellationToken);
 
             // Generate PDF bytes using the GeneratePdfBytes method

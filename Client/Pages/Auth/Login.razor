@@ -1,0 +1,145 @@
+﻿@page "/login"
+@using Quorum.Client.Features.Auth
+@using Quorum.Shared.DTOs.Auth
+@inject IBffAuthClient Auth
+@inject BffAuthenticationStateProvider AuthState
+@inject NavigationManager Navigation
+
+<PageTitle>Log in</PageTitle>
+
+<div class="container" style="max-width: 28rem;">
+    <h1 class="h3 my-4">Log in</h1>
+
+    @if (!string.IsNullOrEmpty(_error))
+    {
+        <div class="alert alert-danger" role="alert">@_error</div>
+    }
+
+    @if (_challengeToken is null)
+    {
+        <EditForm Model="_model" OnValidSubmit="LoginAsync">
+            <DataAnnotationsValidator />
+            <div class="mb-3">
+                <label class="form-label" for="email">Email</label>
+                <InputText id="email" class="form-control" type="email" autocomplete="username" @bind-Value="_model.Email" />
+                <ValidationMessage For="() => _model.Email" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="password">Password</label>
+                <InputText id="password" class="form-control" type="password" autocomplete="current-password" @bind-Value="_model.Password" />
+                <ValidationMessage For="() => _model.Password" />
+            </div>
+            <button class="btn btn-primary w-100" type="submit" disabled="@_busy">
+                @(_busy ? "Signing in…" : "Log in")
+            </button>
+        </EditForm>
+
+        <div class="mt-3 d-flex justify-content-between">
+            <a href="register">Create an account</a>
+            <a href="forgot-password">Forgot password?</a>
+        </div>
+    }
+    else
+    {
+        <p>Enter the 6-digit code from your authenticator app, or a recovery code.</p>
+        <EditForm Model="_twoFactor" OnValidSubmit="TwoFactorLoginAsync">
+            <div class="mb-3">
+                <label class="form-label" for="code">Authenticator code</label>
+                <InputText id="code" class="form-control" autocomplete="one-time-code" @bind-Value="_twoFactor.Code" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="recovery">Recovery code (instead)</label>
+                <InputText id="recovery" class="form-control" @bind-Value="_twoFactor.RecoveryCode" />
+            </div>
+            <button class="btn btn-primary w-100" type="submit" disabled="@_busy">
+                @(_busy ? "Verifying…" : "Verify")
+            </button>
+        </EditForm>
+    }
+</div>
+
+@code {
+    private sealed class LoginModel
+    {
+        [Required, EmailAddress]
+        public string Email { get; set; } = string.Empty;
+
+        [Required]
+        public string Password { get; set; } = string.Empty;
+    }
+
+    private sealed class TwoFactorModel
+    {
+        public string? Code { get; set; }
+        public string? RecoveryCode { get; set; }
+    }
+
+    private readonly LoginModel _model = new();
+    private readonly TwoFactorModel _twoFactor = new();
+    private string? _challengeToken;
+    private string? _error;
+    private bool _busy;
+
+    [Parameter, SupplyParameterFromQuery(Name = "returnUrl")]
+    public string? ReturnUrl { get; set; }
+
+    private async Task LoginAsync()
+    {
+        _busy = true;
+        _error = null;
+
+        var result = await Auth.LoginAsync(new BffLoginRequest(_model.Email, _model.Password));
+        HandleResult(result);
+
+        _busy = false;
+    }
+
+    private async Task TwoFactorLoginAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_twoFactor.Code) && string.IsNullOrWhiteSpace(_twoFactor.RecoveryCode))
+        {
+            _error = "Enter an authenticator code or a recovery code.";
+            return;
+        }
+
+        _busy = true;
+        _error = null;
+
+        var result = await Auth.TwoFactorLoginAsync(
+            new BffTwoFactorLoginRequest(_challengeToken!, _twoFactor.Code, _twoFactor.RecoveryCode));
+        HandleResult(result);
+
+        _busy = false;
+    }
+
+    private void HandleResult(BffCallResult<BffLoginResult> result)
+    {
+        if (!result.Succeeded)
+        {
+            _error = result.ErrorMessage;
+            return;
+        }
+
+        if (result.Value!.RequiresTwoFactor)
+        {
+            _challengeToken = result.Value.ChallengeToken;
+            return;
+        }
+
+        AuthState.NotifySessionChanged(result.Value.Session!);
+        Navigation.NavigateTo(SafeReturnUrl());
+    }
+
+    private string SafeReturnUrl()
+    {
+        // Only relative targets: an absolute returnUrl is an open redirect.
+        if (!string.IsNullOrEmpty(ReturnUrl)
+            && Uri.TryCreate(ReturnUrl, UriKind.Relative, out _)
+            && !ReturnUrl.StartsWith("//", StringComparison.Ordinal))
+        {
+            return ReturnUrl;
+        }
+
+        return "/";
+    }
+}

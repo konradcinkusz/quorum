@@ -1,0 +1,12 @@
+# Build context is the repository root (flyio/*.fly.toml declares context = "..").
+**/bin/
+**/obj/
+**/.vs/
+**/.idea/
+.git/
+.github/
+docs/
+SQLs/
+flyio/
+tests/
+*.md

@@ -15,7 +15,6 @@ public class GetCurrentQuarterPublishedIssues : QueryBase, IRequest<PagedList<Is
                 .Include(x => x.QuarterIssues).ThenInclude(qi => qi.Quarter)
                 .Include(x => x.IssueVisibilityHistories)
                 .Include(x => x.IssueProcessingHistories)
-                .Include(x => x.CreatedBy)
                 .Where(x => 
                         !x.IsDeleted && 
                         x.IsVerifyByAdmin && 

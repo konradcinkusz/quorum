@@ -10,7 +10,7 @@ public class GetSignedIssuesCommand : QueryBase, IRequest<PagedList<Issue>>
 
         public override async Task<PagedList<Issue>> Handle(GetSignedIssuesCommand request, CancellationToken cancellationToken)
         {
-            var query = _context.SignaturePools.Include(x => x.ApplicationUser).Include(x => x.Signatures).ThenInclude(x => x.Issue).Include(x => x.Quarter).AsQueryable();
+            var query = _context.SignaturePools.Include(x => x.Signatures).ThenInclude(x => x.Issue).Include(x => x.Quarter).AsQueryable();
 
             query =  ApplyUserFilter(query, request);
 

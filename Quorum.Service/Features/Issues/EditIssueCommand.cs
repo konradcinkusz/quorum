@@ -38,7 +38,6 @@ public class EditIssueCommand : IRequest<int>
                 .Include(x => x.QuarterIssues).ThenInclude(qi => qi.Quarter)
                 .Include(x => x.IssueVisibilityHistories)
                 .Include(x => x.IssueProcessingHistories)
-                .Include(x => x.CreatedBy)
                 .FirstOrDefaultAsync(x => x.Id == request._id, cancellationToken);
 
             // Deliberately the same result whether the issue does not exist or belongs to

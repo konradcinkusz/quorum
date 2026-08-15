@@ -1,0 +1,332 @@
+# Tag-driven deploy to Fly.io (P12).
+#
+#   push tag v*
+#     ├── test              build + unit tests
+#     ├── detect-changes    diff vs previous tag → per-service flags
+#     │                     (a service whose Fly app is missing is ALWAYS selected,
+#     │                      so a cold estate comes up from a single tag)
+#     ├── build             quorum-server image → registry.fly.io, built once
+#     └── deploy, ordered:  postgres → authservice → server
+#                           each gate accepts success OR skipped from upstream,
+#                           so an unchanged service never blocks the chain
+#
+# Post-deploy assertions the health checks cannot make:
+#   - quorum-authservice publishes a NON-EMPTY JWKS (an empty one means the signing key
+#     never arrived and every consumer would reject every token while looking healthy)
+#   - quorum-server answers /health 200
+#
+# Root secrets live in the GitHub environment `flyio` (see flyio/SECRETS.md). Per-app
+# secrets are derived and staged here — never set by hand.
+
+name: flyio
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+concurrency:
+  group: flyio-deploy
+  cancel-in-progress: false
+
+env:
+  FLY_ORG: personal
+  REGION: waw
+
+jobs:
+  test:
+    name: Build and test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Restore
+        run: dotnet restore Quorum.sln
+
+      - name: Build
+        run: dotnet build Quorum.sln --no-restore --configuration Release
+
+      - name: Test
+        run: dotnet test Quorum.sln --no-build --configuration Release
+
+  detect-changes:
+    name: Detect changed services
+    runs-on: ubuntu-latest
+    environment: flyio
+    outputs:
+      server: ${{ steps.detect.outputs.server }}
+      authservice: ${{ steps.detect.outputs.authservice }}
+      postgres: ${{ steps.detect.outputs.postgres }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Diff against the previous tag, and select any app that does not exist
+        id: detect
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          TAG="${GITHUB_REF_NAME}"
+          PREV="$(git describe --tags --abbrev=0 "${TAG}^" 2>/dev/null || true)"
+
+          if [ -z "$PREV" ]; then
+            echo "No previous tag — first release, everything is selected."
+            CHANGED_ALL=true
+          else
+            CHANGED_ALL=false
+            echo "Comparing ${PREV}..${TAG}"
+            git diff --name-only "${PREV}" "${TAG}" > changed.txt
+            cat changed.txt
+          fi
+
+          changed() {
+            [ "$CHANGED_ALL" = true ] && return 0
+            grep -qE "$1" changed.txt
+          }
+
+          # flyctl has changed JSON field casing between versions; match either.
+          APPS_JSON="$(flyctl apps list --json)"
+          app_missing() {
+            ! echo "$APPS_JSON" | jq -e --arg a "$1" '.[] | select((.Name // .name) == $a)' >/dev/null
+          }
+
+          # A change to any compiled project invalidates the server image. The client,
+          # shared DTOs, domain, persistence and migrations all compile into it.
+          SERVER=false
+          if changed '^(Server|Client|Shared|Quorum\.Domain|Quorum\.Persistence|Quorum\.Persistence\.Migrations\.[A-Za-z]+|Quorum\.Service|Quorum\.Infrastructure)/|^global\.json$|^flyio/quorum-server\.fly\.toml$|^\.github/workflows/flyio\.yml$' \
+            || app_missing quorum-server; then
+            SERVER=true
+          fi
+
+          # The authservice image is pinned; only its config (or absence) redeploys it.
+          AUTHSERVICE=false
+          if changed '^flyio/quorum-authservice\.fly\.toml$' || app_missing quorum-authservice; then
+            AUTHSERVICE=true
+          fi
+
+          # Redeploying Postgres restarts it: gate on its own config or absence only.
+          POSTGRES=false
+          if changed '^flyio/postgres\.fly\.toml$' || app_missing quorum-postgres; then
+            POSTGRES=true
+          fi
+
+          echo "server=${SERVER}"           >> "$GITHUB_OUTPUT"
+          echo "authservice=${AUTHSERVICE}" >> "$GITHUB_OUTPUT"
+          echo "postgres=${POSTGRES}"       >> "$GITHUB_OUTPUT"
+          echo "server=${SERVER} authservice=${AUTHSERVICE} postgres=${POSTGRES}"
+
+  build:
+    name: Build quorum-server image
+    runs-on: ubuntu-latest
+    needs: [test, detect-changes]
+    if: needs.detect-changes.outputs.server == 'true'
+    environment: flyio
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Build once, push to registry.fly.io
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          flyctl auth docker
+          docker build -f Server/Dockerfile -t "registry.fly.io/quorum-server:${GITHUB_REF_NAME}" .
+          docker push "registry.fly.io/quorum-server:${GITHUB_REF_NAME}"
+
+  deploy-postgres:
+    name: Deploy quorum-postgres
+    runs-on: ubuntu-latest
+    needs: [test, detect-changes]
+    if: >-
+      ${{ always() && !cancelled()
+          && needs.test.result == 'success'
+          && needs.detect-changes.result == 'success'
+          && needs.detect-changes.outputs.postgres == 'true' }}
+    environment: flyio
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Require root secrets
+        env:
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          AUTH_DB_PASSWORD: ${{ secrets.AUTH_DB_PASSWORD }}
+        run: |
+          set -euo pipefail
+          [ -n "$POSTGRES_PASSWORD" ] || { echo "POSTGRES_PASSWORD is not set in the flyio environment"; exit 1; }
+          [ -n "$AUTH_DB_PASSWORD" ]  || { echo "AUTH_DB_PASSWORD is not set in the flyio environment"; exit 1; }
+
+      - name: Ensure app and volume exist
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          if flyctl apps list --json | jq -e --arg a quorum-postgres '.[] | select((.Name // .name) == $a)' >/dev/null; then
+            echo "App quorum-postgres already exists."
+          else
+            flyctl apps create quorum-postgres --org "${FLY_ORG}" --yes
+          fi
+
+          if flyctl volumes list -a quorum-postgres --json | jq -e '.[] | select((.Name // .name) == "quorum_pgdata")' >/dev/null; then
+            echo "Volume quorum_pgdata already exists."
+          else
+            flyctl volumes create quorum_pgdata -a quorum-postgres --region "${REGION}" --size 10 --yes
+          fi
+
+      - name: Stage secrets and deploy
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          AUTH_DB_PASSWORD: ${{ secrets.AUTH_DB_PASSWORD }}
+        run: |
+          set -euo pipefail
+          flyctl secrets set -a quorum-postgres --stage \
+            "POSTGRES_PASSWORD=${POSTGRES_PASSWORD}" \
+            "AUTH_DB_PASSWORD=${AUTH_DB_PASSWORD}"
+          # --ha=false: a second machine would get a second, empty volume, not a replica.
+          flyctl deploy --config flyio/postgres.fly.toml -a quorum-postgres --ha=false --yes
+
+  deploy-authservice:
+    name: Deploy quorum-authservice
+    runs-on: ubuntu-latest
+    needs: [test, detect-changes, deploy-postgres]
+    if: >-
+      ${{ always() && !cancelled()
+          && needs.test.result == 'success'
+          && needs.detect-changes.result == 'success'
+          && needs.detect-changes.outputs.authservice == 'true'
+          && (needs.deploy-postgres.result == 'success' || needs.deploy-postgres.result == 'skipped') }}
+    environment: flyio
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Require the signing key and admin seed
+        env:
+          AUTH_JWT_PRIVATE_KEY_PEM: ${{ secrets.AUTH_JWT_PRIVATE_KEY_PEM }}
+          AUTH_DB_PASSWORD: ${{ secrets.AUTH_DB_PASSWORD }}
+          AUTH_INITIAL_ADMIN_EMAIL: ${{ secrets.AUTH_INITIAL_ADMIN_EMAIL }}
+          AUTH_INITIAL_ADMIN_PASSWORD: ${{ secrets.AUTH_INITIAL_ADMIN_PASSWORD }}
+        run: |
+          set -euo pipefail
+          # A signing key is not an optional dependency: a service that boots without one
+          # infers HS256 and publishes a valid, EMPTY JWKS while looking perfectly healthy.
+          [ -n "$AUTH_JWT_PRIVATE_KEY_PEM" ] || { echo "AUTH_JWT_PRIVATE_KEY_PEM is not set in the flyio environment"; exit 1; }
+          case "$AUTH_JWT_PRIVATE_KEY_PEM" in
+            *"BEGIN PRIVATE KEY"*) ;;
+            *) echo "AUTH_JWT_PRIVATE_KEY_PEM is not a PKCS#8 PEM (expected 'BEGIN PRIVATE KEY')"; exit 1 ;;
+          esac
+          [ -n "$AUTH_DB_PASSWORD" ]            || { echo "AUTH_DB_PASSWORD is not set"; exit 1; }
+          [ -n "$AUTH_INITIAL_ADMIN_EMAIL" ]    || { echo "AUTH_INITIAL_ADMIN_EMAIL is not set"; exit 1; }
+          [ -n "$AUTH_INITIAL_ADMIN_PASSWORD" ] || { echo "AUTH_INITIAL_ADMIN_PASSWORD is not set"; exit 1; }
+
+      - name: Ensure app exists
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          if flyctl apps list --json | jq -e --arg a quorum-authservice '.[] | select((.Name // .name) == $a)' >/dev/null; then
+            echo "App quorum-authservice already exists."
+          else
+            flyctl apps create quorum-authservice --org "${FLY_ORG}" --yes
+          fi
+
+      - name: Stage secrets and deploy the pinned image
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+          AUTH_JWT_PRIVATE_KEY_PEM: ${{ secrets.AUTH_JWT_PRIVATE_KEY_PEM }}
+          AUTH_DB_PASSWORD: ${{ secrets.AUTH_DB_PASSWORD }}
+          AUTH_INITIAL_ADMIN_EMAIL: ${{ secrets.AUTH_INITIAL_ADMIN_EMAIL }}
+          AUTH_INITIAL_ADMIN_PASSWORD: ${{ secrets.AUTH_INITIAL_ADMIN_PASSWORD }}
+        run: |
+          set -euo pipefail
+          flyctl secrets set -a quorum-authservice --stage \
+            "ConnectionStrings__DefaultConnection=Host=quorum-postgres.internal;Port=5432;Database=authdb;Username=auth;Password=${AUTH_DB_PASSWORD}" \
+            "Jwt__PrivateKeyPem=${AUTH_JWT_PRIVATE_KEY_PEM}" \
+            "InitialAdmin__Email=${AUTH_INITIAL_ADMIN_EMAIL}" \
+            "InitialAdmin__Password=${AUTH_INITIAL_ADMIN_PASSWORD}"
+          flyctl deploy --config flyio/quorum-authservice.fly.toml -a quorum-authservice --yes
+
+      - name: Assert the published JWKS is non-empty
+        run: |
+          set -euo pipefail
+          # The one thing the health check cannot see. Retry briefly: machines may still
+          # be settling right after the deploy.
+          for i in $(seq 1 10); do
+            COUNT="$(curl -fsS https://quorum-authservice.fly.dev/.well-known/jwks.json | jq '.keys | length')" && \
+              [ "$COUNT" -ge 1 ] && { echo "JWKS has ${COUNT} key(s)."; exit 0; }
+            echo "Attempt ${i}: JWKS empty or unreachable; retrying in 6s"
+            sleep 6
+          done
+          echo "The JWKS is still empty: the signing key did not reach the service, so every consumer would reject every token."
+          exit 1
+
+  deploy-server:
+    name: Deploy quorum-server
+    runs-on: ubuntu-latest
+    needs: [test, detect-changes, build, deploy-authservice]
+    if: >-
+      ${{ always() && !cancelled()
+          && needs.test.result == 'success'
+          && needs.detect-changes.result == 'success'
+          && needs.detect-changes.outputs.server == 'true'
+          && needs.build.result == 'success'
+          && (needs.deploy-authservice.result == 'success' || needs.deploy-authservice.result == 'skipped') }}
+    environment: flyio
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Require root secrets
+        env:
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+        run: |
+          set -euo pipefail
+          [ -n "$POSTGRES_PASSWORD" ] || { echo "POSTGRES_PASSWORD is not set in the flyio environment"; exit 1; }
+
+      - name: Ensure app exists
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          if flyctl apps list --json | jq -e --arg a quorum-server '.[] | select((.Name // .name) == $a)' >/dev/null; then
+            echo "App quorum-server already exists."
+          else
+            flyctl apps create quorum-server --org "${FLY_ORG}" --yes
+          fi
+
+      - name: Stage secrets and deploy the image built for this tag
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+        run: |
+          set -euo pipefail
+          flyctl secrets set -a quorum-server --stage \
+            "ConnectionStrings__Default=Host=quorum-postgres.internal;Port=5432;Database=quorumdb;Username=quorum;Password=${POSTGRES_PASSWORD}"
+          flyctl deploy --config flyio/quorum-server.fly.toml -a quorum-server \
+            --image "registry.fly.io/quorum-server:${GITHUB_REF_NAME}" --yes
+
+      - name: Assert the app answers
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 10); do
+            curl -fsS -o /dev/null https://quorum-server.fly.dev/health && { echo "healthy"; exit 0; }
+            echo "Attempt ${i}: not healthy yet; retrying in 6s"
+            sleep 6
+          done
+          echo "quorum-server never reported healthy after the deploy."
+          exit 1

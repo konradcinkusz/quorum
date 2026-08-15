@@ -11,9 +11,8 @@ public class CloudinaryFileIssue
     public Guid CloudinaryFileId { get; set; }
     public CloudinaryFile CloudinaryFile { get; set; }
 
-    [ForeignKey(nameof(ApplicationUser))]
+    /// <summary>Subject id from the identity service; no navigation on purpose (ADR 0001).</summary>
     public string? ApplicationUserId { get; set; }
-    public ApplicationUser? ApplicationUser { get; set; }
 
     public CloudinaryFileIssueType CloudinaryFileIssueType { get; set; }
 }

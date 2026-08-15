@@ -11,9 +11,9 @@ three earlier repositories hold earlier versions of the same system and are depr
 The name is the mechanic: an initiative goes nowhere until enough people have signed it, and
 the quarterly cycle exists to find the one that reaches its quorum first.
 
-> **Status: prototype, not deployed.** The last feature commit is from July 2023. It builds
-> and runs locally against SQL Server; it has no container, no CI and no deployment
-> pipeline. Before it is run anywhere other than a development machine, read
+> **Status: prototype, deployable.** CI builds and tests every push; a tag-driven
+> workflow deploys the whole estate to Fly.io (`.github/workflows/flyio.yml`, config in
+> [`flyio/`](flyio/)). No environment is live yet. Before running one, read
 > [`docs/architecture/00-SECURITY-IMMEDIATE.md`](docs/architecture/00-SECURITY-IMMEDIATE.md)
 > — credentials that were committed to this repository are still valid until they are
 > rotated, which is not something a code change can do for you.
@@ -32,38 +32,64 @@ the quarterly cycle exists to find the one that reaches its quorum first.
 
 ## Architecture
 
-.NET 7, Blazor WebAssembly hosted by an ASP.NET Core server, layered as:
+.NET 10, Blazor WebAssembly hosted by an ASP.NET Core server, layered as:
 
 ```
 Client        Blazor WASM SPA
-Server        controllers, AutoMapper profiles, IdentityServer host
+Server        controllers, AutoMapper profiles, BFF auth endpoints
   Quorum.Service       MediatR handlers, one file per use case (Features/<Domain>/<UseCase>Command.cs)
-  Quorum.Infrastructure  DI composition, cross-cutting extensions
-  Quorum.Persistence     ApplicationDbContext, EF migrations, seeds
-  Quorum.Domain          entities, enums, constants, settings
-Shared        DTOs shared between Client and Server
+  Quorum.Infrastructure  DI composition, cross-cutting extensions, JWT validation, cookie bridge
+  Quorum.Persistence     ApplicationDbContext, provider switch
+  Quorum.Persistence.Migrations.{PostgreSQL,SqlServer}  per-provider migration sets
+  Quorum.Domain          entities, enums, constants
+Shared        DTOs shared between Client and Server (incl. the BFF auth contract)
 ```
 
-Authentication is ASP.NET Core Identity + Duende IdentityServer (`AddApiAuthorization`),
-with role claims flowed into the SPA. Persistence is EF Core against SQL Server, schema by
-migration.
+**Identity lives outside this repository**
+([ADR 0001](docs/architecture/0001-identity-via-authservice.md)): Quorum runs its own
+instance of [`konradcinkusz/authservice`](https://github.com/konradcinkusz/authservice) —
+a version-pinned image, never a source dependency — and validates the RS256 tokens it
+issues against that instance's published JWKS. Quorum holds no signing key and cannot mint
+a token. The browser holds no token either: `Quorum.Server` is a BFF whose
+`/bff/auth/*` endpoints proxy login/registration/refresh to authservice and keep the
+token pair in `HttpOnly; Secure; SameSite=Strict` cookies, translated back into a bearer
+header server-side on every API call.
+
+Persistence is EF Core behind a provider switch (`DATABASE_PROVIDER`): PostgreSQL is the
+deployed default, SQL Server remains supported, and with no connection string configured
+the InMemory fallback keeps `git clone && dotnet run` and the test suite working with
+zero infrastructure. The schema is applied by migration from a background service after
+the listener is up — readiness (`/health`) reports 503 until it lands.
 
 ## Running it locally
 
-Requires the .NET 7 SDK (pinned in `global.json`) and a reachable SQL Server instance.
+Requires the .NET 10 SDK (pinned in `global.json`) and Docker (for the backing services).
 
-1. Point `ConnectionStrings:DEV` at your SQL Server. **Do not commit it** — use
-   `dotnet user-secrets` (the `UserSecretsId` is already declared in `Server/Quorum.Server.csproj`):
+1. Bring up Postgres and the local authservice instance:
    ```sh
-   dotnet user-secrets --project Server set "ConnectionStrings:DEV" "<your connection string>"
+   scripts/dev-up.sh
    ```
-   The value currently committed in `Server/appsettings.json` names a specific developer
-   workstation and will not resolve for you.
-2. Apply the schema:
+   On the first run this generates a local RS256 signing key into `.dev/` (git-ignored —
+   a development convenience, never a deployed trust root) and seeds an initial admin,
+   `admin@quorum.local` / `Admin123!`. Windows: run
+   `scripts/generate-jwt-signing-key.ps1 -Path .dev/keys/authservice-dev.pem` once, then
+   `docker compose up -d`.
+2. Run the app:
    ```sh
-   dotnet ef database update --project Quorum.Persistence --startup-project Server
+   dotnet run --project Server
    ```
-3. Set `Quorum.Server` as the startup project and run. Swagger is at `/swagger`.
+   The schema is applied automatically at startup by the migration background service.
+   Swagger is at `/swagger`; register or sign in at `/login`.
+
+Prefer SQL Server locally? Set `DatabaseProvider` to `SqlServer` and point
+`ConnectionStrings:Default` at your instance through user-secrets (the `UserSecretsId` is
+declared in `Server/Quorum.Server.csproj`) — **never** in a committed `appsettings` file:
+```sh
+dotnet user-secrets --project Server set "DatabaseProvider" "SqlServer"
+dotnet user-secrets --project Server set "ConnectionStrings:Default" "<your connection string>"
+```
+SQL Server migrations are regenerated with `scripts/generate-migrations.sh` after model
+changes; the PostgreSQL set is the one the deployed estate applies.
 
 Cloudinary credentials are needed only for the document-upload and PDF paths. Without them
 the application starts and everything else works; those two endpoints fail with a message
@@ -78,11 +104,29 @@ dotnet user-secrets --project Server set "CloudinaryOpt:ApiSecret" "<api secret>
 In a deployed environment the same values are `CloudinaryOpt__Cloud`, `__ApiKey` and
 `__ApiSecret`.
 
-> **If you have a database created before 2026-08-15**, step 2 also applies migration
-> `20260815000000_RemoveSeededIdentityAccounts`, which deletes the seeded
-> `superadmin@gmail.com` and `basicuser@gmail.com` accounts. Those accounts share one
-> password that was written in a source comment, so run it against every environment. The
-> migration is deliberately not reversible.
+> **If you have a local database created before the authservice cutover** (ADR 0001,
+> 2026-08-15): drop and recreate it. The migration history was re-baselined when the
+> `AspNet*`/IdentityServer tables left the schema — there has never been a deployed
+> environment or a real user account, so there is nothing to carry over
+> (`docs/DropAllTablesInSchema.txt` has the script). This also disposes of the seeded
+> `superadmin@gmail.com`/`basicuser@gmail.com` accounts and their shared committed
+> password: user accounts no longer exist in this database at all.
+
+## Deploying
+
+The estate deploys to Fly.io from a tag (`git tag v0.x.y && git push --tags`): three
+apps — `quorum-postgres`, `quorum-authservice` (the pinned identity image),
+`quorum-server` — deployed in dependency order with change detection against the previous
+tag. A missing Fly app is always selected, so a cold estate comes up from a single tag.
+The deploy asserts what health checks cannot see: that the identity instance publishes a
+**non-empty JWKS**.
+
+- [`flyio/`](flyio/) — one `fly.toml` per app, annotated
+- [`flyio/SECRETS.md`](flyio/SECRETS.md) — what is a secret, where it lives, how it is set
+- [`flyio/INFRASTRUCTURE-ANALYSIS.md`](flyio/INFRASTRUCTURE-ANALYSIS.md) — topology,
+  sizing and cost reasoning, including which synchronous call pins which machine
+- `flyio-scale` / `flyio-destroy` workflows — manual scaling and (typed-confirmation)
+  teardown
 
 ## Architecture documentation
 

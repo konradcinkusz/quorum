@@ -27,6 +27,13 @@ public interface IQuorumUserService
 
     /// <summary>The cached email for a user id, or <c>null</c> if MR has never seen them.</summary>
     Task<string?> GetEmailAsync(string userId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Batch id→email lookup for admin lists. With identity in authservice there is no user
+    /// table to join, so display emails come from the projection in one query per page.
+    /// </summary>
+    Task<IReadOnlyDictionary<string, string?>> GetEmailsAsync(
+        IReadOnlyCollection<string> userIds, CancellationToken cancellationToken);
 }
 
 internal sealed class QuorumUserService : IQuorumUserService
@@ -142,4 +149,17 @@ internal sealed class QuorumUserService : IQuorumUserService
             .Where(x => x.Id == userId)
             .Select(x => x.Email)
             .FirstOrDefaultAsync(cancellationToken);
+
+    public async Task<IReadOnlyDictionary<string, string?>> GetEmailsAsync(
+        IReadOnlyCollection<string> userIds, CancellationToken cancellationToken)
+    {
+        if (userIds.Count == 0)
+        {
+            return new Dictionary<string, string?>();
+        }
+
+        return await _context.QuorumUsers
+            .Where(x => userIds.Contains(x.Id))
+            .ToDictionaryAsync(x => x.Id, x => x.Email, cancellationToken);
+    }
 }

@@ -16,7 +16,6 @@ public class GetMySubscription : IRequest<Subscription>
         public override async Task<Subscription> Handle(GetMySubscription request, CancellationToken cancellationToken)
         {
             var subscription = await _context.Subscriptions
-                .Include(x => x.ApplicationUser)
                 .Include(x => x.SubscriptionPayments).ThenInclude(sp => sp.Payment).ThenInclude(spH => spH.PaymentStatusHistories)
                 .FirstOrDefaultAsync(x => x.ApplicationUserId == request.ApplicationUserId, cancellationToken);
 
@@ -24,6 +23,9 @@ public class GetMySubscription : IRequest<Subscription>
             {
                 throw new ApplicationException("User doesn't have a subscription, contact admin to add it");
             }
+
+            await _context.PopulateUserEmailsAsync(
+                new[] { subscription }, x => x.ApplicationUserId, (x, email) => x.ApplicationUserEmail = email, cancellationToken);
 
             return subscription;
         }

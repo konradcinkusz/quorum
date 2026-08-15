@@ -17,7 +17,6 @@ public class GetSignedIssueByUser : IRequest<List<Guid>>
         public override async Task<List<Guid>> Handle(GetSignedIssueByUser request, CancellationToken cancellationToken)
         {
             var issues = await _context.SignaturePools
-                .Include(x => x.ApplicationUser)
                 .Include(x => x.Signatures).ThenInclude(x => x.Issue)
                 .Where(x => x.ApplicationUserId == request._applicationUserId)
                 .SelectMany(x => x.Signatures.Select(x => x.Issue)).ToListAsync(cancellationToken);

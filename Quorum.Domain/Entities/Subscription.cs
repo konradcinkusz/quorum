@@ -3,9 +3,14 @@
 [Table(nameof(TableNames.Subscriptions), Schema = SchemasNames.MRBasics)]
 public class Subscription
 {
-    [ForeignKey(nameof(ApplicationUser)), Key]
+    /// <summary>Subject id from the identity service; no navigation on purpose (ADR 0001).</summary>
+    [Key]
     public string ApplicationUserId { get; set; }
-    public ApplicationUser ApplicationUser { get; set; }
+
+    /// <summary>Display email resolved from the <see cref="QuorumUser"/> projection by the
+    /// query layer; not a column, and never authoritative.</summary>
+    [NotMapped]
+    public string? ApplicationUserEmail { get; set; }
 
     public DateTime? Begin { get; set; }
     public DateTime? End { get; set; }

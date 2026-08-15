@@ -1,0 +1,52 @@
+# One Postgres instance, two logical databases: quorumdb (owned by role `quorum`) and
+# authdb (owned by role `auth`, for the quorum-authservice instance).
+#
+# Physical co-location is a cost decision; the logical boundary is what must not be
+# crossed (P3): each service gets a connection string to exactly one database and no
+# credentials for the other, so splitting into separate instances later is a
+# configuration change, not a code change.
+#
+# No [http_service] and no [[services]] block, deliberately: this is reached only at
+# quorum-postgres.internal:5432 over 6PN. A database with a public listener is a database
+# waiting to be scanned. Deploy with --ha=false — a second machine would get a second,
+# empty volume, not a replica.
+
+app = "quorum-postgres"
+primary_region = "waw"
+
+[build]
+  image = "postgres:17-alpine"      # a pinned major, not `latest`
+
+[env]
+  POSTGRES_USER = "quorum"
+  POSTGRES_DB = "quorumdb"
+  # A SUBDIRECTORY of the mount: the volume root carries lost+found and initdb refuses a
+  # non-empty data directory.
+  PGDATA = "/var/lib/postgresql/data/pgdata"
+  POSTGRES_INITDB_ARGS = "--encoding=UTF8 --locale=C"
+
+# Secrets (set by the deploy workflow, never here):
+#   POSTGRES_PASSWORD — the quorum role's password
+#   AUTH_DB_PASSWORD  — the auth role's password, read by the init script below
+
+[[mounts]]
+  source = "quorum_pgdata"
+  destination = "/var/lib/postgresql/data"
+  initial_size = "10gb"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "1gb"
+
+# Runs on first boot only — the postgres entrypoint executes
+# /docker-entrypoint-initdb.d/*.sh only when the data directory is empty. Creates the
+# authservice instance's database with its own role and no cross-grants.
+[[files]]
+  guest_path = "/docker-entrypoint-initdb.d/01-create-auth-database.sh"
+  raw_value = """#!/bin/bash
+set -e
+psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
+  CREATE ROLE auth LOGIN PASSWORD '$AUTH_DB_PASSWORD';
+  CREATE DATABASE authdb OWNER auth;
+EOSQL
+"""

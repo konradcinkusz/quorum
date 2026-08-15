@@ -41,7 +41,11 @@ paths = [
   #
   # Closed by: nothing further — this is the accepted end state for the historical files.
   # If the repository is ever squashed or its history rewritten, drop this entry.
-  '''MR\.Persistence/Migrations/.*\.cs$''',
+  #
+  # The files lived under MR.Persistence/ until the rename and under Quorum.Persistence/
+  # after it, and were deleted from the working tree when identity moved to authservice
+  # (ADR 0001) — the full-history scan still sees both paths.
+  '''(MR|Quorum)\.Persistence/Migrations/.*\.cs$''',
 ]
 
 regexes = [

@@ -1,0 +1,51 @@
+# Manual scaling for the stateless apps. quorum-postgres is deliberately excluded:
+# scaling an app with a volume past 1 creates a second, empty database, and scaling it to
+# zero is an outage. Note that "down" scales machine COUNT to zero, which is not the same
+# as min_machines_running = 0 — with no machine there is nothing for the proxy to start,
+# so "down" means "off until someone scales back up".
+
+name: flyio-scale
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: What to do with the stateless apps
+        type: choice
+        required: true
+        options:
+          - normalize   # 1 machine each — the deployed default
+          - out         # 2 machines on quorum-server for a traffic spike
+          - down        # 0 machines on quorum-server; authservice stays up (sign-in path)
+          - 'off'       # 0 machines on both — nobody can sign in until scaled back
+
+jobs:
+  scale:
+    runs-on: ubuntu-latest
+    environment: flyio
+    steps:
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Scale
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          case "${{ inputs.action }}" in
+            normalize)
+              flyctl scale count 1 -a quorum-server --yes
+              flyctl scale count 1 -a quorum-authservice --yes
+              ;;
+            out)
+              flyctl scale count 2 -a quorum-server --yes
+              flyctl scale count 1 -a quorum-authservice --yes
+              ;;
+            down)
+              flyctl scale count 0 -a quorum-server --yes
+              flyctl scale count 1 -a quorum-authservice --yes
+              ;;
+            off)
+              flyctl scale count 0 -a quorum-server --yes
+              flyctl scale count 0 -a quorum-authservice --yes
+              ;;
+          esac

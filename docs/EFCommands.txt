@@ -1,19 +1,35 @@
-dotnet tool update --global dotnet-ef
+Migrations live in per-provider assemblies (P4): one migration set cannot serve two SQL
+dialects.
 
-dotnet ef migrations add "migrations_name" --startup-project ..\..\Quorum\Server\
+  Quorum.Persistence.Migrations.PostgreSQL   the deployed set, applied at startup
+  Quorum.Persistence.Migrations.SqlServer    the local-SQL-Server set
 
-dotnet ef migrations remove --startup-project ..\..\Quorum\Server\
+Generate both sets after a model change (uses the design-time factory; no database or
+running app needed):
 
-dotnet ef database update --startup-project ..\..\Quorum\Server\
+  scripts/generate-migrations.sh AddWidgetTable
 
-dotnet ef database update -- --environment Production
+Or one provider by hand:
 
+  dotnet tool update --global dotnet-ef
 
-Do update'owania bazy produkcyjnej nalezy wykomentowaæ (FSE.Club.Infrastructure -> DependencyInjection -> AddInfrastructure):
+  DATABASE_PROVIDER=PostgreSQL Database__MigrationsAssembly=Quorum.Persistence.Migrations.PostgreSQL \
+  dotnet ef migrations add AddWidgetTable \
+    --project Quorum.Persistence.Migrations.PostgreSQL --startup-project Server \
+    --context ApplicationDbContext
 
-string connectionString = "PROD";
-//var env = configuration["ASPNETCORE_ENVIRONMENT"];
-//if (env == "Development")
-//{
-//    connectionString = "DEV";
-//}
+  DATABASE_PROVIDER=PostgreSQL Database__MigrationsAssembly=Quorum.Persistence.Migrations.PostgreSQL \
+  dotnet ef migrations remove \
+    --project Quorum.Persistence.Migrations.PostgreSQL --startup-project Server \
+    --context ApplicationDbContext
+
+There is no manual `database update` step in the normal flow: MigrationBackgroundService
+applies the active provider's migrations at startup, after Kestrel is listening, and
+/health reports 503 until it finishes. To push the schema at a database without running
+the app:
+
+  DATABASE_PROVIDER=PostgreSQL Database__MigrationsAssembly=Quorum.Persistence.Migrations.PostgreSQL \
+  ConnectionStrings__Default="Host=localhost;Port=5432;Database=quorumdb;Username=quorum;Password=quorum" \
+  dotnet ef database update \
+    --project Quorum.Persistence.Migrations.PostgreSQL --startup-project Server \
+    --context ApplicationDbContext

@@ -1,0 +1,66 @@
+# Quorum's own, independent instance of konradcinkusz/authservice (ADR 0001).
+#
+# One codebase, N independent instances: this deployment shares nothing at runtime with
+# any other system's authservice — own compute, own database (authdb on quorum-postgres),
+# own RS256 signing key. The image is version-pinned and pulled from GHCR; there is no
+# source-level dependency and this repository never modifies authservice.
+
+app = "quorum-authservice"
+primary_region = "waw"
+
+[build]
+  image = "ghcr.io/konradcinkusz/authservice:v0.3.1"   # pinned, never :latest
+
+[env]
+  ASPNETCORE_ENVIRONMENT = "Production"
+  ASPNETCORE_URLS = "http://+:8080"
+  DatabaseProvider = "PostgreSQL"
+  # Issuer/audience are deliberately NOT the "AuthService" defaults: two products left on
+  # the defaults would accept each other's tokens. Quorum's validator checks these exact
+  # strings.
+  Jwt__Issuer = "Quorum"
+  Jwt__Audience = "Quorum"
+  # Stamped into the discovery document so jwks_uri points at the public URL every
+  # validator can reach.
+  Jwt__PublicBaseUrl = "https://quorum-authservice.fly.dev"
+  # Fly sets this header itself and strips any client-supplied copy, so unlike
+  # X-Forwarded-For it is a trustworthy partition key for per-IP rate limiting.
+  Network__ClientIpHeader = "Fly-Client-IP"
+  # Links in transactional email (verification, reset) point back at the app.
+  FrontendBaseUrl = "https://quorum-server.fly.dev"
+  App__Name = "Quorum"
+  # No Cors__AllowedOrigins on purpose: the browser never calls this service. Quorum's BFF
+  # (quorum-server) is the only caller, server-to-server.
+
+# Secrets (set by the deploy workflow, never here):
+#   ConnectionStrings__DefaultConnection — authdb on quorum-postgres, over 6PN
+#   Jwt__PrivateKeyPem                   — RS256 PKCS#8 PEM; THE trust root of the estate
+#   InitialAdmin__Email / InitialAdmin__Password — seeds the first SuperAdmin
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  # 1, not 0: this service is on the synchronous request path of everything (P7). The
+  # named calls: quorum-server fetches/refreshes this instance's JWKS to validate every
+  # bearer token, and the BFF calls login/refresh in-request.
+  min_machines_running = 1
+
+  [http_service.concurrency]
+    type = "requests"
+    hard_limit = 250
+    soft_limit = 200
+
+  [[http_service.checks]]
+    # /health/ready, not /health: liveness answers 200 the moment Kestrel binds, which
+    # would route traffic at a machine whose schema is still being created. Readiness
+    # returns 503 until the schema is initialised and the database reachable.
+    path = "/health/ready"
+    interval = "30s"
+    timeout = "5s"
+    grace_period = "60s"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"
