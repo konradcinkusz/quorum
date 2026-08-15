@@ -10,8 +10,10 @@
 > The findings below are left as written, describing the code as reviewed, so the ledger has
 > something to refer to. F0 was added *after* first publication: it was found by the CI
 > secret scanner this review recommended, not by the review.
-> **Scope:** static review of the repository as committed. No build was run (no .NET SDK
-> in the review environment) and no deployed instance was exercised. Per
+> **Scope:** static review of the repository as committed. The review itself was written
+> without a build — there is no .NET SDK in the review environment — and no deployed instance
+> has been exercised at any point. The CI added for F8 now builds and unit-tests the branch;
+> see the residual risks in §4 for what that does and does not establish. Per
 > [`SECURITY-REVIEW.md`](https://github.com/konradcinkusz/architecture-standards/blob/main/docs/guides/SECURITY-REVIEW.md)
 > §1: a code review is static analysis and does not replace a penetration test.
 
@@ -542,10 +544,17 @@ Consider upgrading your TargetFramework to net8.0 or later.
 ```
 
 It had to be pinned back to 17.8.0, with xunit and its VS runner pinned to matching
-2023-era versions, purely to target a framework this repository cannot currently leave. That
-is the shape of the cost: every new dependency added from here is chosen from what still
-supports .NET 7, and that set only shrinks. F13 is not a tidiness item — it is the thing
-gating the repository's ability to take a modern dependency at all.
+2023-era versions, purely to target a framework this repository cannot currently leave.
+
+The same build emits a wall of the same complaint from the *transitive* graph — thirteen
+`Microsoft.Extensions.*` 9.0.0 packages, arriving under OpenTelemetry, each reporting
+`doesn't support net7.0 and has not been tested with it`. They resolve through a
+`netstandard2.0` compatibility shim rather than a supported target.
+
+That is the shape of the cost, and it is already being paid: every new dependency is chosen
+from what still supports .NET 7, that set only shrinks, and what does resolve increasingly
+does so through compatibility paths its authors do not test. F13 is not a tidiness item — it
+gates the repository's ability to take a modern dependency at all.
 
 **Recommendation — do not paper over it.** Three options, in rough order of preference:
 
@@ -792,14 +801,21 @@ yet. It stays a P2 open row, not a closed one.
 
 ### Residual risks — deliberately not addressed here
 
-- **The fixes compile; they have not been run.** The review environment has no .NET SDK and
-  cannot reach NuGet, so the `build` workflow added for F8 is what verifies this branch —
-  `dotnet restore` and a Release build of all seven projects, green on every commit since it
-  was added. That closes the "does it compile" question and nothing beyond it: the
-  application has still never been started, no request has been made against a changed
-  endpoint, and no migration has been applied to a real database. F6's `FindAsync` bug is the
-  reminder of what that gap can hide — code that compiles fine and throws on first execution.
-  Every behavioural claim in this document is read from source, not observed.
+- **The fixes compile and 42 unit tests pass; the application has still never been run.**
+  The review environment has no .NET SDK and cannot reach NuGet, so the `build` workflow
+  added for F8 is what verifies this branch: restore, a Release build of all eight projects,
+  and `dotnet test`. The test step asserts a positive pass count rather than trusting the
+  exit code, because a run that discovers zero tests exits successfully and would otherwise
+  look identical to a run that passed.
+
+  What that does *not* cover is most of the system. The 42 tests cover pure logic —
+  `IssueOwnerScope`, `SignedDocumentRules`, the quarter arithmetic — and nothing that touches
+  the database, the HTTP pipeline, or Cloudinary. No request has been made against a changed
+  endpoint, no migration has been applied to a real database, and the new `/health` and
+  `/alive` endpoints have never answered a probe. F6's `FindAsync` bug is the standing
+  reminder of what that gap hides: it compiled cleanly for three years and threw on first
+  execution. Every behavioural claim about the paths those tests do not reach is still read
+  from source, not observed.
 - **A user editing their own issue silently un-verifies it.** `EditIssueCommand.IsVerifyByAdmin`
   defaults to `false` rather than `null`, and the handler's `request.IsVerifyByAdmin ?? issue.IsVerifyByAdmin`
   therefore writes `false` on every user-facing edit. This is pre-existing behaviour, it
