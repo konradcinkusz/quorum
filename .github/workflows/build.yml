@@ -1,0 +1,41 @@
+name: build
+
+# The cheapest thing this repository was missing. Until this existed, nothing ever
+# compiled MR except an IDE on one machine, so a change that did not build could be
+# committed and stay broken indefinitely — and a latent runtime bug like the FindAsync
+# overload in UploadSignedDocumentCommand had nothing to surface it.
+#
+# See docs/architecture/ARCHITECTURE_REVIEW.md F8.
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          # Read the version from global.json rather than restating it here, so the two
+          # cannot drift. global.json currently pins 7.0.203; .NET 7 is out of support
+          # (see review F12) and this is the workflow that will tell us when the SDK stops
+          # being installable.
+          global-json-file: global.json
+
+      - name: Report SDK
+        run: dotnet --info
+
+      - name: Restore
+        run: dotnet restore MR.sln
+
+      - name: Build
+        run: dotnet build MR.sln --configuration Release --no-restore
