@@ -97,6 +97,40 @@ and it is an absolute bar to the repo ever being made public
 
 ---
 
+### F0 — Stripe **live** secret key committed in `docs/stripe.txt` · **Critical** · P5
+
+```
+Location        docs/stripe.txt:1 (in HEAD until 2026-08-15), introduced in e43abc8 (2023-06-05)
+Current code    sk_live_… (a Stripe live-mode secret key, 107 chars)
+```
+
+Also referenced as a solution item in `MR.sln`, so it appeared in Visual Studio's Solution
+Explorer alongside the architecture diagram.
+
+**Attack scenario.** Anyone with read access to this repository — or to any clone, fork,
+laptop backup or CI cache of it — takes the key and calls the Stripe API directly. No part
+of this application is involved.
+
+**Impact.** Full control of the Stripe *account*, not of this app's payment feature:
+creating charges, issuing refunds, reading every customer record and stored payment method,
+and on most account configurations moving money out. The key does not expire and is not
+scoped to an environment. The exposure window is 2023-06-05 to 2026-08-15.
+
+**Recommendation.** Roll the key in the Stripe dashboard and audit the account's event log
+back to 2023-06-05, before anything else in this document. File deleted 2026-08-15;
+deletion is not remediation.
+
+**This finding was added after the review was first published, and not by the review.** It
+was found by the `secret-scan` workflow's first run, in four seconds. The original F1 below
+was the product of a hand-written search across four repositories, and that search missed
+this — because a manual grep only finds the patterns its author thought to look for, and
+`sk_live_…` sitting in a stray notes file was not one of them. Two people would have made
+the same mistake. This is P5's "enforced by a scanner, not by review" demonstrated at this
+repository's expense, and it is the strongest single argument in this document for the
+CI change that accompanies it.
+
+---
+
 ### F1 — Live Cloudinary API secret committed in `appsettings.json` · **Critical** · P5
 
 ```
@@ -531,6 +565,8 @@ repository, so no commit can close it.
 
 | P | Action | Finding | Status |
 |---|---|---|---|
+| P1 | **Roll the Stripe live secret key and audit the account's event log back to 2023-06-05** | F0 | **OPEN (owner action)** — the single most urgent row in this document |
+| P1 | Delete `docs/stripe.txt` | F0 | **FIXED** — 2026-08-15, also removed from `MR.sln`'s solution items |
 | P1 | Remove the Cloudinary secret from `appsettings.json`; read it from user-secrets / the environment instead | F1 | **FIXED** — 2026-08-15 |
 | P1 | **Rotate** the Cloudinary key/secret | F1 | **OPEN (owner action)** — the committed value stays valid until rotated in the Cloudinary console, and stays in git history regardless |
 | P1 | Rotate the Azure SQL password and signing certificate in `mreferendaInternal` history | [`00-SECURITY-IMMEDIATE.md`](00-SECURITY-IMMEDIATE.md) | **OPEN (owner action)** |
@@ -538,9 +574,13 @@ repository, so no commit can close it.
 | P1 | Apply that migration to every existing database | F4 | **OPEN (owner action)** — nothing applies migrations at startup (F7), so `dotnet ef database update` must be run per environment |
 | P1 | Add ownership filters to edit / archive / read-for-edit / publish / pay | F2 | **FIXED** — 2026-08-15 |
 | P1 | Gate or delete `get-issues-by-search-params` | F3 | **FIXED** — 2026-08-15, deleted |
-| P2 | Validate upload type/size; make signed documents non-public | F6 | **OPEN** — `ICloudinaryService` is the single choke point |
-| P2 | Fix the DEV/PROD connection-string switch; guard `EnableSensitiveDataLogging`; `DbContext` → `Scoped` | F5 | **OPEN** — three lines in one method |
-| P2 | Add a secret scanner as a pre-commit hook and a CI job | F1 | **OPEN** |
+| P2 | Validate upload type/size; generate the stored name server-side; enforce eligibility | F6 | **FIXED** — 2026-08-15 |
+| P2 | Make signed documents non-public (authenticated delivery) | F6 | **OPEN** — deliberately deferred; see below |
+| P2 | Fix the DEV/PROD connection-string switch; guard `EnableSensitiveDataLogging`; `DbContext` → `Scoped` | F5 | **FIXED** — 2026-08-15 |
+| P2 | Add a secret scanner in CI | F1 | **FIXED** — 2026-08-15, `secret-scan` workflow over tree and full history |
+| P2 | Add a secret scanner as a **pre-commit hook** | F1 | **OPEN** — CI catches it after the commit exists; the hook is what stops it being written |
+| P2 | Add a CI workflow running `dotnet build` | F8 | **FIXED** — 2026-08-15, and it is now the only thing that compiles this repo |
+| P2 | Upgrade `net7.0` → current LTS | F12 | **OPEN** |
 
 ### How F2 and F3 were fixed
 
@@ -593,12 +633,50 @@ method went with it.
   been thrown away. The application still starts and every other feature still works, which
   is the part of P8 that matters.
 
+### How F5 and F6 were fixed, and what F6 still leaves open
+
+**F5** turned out to be three separate defects in one method. The connection-string key is
+now resolved once, preferring a single `ConnectionStrings:Default` (P5's shape — one key
+supplied per environment beats a key chosen by a branch) and falling back to the historical
+`DEV`/`PROD` names so existing local setups keep working. A missing connection string now
+throws at startup naming the keys it tried, instead of surfacing later as every request
+returning 500 with nothing pointing at configuration. `EnableSensitiveDataLogging` is
+Development-only. The `DbContext` is back to the default `Scoped` lifetime.
+
+A fourth thing surfaced while fixing it: `IApplicationDbContext` was registered **twice** —
+`AddDbContextService` registered it `Transient`, `ConfigureServiceContainer.AddScopedServices`
+registered it `Scoped`, and which one won depended on the call order in `Program.cs`. The
+duplicate is removed rather than kept in sync.
+
+**F6's authorization rule is deliberately not ownership.** Reading `GetYourWinnersCommand`
+shows who is actually supposed to upload a signed document: a user who *signed* the issue,
+once it has ended as a winner in the current quarter. Applying the owner check used
+everywhere else would have been the wrong rule, confidently enforced. The handler now uses
+the same predicate as the query that offers the user the upload in the first place, so the
+two cannot disagree about eligibility.
+
+That rewrite also removed the `FindAsync(request._issueId, cancellationToken)` call this
+review flagged — it bound to the `params object[] keyValues` overload, so EF saw two key
+values for a single-key entity and threw. **This endpoint could not have worked**, which is
+worth noting as evidence for how much of the app has actually been exercised recently.
+
+**What F6 leaves open, on purpose: delivery is still public.** Uploads are validated,
+size-capped, eligibility-checked and stored under a name this application generates whose
+suffix is 256 bits from a CSPRNG — because while delivery stays public, that name is the
+only thing between a stranger and a document full of real signatures, which makes it a share
+token, and [`SECURITY-REVIEW.md`](https://github.com/konradcinkusz/architecture-standards/blob/main/docs/guides/SECURITY-REVIEW.md)
+§5 is explicit that a GUID is not a secret. That is **mitigation, not a fix**: an unguessable
+URL is still an unauthenticated one, and it leaks the moment it reaches a browser history, a
+proxy log or a referrer header. The real answer is Cloudinary `authenticated` delivery (or
+blob storage with short-lived SAS) behind an authorizing endpoint. It is deferred because it
+changes the read path — every already-stored `SecureUri` would stop resolving — and that
+cannot be verified without running the application, which nothing in this repository can do
+yet. It stays a P2 open row, not a closed one.
+
 ### Should be done before deployment
 
 | P | Action | Finding |
 |---|---|---|
-| P2 | Add a CI workflow running `dotnet build` | F8 |
-| P2 | Upgrade `net7.0` → current LTS | F12 |
 | P3 | Wire `AddHealthCheck`/`UseHealthCheck` (fix the `OnionArchConn` key); split `/health` and `/alive`; add the exception middleware | F7 |
 | P3 | Add an xUnit project; characterisation tests over quarter resolution and rating first | F10 |
 | P3 | Add OpenTelemetry per P2's table | F9 |
@@ -627,9 +705,12 @@ method went with it.
   disruptive operation and is only strictly required before the repo goes public.
 - **Payments were not reviewed against
   [`PAYMENTS-AND-MONETIZATION.md`](https://github.com/konradcinkusz/architecture-standards/blob/main/docs/guides/PAYMENTS-AND-MONETIZATION.md).**
-  `docs/stripe.txt` suggests Stripe was intended, but the committed payment flow is manual
-  status transitions with no provider integration and no webhook. That is a whole guide's
-  worth of review that has not been done.
+  The committed payment flow is manual status transitions with no provider integration and
+  no webhook. `docs/stripe.txt` (F0) shows Stripe was not merely intended but *live* — a
+  live-mode key implies a real account taking real money somewhere, which this codebase does
+  not contain. Where that integration lives, and whether it is in a repository anyone still
+  has, is an open question this review cannot answer and a payments audit would have to
+  start from.
 - **The Blazor client's token handling was not audited** against
   [`SECURITY-REVIEW.md`](https://github.com/konradcinkusz/architecture-standards/blob/main/docs/guides/SECURITY-REVIEW.md)
   §4. It uses the framework-default `Microsoft.AspNetCore.Components.WebAssembly.Authentication`

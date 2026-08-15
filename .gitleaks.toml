@@ -19,6 +19,17 @@ useDefault = true
 description = "Known, recorded historical leaks — see docs/architecture/00-SECURITY-IMMEDIATE.md"
 
 paths = [
+  # docs/stripe.txt held a Stripe LIVE secret key (sk_live_…) from e43abc8 (2023-06-05) until
+  # the file was deleted on 2026-08-15. The value is not repeated here — this entry is a path,
+  # deliberately, so silencing the history finding does not require committing the key again.
+  #
+  # Tolerable ONLY until the key is rolled in the Stripe dashboard. Nothing about this entry
+  # makes the key safe; it exists so the scan fails on the NEXT leak instead of on this one.
+  #
+  # Closed by: rolling the key, then deleting this entry (the path no longer exists in HEAD,
+  # so only the history scan needs it).
+  '''docs/stripe\.txt$''',
+
   # Historical EF migrations are an append-only record: editing an applied migration or its
   # Designer snapshot changes what a replay produces and breaks every database built from
   # it. 20230426123223_init.cs and the *.Designer.cs snapshots therefore still contain the

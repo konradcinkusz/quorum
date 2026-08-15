@@ -42,10 +42,39 @@ existing databases.
   from these migrations. Until it runs, the known-password superadmin still exists there.
 - **Rewriting history.** All six rows below remain in git history after rotation.
 
+## 🚨 Roll this first
+
+**A Stripe *live* secret key (`sk_live_…`) was committed to `docs/stripe.txt`** in `e43abc8`
+(2023-06-05) and sat in `HEAD` until it was deleted on 2026-08-15. It was also listed as a
+solution item in `MR.sln`, so it opened in Visual Studio's Solution Explorer.
+
+This outranks everything else in this document. A live Stripe secret key is not a
+credential for *this* application — it is full API access to the Stripe **account**: create
+charges, issue refunds, read every customer record and payment method, and on most account
+configurations move money out. It does not expire, and it is not scoped to an environment.
+
+**Do this before reading further:**
+
+1. Roll the key in the Stripe dashboard (Developers → API keys → roll the live secret key).
+2. Review the account's [Events and logs](https://dashboard.stripe.com/logs) for API calls
+   you do not recognise, going back to 2023-06-05. That is a ~3-year exposure window.
+3. Check for unexpected refunds, transfers, payouts and newly-created API keys or webhooks.
+
+**How it was found, and why that matters.** Not by the architecture review, and not by a
+manual search — this document's first version listed six credentials and missed this one,
+because a hand-written grep looks for the patterns its author thought of (`ApiSecret`,
+`Password=`, `ConnectionString`) and `sk_live_…` in a stray notes file was not one of them.
+The `secret-scan` workflow found it on its first run, in four seconds. That is the entire
+argument for P5's "enforced by a scanner, not by review", made at this repository's expense.
+
+**Assume there are more.** The scanner now runs on every push; the two `gitleaks` steps and
+a short, dated allowlist in `.gitleaks.toml` are what keep that true.
+
 ## Rotate now (P1)
 
 | # | Secret | Repo | Location | Introduced |
 |---|---|---|---|---|
+| 0 | **Stripe live secret key** — see above | **MR** | `docs/stripe.txt` (deleted 2026-08-15) | `e43abc8`, 2023-06-05 |
 | 1 | Cloudinary API key + secret (cloud `dho08…`) | **MR** | `Server/appsettings.json` — **still in HEAD** | `f0fca15`, 2023-07-18 |
 | 2 | The same Cloudinary key + secret | `mreferendaInternal` | `mreferenda/Server/appsettings.json` | `103699f`, 2023-03-16 |
 | 3 | Azure SQL admin password for `konradcinkusz.database.windows.net`, database `mreferenda`, user `konradcinkusz` | `mreferendaInternal` | `mreferenda/Server/appsettings.json`, full ADO.NET connection string | `f7e1663`, 2023-03-26 |
@@ -53,12 +82,14 @@ existing databases.
 | 5 | IdentityServer signing-certificate password | `mreferendaInternal` | `mreferenda/Server/appsettings.json`, `IdentityServer:Key:Password` | `96e1fe5`, 2023-03-26 |
 | 6 | `mreferenda_wasm_cert.pfx` — the signing certificate itself | `mreferendaInternal` | `mreferenda/Server/mreferenda_wasm_cert.pfx` | `96e1fe5` / `b4a6c18`, 2023-03-26 |
 
-Rows 3 and 5–6 are the sharpest: an Azure SQL server reachable from the internet with a
-committed admin password, and a signing certificate committed together with the password
-that unlocks it. Both should be treated as compromised.
+Row 0 is the one that matters most. After it, rows 3 and 5–6 are the sharpest: an Azure SQL
+server reachable from the internet with a committed admin password, and a signing
+certificate committed together with the password that unlocks it. Both should be treated as
+compromised.
 
 **Actions.**
 
+0. **Stripe** — roll the live secret key and audit the account's event log, as set out above.
 1. **Cloudinary** — regenerate the API secret in the Cloudinary console. Check the account's
    usage/audit log for access you do not recognise before rotating, and after rotating,
    confirm the stored asset list is intact.
