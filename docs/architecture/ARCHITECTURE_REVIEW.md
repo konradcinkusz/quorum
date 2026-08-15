@@ -533,6 +533,20 @@ cannot move forward without first deciding what replaces this package.
 
 **Impact.** No security patches for the runtime, and no upgrade path that is a version bump.
 
+**The ecosystem is already leaving, not just Microsoft's support calendar.** Adding the test
+project for F10 produced this, from the current test SDK:
+
+```
+error : Microsoft.NET.Test.Sdk doesn't support net7.0 and has not been tested with it.
+Consider upgrading your TargetFramework to net8.0 or later.
+```
+
+It had to be pinned back to 17.8.0, with xunit and its VS runner pinned to matching
+2023-era versions, purely to target a framework this repository cannot currently leave. That
+is the shape of the cost: every new dependency added from here is chosen from what still
+supports .NET 7, and that set only shrinks. F13 is not a tidiness item — it is the thing
+gating the repository's ability to take a modern dependency at all.
+
 **Recommendation — do not paper over it.** Three options, in rough order of preference:
 
 1. **Replace it with ASP.NET Core Identity's built-in token endpoints** (`MapIdentityApi`,

@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection.Extensions;
+﻿using OpenTelemetry;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
@@ -18,7 +18,7 @@ public static class TelemetryExtensions
     /// <summary>Set by the platform. Its absence is how a developer runs with no collector.</summary>
     private const string OtlpEndpointVariable = "OTEL_EXPORTER_OTLP_ENDPOINT";
 
-    private static readonly string[] ProbePaths = ["/health", "/alive"];
+    private static readonly string[] ProbePaths = new[] { "/health", "/alive" };
 
     public static WebApplicationBuilder ConfigureOpenTelemetry(this WebApplicationBuilder builder)
     {
