@@ -14,7 +14,10 @@ public static class ConfigureServiceContainer
 
     public static void AddScopedServices(this IServiceCollection serviceCollection)
     {
-        serviceCollection.AddScoped<IApplicationDbContext>(provider => provider.GetService<ApplicationDbContext>());
+        // IApplicationDbContext is registered by AddDbContextService, next to the
+        // AddDbContext call whose lifetime it has to match. It was registered in both
+        // places, with different lifetimes, and which one won depended on the call order in
+        // Program.cs — so the duplicate is removed rather than kept in sync.
     }
 
     public static void AddTransientServices(this IServiceCollection serviceCollection)

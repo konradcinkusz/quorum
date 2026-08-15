@@ -103,11 +103,16 @@ and it is an absolute bar to the repo ever being made public
 Location        Server/appsettings.json:19-23 (HEAD), introduced in f0fca15 (2023-07-18)
 ```
 
+Values are truncated below. The first draft of this document pasted them in full, following
+the finding format's "current code" field literally — which turned a document *about* a leak
+into a second copy of it, in a new file, and is precisely the mistake P5 says review does not
+catch. The `secret-scan` workflow added alongside this review is what flagged it.
+
 ```json
 "CloudinaryOpt": {
-  "Cloud": "dho08i9uu",
-  "ApiKey": "381596999872342",
-  "ApiSecret": "QCth6u4bryHasG8YCohWCHggbzY"
+  "Cloud": "dho08…",
+  "ApiKey": "3815…",
+  "ApiSecret": "QCth…"
 }
 ```
 
@@ -240,7 +245,7 @@ Location        MR.Persistence/Seeds/DefaultUser.cs:18-19, 34-35
 
 ```csharp
 // Password@123
-PasswordHash = "AQAAAAEAACcQAAAAEBLjouNqaeiVWbN0TbXUS3+ChW3d7aQIk/BQEkWBxlrdRRngp14b0BIH0Rp65qD6mA==",
+PasswordHash = "AQAAAAEAACcQ…",   // redacted; the plaintext was the comment above it
 EmailConfirmed = true,
 ```
 

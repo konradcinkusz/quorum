@@ -1,0 +1,52 @@
+# gitleaks configuration for MR.
+#
+# The point of the allowlist below is that it is SHORT and every entry is dated, explained
+# and tied to a remediation. A scanner that fails permanently on known history gets muted,
+# and a muted scanner is worse than none — so what is already recorded in
+# docs/architecture/00-SECURITY-IMMEDIATE.md is listed here by exact value, and everything
+# else fails the build.
+#
+# Do not add a broad path or pattern to silence a new finding. Rotate the credential, remove
+# it, and if it must stay in history, add it here with the same three things every entry
+# below has: what it is, why it is tolerable now, and what closes it.
+
+title = "MR secret scanning"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Known, recorded historical leaks — see docs/architecture/00-SECURITY-IMMEDIATE.md"
+
+paths = [
+  # Historical EF migrations are an append-only record: editing an applied migration or its
+  # Designer snapshot changes what a replay produces and breaks every database built from
+  # it. 20230426123223_init.cs and the *.Designer.cs snapshots therefore still contain the
+  # seeded superadmin/basicuser rows and their password hash.
+  #
+  # Tolerable because those accounts no longer exist: migration
+  # 20260815000000_RemoveSeededIdentityAccounts deletes them, and the hash is of the string
+  # "Password@123", which was already published in a source comment and is worthless.
+  #
+  # Closed by: nothing further — this is the accepted end state for the historical files.
+  # If the repository is ever squashed or its history rewritten, drop this entry.
+  '''MR\.Persistence/Migrations/.*\.cs$''',
+]
+
+regexes = [
+  # The Cloudinary API secret committed in Server/appsettings.json in f0fca15 (2023-07-18)
+  # and removed from the working tree on 2026-08-15. Still reachable in history.
+  #
+  # Tolerable ONLY until rotated. This entry exists so the scan fails on a NEW secret rather
+  # than on this one; it is not a statement that this one is safe.
+  #
+  # Closed by: rotating the Cloudinary key/secret in the console, then deleting this line.
+  '''QCth6u4bryHasG8YCohWCHggbzY''',
+
+  # The seeded account password hash, as it appears in history outside the migrations path
+  # above — MR.Persistence/Seeds/DefaultUser.cs (deleted 2026-08-15) and, in commit
+  # 4b425b7 only, quoted in the architecture review before that document was redacted.
+  #
+  # Closed by: nothing further — see the migrations note above.
+  '''AQAAAAEAACcQAAAAEBLjouNqaeiVWbN0TbXUS3\+ChW3d7aQIk/BQEkWBxlrdRRngp14b0BIH0Rp65qD6mA==''',
+]

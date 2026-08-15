@@ -138,6 +138,10 @@ public sealed class IssueController : MRBaseController
         return request;
     }
 
+    // The size cap is enforced twice on purpose: here, so an oversized body is rejected by
+    // the framework before it is buffered, and again in the handler, so the rule still holds
+    // if this endpoint is ever called from somewhere that does not set the attribute.
+    [RequestSizeLimit(SignedDocumentRules.MaxSizeBytes)]
     [HttpPut("upload-signed-document/{id}")]
     public async Task<ActionResult<ApiResponse<string>>> UploadSignedDocument([FromRoute] Guid id, [FromForm] IFormFile file)
         => await HandleErrors(async () => await Mediator.Send(new UploadSignedDocumentCommand(id, file, GetUserId())));
