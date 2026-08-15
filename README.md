@@ -125,7 +125,7 @@ multi-table `ALTER SCHEMA … TRANSFER` for no benefit. The physical database na
 per-environment configuration and is yours to set.
 
 Old GitHub URLs redirect, so existing clones and links keep working; update your remote with
-`git remote set-url origin https://github.com/konradcinkusz/Quorum`.
+`git remote set-url origin https://github.com/konradcinkusz/quorum`.
 
 ## Backlog
 
