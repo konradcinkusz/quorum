@@ -1,4 +1,4 @@
-﻿namespace MR.Client.Pages.Base;
+﻿namespace Quorum.Client.Pages.Base;
 
 public abstract class ListPageBase<T, S> : ComponentBase 
     where T : BaseDTO

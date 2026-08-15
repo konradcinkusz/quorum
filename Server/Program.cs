@@ -1,4 +1,4 @@
-var builder = WebApplication.CreateBuilder(args);
+﻿var builder = WebApplication.CreateBuilder(args);
 
 builder.ConfigureOpenTelemetry();
 
@@ -8,7 +8,7 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<ApplicationUser>
     (options => options.SignIn.RequireConfirmedAccount = true)
-    .AddUserManager<MRUserManager>()
+    .AddUserManager<QuorumUserManager>()
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddClaimsPrincipalFactory<CustomClaimsPrincipalFactory>();
@@ -62,7 +62,7 @@ builder.Services.AddDefaultHealthChecks();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "MR", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Quorum", Version = "v1" });
 });
 
 var app = builder.Build();
@@ -105,6 +105,6 @@ app.MapDefaultEndpoints();
 app.MapFallbackToFile("index.html");
 
 app.UseSwaggerUI(c =>
-     c.SwaggerEndpoint("/swagger/v1/swagger.json", "MR v1"));
+     c.SwaggerEndpoint("/swagger/v1/swagger.json", "Quorum v1"));
 
 app.Run();

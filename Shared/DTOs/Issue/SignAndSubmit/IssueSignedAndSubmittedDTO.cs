@@ -1,4 +1,4 @@
-﻿namespace MR.Shared.DTOs.Issue.SignAndSubmit;
+﻿namespace Quorum.Shared.DTOs.Issue.SignAndSubmit;
 
 public class IssueSignedAndSubmittedDTO : PublicPublishedEndedIssueRead
 {

@@ -1,4 +1,4 @@
-﻿namespace MR.Server.Mappings.AutomapperProfiles;
+﻿namespace Quorum.Server.Mappings.AutomapperProfiles;
 
 public class SubscriptionProfile : Profile
 {

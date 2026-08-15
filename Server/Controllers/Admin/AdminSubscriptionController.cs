@@ -1,7 +1,7 @@
-﻿namespace MR.Server.Controllers.Admin;
+﻿namespace Quorum.Server.Controllers.Admin;
 
 [Authorize(Policy = Constants.Policies.RequireAdminRole)]
-public class AdminSubscriptionController : MRBaseController
+public class AdminSubscriptionController : QuorumBaseController
 {
     public AdminSubscriptionController(IMapper mapper) : base(mapper)
     {

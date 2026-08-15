@@ -1,4 +1,4 @@
-﻿namespace MR.Server.Mappings.SearchParamsMapping;
+﻿namespace Quorum.Server.Mappings.SearchParamsMapping;
 
 public static class SearchParamsExtension
 {

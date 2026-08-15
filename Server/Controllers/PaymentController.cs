@@ -1,7 +1,7 @@
-﻿namespace MR.Server.Controllers;
+﻿namespace Quorum.Server.Controllers;
 
 [Authorize(Policy = Constants.Policies.RequireAdminRole)]
-public class PaymentController : MRBaseController
+public class PaymentController : QuorumBaseController
 {
     public PaymentController(IMapper mapper) : base(mapper)
     {

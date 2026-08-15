@@ -1,4 +1,4 @@
-﻿namespace MR.Shared;
+﻿namespace Quorum.Shared;
 
 public class PagedListDto<T> where T : class
 {

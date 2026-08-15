@@ -1,4 +1,4 @@
-﻿namespace MR.Shared.DTOs.Issue.SearchParams;
+﻿namespace Quorum.Shared.DTOs.Issue.SearchParams;
 
 public class IssueSearchParamsDTO : SearchParamsDTO
 {

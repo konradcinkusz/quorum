@@ -1,4 +1,4 @@
-﻿namespace MR.Shared.DTOs.Issue;
+﻿namespace Quorum.Shared.DTOs.Issue;
 
 public enum IssueProcessEnum
 {

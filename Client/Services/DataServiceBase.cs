@@ -1,4 +1,4 @@
-﻿namespace MR.Client.Services;
+﻿namespace Quorum.Client.Services;
 
 internal abstract class DataServiceBase
 {

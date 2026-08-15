@@ -1,4 +1,4 @@
-﻿namespace MR.Shared;
+﻿namespace Quorum.Shared;
 
 public class UploadResult
 {

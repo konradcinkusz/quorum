@@ -1,4 +1,4 @@
-﻿namespace MR.Shared.DTOs.Quarter;
+﻿namespace Quorum.Shared.DTOs.Quarter;
 
 public class InitQuarterDTO
 {

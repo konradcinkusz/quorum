@@ -1,9 +1,9 @@
-﻿using MR.Server.Controllers.Base;
+﻿using Quorum.Server.Controllers.Base;
 
-namespace MR.Server.Controllers;
+namespace Quorum.Server.Controllers;
 
 [Authorize]
-public class SubscriptionController : MRBaseController
+public class SubscriptionController : QuorumBaseController
 {
     public SubscriptionController(IMapper mapper) : base(mapper)
     {

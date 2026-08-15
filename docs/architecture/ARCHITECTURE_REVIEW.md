@@ -1,4 +1,4 @@
-# MR — Architecture Review
+﻿# Quorum — Architecture Review
 
 > Measured against
 > [`architecture-standards/docs/architecture/00-REFERENCE-ARCHITECTURE.md`](https://github.com/konradcinkusz/architecture-standards/blob/main/docs/architecture/00-REFERENCE-ARCHITECTURE.md)
@@ -19,7 +19,7 @@
 
 ## 0. Why this repo, and what it is
 
-MR is a Blazor WebAssembly citizens'-initiative platform: users create an *issue*
+Quorum is a Blazor WebAssembly citizens'-initiative platform: users create an *issue*
 (a referendum question), pay an initial fee, an admin verifies it, it is published into
 the current quarter, other users sign it, the quarter is resolved to a winner, and
 winners produce a PDF for wet-signature collection which is uploaded back.
@@ -30,12 +30,12 @@ It is the surviving line of four repositories holding the same product:
 |---|---|---|---|---|---|
 | `mreferendaInternal` | 2023-03-13 | 2023-03-26 | 50 | 25.5k | First implementation. Superseded. |
 | `mreferenda` | 2023-03-29 | 2023-03-29 | 4 | 10.6k | Squashed POC extract of the above, for sharing. Superseded. |
-| **`MR`** | **2023-04-11** | **2023-07-26** | **50** | **26.4k** | **The product. Current.** |
-| `MRef` | 2023-06-29 | 2023-06-29 | 1 | 17.8k | Single-commit re-import of MR's 2023-06-29 tree (no shared git history). Superseded by MR's own later commits. |
+| **`Quorum`** | **2023-04-11** | **2023-07-26** | **50** | **26.4k** | **The product. Current.** |
+| `MRef` | 2023-06-29 | 2023-06-29 | 1 | 17.8k | Single-commit re-import of Quorum's 2023-06-29 tree (no shared git history). Superseded by Quorum's own later commits. |
 
-MR is a strict superset of `MRef`: 14 migrations against 9, and the entire quarter-winner
+Quorum is a strict superset of `MRef`: 14 migrations against 9, and the entire quarter-winner
 resolution, rating calculation, signature-pool admin, PDF generation and Cloudinary
-document pipeline exist only in MR. Everything `MRef` has, MR has later and further along.
+document pipeline exist only in MR. Everything `MRef` has, Quorum has later and further along.
 
 **Mode recommendation: RECOVER, not REVIEW.** The playbook's mode table routes on two
 signals that both fire here — the target framework is out of support (`net7.0`, EOL
@@ -53,7 +53,7 @@ does not re-derive them.
 **S1 — The layering is already the shape P9 asks for.** `Controllers → MediatR handlers →
 DbContext`, with transport genuinely thin: `IssueController` binds, pulls the caller id and
 delegates. There are no business rules in a controller. The vertical-slice layout
-(`MR.Service/Features/<Domain>/<UseCase>Command.cs`, handler nested in the command) means
+(`Quorum.Service/Features/<Domain>/<UseCase>Command.cs`, handler nested in the command) means
 one use case is one file, which is the cheapest possible structure to move service by
 service later.
 
@@ -108,7 +108,7 @@ Location        docs/stripe.txt:1 (in HEAD until 2026-08-15), introduced in e43a
 Current code    sk_live_… (a Stripe live-mode secret key, 107 chars)
 ```
 
-Also referenced as a solution item in `MR.sln`, so it appeared in Visual Studio's Solution
+Also referenced as a solution item in `Quorum.sln`, so it appeared in Visual Studio's Solution
 Explorer alongside the architecture diagram.
 
 **Attack scenario.** Anyone with read access to this repository — or to any clone, fork,
@@ -179,10 +179,10 @@ rotation list across all four repos, including an Azure SQL production password 
 ### F2 — No ownership check on any issue mutation (IDOR) · **Critical** · P-none, `SECURITY-REVIEW` §8
 
 ```
-Location        MR.Service/Features/Issues/EditIssueCommand.cs:36
-                MR.Service/Features/Issues/ArchiveIssueCommand.cs:20
-                MR.Service/Features/Issues/Queries/GetIssueByIdForEdit.cs:20
-                MR.Service/Features/Issues/Base/IssueCommandHandlerBase.cs:20-32
+Location        Quorum.Service/Features/Issues/EditIssueCommand.cs:36
+                Quorum.Service/Features/Issues/ArchiveIssueCommand.cs:20
+                Quorum.Service/Features/Issues/Queries/GetIssueByIdForEdit.cs:20
+                Quorum.Service/Features/Issues/Base/IssueCommandHandlerBase.cs:20-32
 ```
 
 `IssueController` passes the caller's id into `PublishIssueCommand` and `PayForAnIssueCommand`
@@ -202,7 +202,7 @@ the *caller* has an active subscription, then fetches the issue by id — it nev
 
 ```csharp
 // IssueCommandHandlerBase.cs:22-31
-var isActiveSub = await _MRUserManager.HasActiveSubscription(request.CreatedById);
+var isActiveSub = await _QuorumUserManager.HasActiveSubscription(request.CreatedById);
 if (!isActiveSub) throw new ApplicationException(…);
 var issue = await _context.Issues.Include(x => x.InitialPayment)
     .FirstAsync(x => x.Id == request.IssueId, cancellationToken);
@@ -239,7 +239,7 @@ should be immutable regardless of who is asking.
 
 ```
 Location        Server/Controllers/IssueController.cs:10-16
-                MR.Service/Features/Issues/Queries/GetIssuesBySearchParamsQuery.cs:26-56
+                Quorum.Service/Features/Issues/Queries/GetIssuesBySearchParamsQuery.cs:26-56
 ```
 
 `get-issues-by-search-params` carries only `[Authorize]` — no admin policy. Its handler
@@ -276,9 +276,9 @@ expressed at the controller and then re-derived, inconsistently, per handler.
 ### F4 — Seeded superadmin with a publicly-known password, baked into every migration · **High** · P4, P5
 
 ```
-Location        MR.Persistence/Seeds/DefaultUser.cs:18-19, 34-35
-                MR.Persistence/Seeds/ContextSeed.cs:23  (HasData)
-                MR.Persistence/ApplicationDbContext.cs:49  (modelBuilder.Seed())
+Location        Quorum.Persistence/Seeds/DefaultUser.cs:18-19, 34-35
+                Quorum.Persistence/Seeds/ContextSeed.cs:23  (HasData)
+                Quorum.Persistence/ApplicationDbContext.cs:49  (modelBuilder.Seed())
 ```
 
 ```csharp
@@ -316,7 +316,7 @@ seeding service run once per environment, and migrations go back to describing s
 ### F5 — Production always connects to the `DEV` connection string · **High** · P5, correctness
 
 ```
-Location        MR.Service/DI/DependencyInjection.cs:44-56
+Location        Quorum.Service/DI/DependencyInjection.cs:44-56
 ```
 
 ```csharp
@@ -360,8 +360,8 @@ the context twice will not see its own pending writes; `Scoped` is the correct l
 
 ```
 Location        Server/Controllers/IssueController.cs:141-143
-                MR.Service/Features/Issues/PDF/UploadSignedDocumentCommand.cs:27-47
-                MR.Service/FilesManagement/CloudinaryService.cs:41-56
+                Quorum.Service/Features/Issues/PDF/UploadSignedDocumentCommand.cs:27-47
+                Quorum.Service/FilesManagement/CloudinaryService.cs:41-56
 ```
 
 `upload-signed-document/{id}` accepts an `IFormFile` and, with no checks on content type,
@@ -398,8 +398,8 @@ needs a test before it needs a fix.
 ### F7 — Health checks are written but never wired · **Medium** · P15, checklist
 
 ```
-Location        MR.Infrastructure/Extension/ConfigureServiceContainer.cs:40-52
-                MR.Infrastructure/Extension/ConfigureContainer.cs:26-45
+Location        Quorum.Infrastructure/Extension/ConfigureServiceContainer.cs:40-52
+                Quorum.Infrastructure/Extension/ConfigureContainer.cs:26-45
                 Server/Program.cs — no call site
 ```
 
@@ -407,7 +407,7 @@ Location        MR.Infrastructure/Extension/ConfigureServiceContainer.cs:40-52
 group, SQL Server check, a health-checks UI at `/healthcheck-ui` — and neither is ever
 called. `Program.cs` does not reference them. The same is true of
 `ConfigureCustomExceptionMiddleware()`: the middleware exists
-(`MR.Service/Middleware/CustomExceptionMiddleware.cs`) and is never added to the pipeline,
+(`Quorum.Service/Middleware/CustomExceptionMiddleware.cs`) and is never added to the pipeline,
 so handler exceptions surface as unhandled.
 
 Additionally, `AddHealthCheck` reads `configuration.GetConnectionString("OnionArchConn")`
@@ -443,12 +443,12 @@ machine named in the connection string. There is no build that would catch F5 or
 that runs `dotnet build` on push — before any container or platform work. Then the
 multi-stage Dockerfile (P6) and one `fly.toml` (P7).
 
-**Note on P1/P2.** MR has no Aspire `AppHost` and no `ServiceDefaults`. This is recorded but
-**not** raised as a finding: MR is a single deployable unit (one ASP.NET Core host serving a
+**Note on P1/P2.** Quorum has no Aspire `AppHost` and no `ServiceDefaults`. This is recorded but
+**not** raised as a finding: Quorum is a single deployable unit (one ASP.NET Core host serving a
 Blazor WASM client), and P3 is explicit that bounded contexts are drawn around data
 cohesion, not nouns — the CopilotScope Collector is the cited precedent for a justified
 monolith. A ServiceDefaults-equivalent still earns its place for the OTel/health/resilience
-plumbing in F7 and F9, but "split MR into services" is not what this review recommends.
+plumbing in F7 and F9, but "split Quorum into services" is not what this review recommends.
 
 ---
 
@@ -497,7 +497,7 @@ and it is in Polish, as are several XML doc comments
 most commit messages. The constitution's §2 resolution is: **English for anything needed to
 build or deploy.**
 
-There is no statement anywhere in the repo that MR — rather than `MRef`, `mreferenda` or
+There is no statement anywhere in the repo that Quorum — rather than `MRef`, `mreferenda` or
 `mreferendaInternal` — is the live line.
 
 **Recommendation.** Addressed in this change: a README has been added stating what the
@@ -509,7 +509,7 @@ product is, how to run it, and that the three sibling repositories are deprecate
 ### F13 — The LTS upgrade is blocked by a discontinued authentication package · **High** · P6, F12
 
 ```
-Location        Server/MR.Server.csproj, MR.Domain/MR.Domain.csproj
+Location        Server/Quorum.Server.csproj, Quorum.Domain/Quorum.Domain.csproj
                 PackageReference Microsoft.AspNetCore.ApiAuthorization.IdentityServer 7.0.5
 Evidence        CI run 31870341298, restore against net10.0:
                 error NU1102: Unable to find package
@@ -527,7 +527,7 @@ Duende IdentityServer moving to a commercial licence, which is also why the Blaz
 "Individual Accounts" template that generated this code no longer exists. The last stable
 release is the 7.0.x line this repository is already on.
 
-**Failure scenario.** Not a runtime one — a strategic one. MR's authentication is welded to
+**Failure scenario.** Not a runtime one — a strategic one. Quorum's authentication is welded to
 .NET 7, which left support on 2024-05-14. Every other finding in this document that requires
 a framework upgrade to fix properly is downstream of this: F6's authenticated delivery, F12's
 supported runtime, P6's rule that the runtime image major version matches the TFM. The repo
@@ -556,7 +556,7 @@ from what still supports .NET 7, that set only shrinks, and what does resolve in
 does so through compatibility paths its authors do not test. F13 is not a tidiness item — it
 gates the repository's ability to take a modern dependency at all.
 
-**Decision taken, 2026-08-15:** MR adopts `konradcinkusz/authservice` as its identity
+**Decision taken, 2026-08-15:** Quorum adopts `konradcinkusz/authservice` as its identity
 provider — see [`0001-identity-via-authservice.md`](0001-identity-via-authservice.md). That
 ADR supersedes option 1 below, which was this review's recommendation before `authservice`
 was examined. `authservice` already implements RS256 with a published JWKS (its ADR 0002),
@@ -567,7 +567,7 @@ the estate has run this pattern before.
 
 1. **Replace it with ASP.NET Core Identity's built-in token endpoints** (`MapIdentityApi`,
    introduced in .NET 8). This is where Microsoft moved everyone, it removes the Duende
-   dependency and its licence entirely, and it suits MR's shape: one server issuing tokens
+   dependency and its licence entirely, and it suits Quorum's shape: one server issuing tokens
    to its own Blazor client. It is a real migration — the client's OIDC wiring, the
    `ApiAuthorizationDbContext` base class, and the `IdentityServer` configuration section all
    change — and it needs its own PR and its own testing.
@@ -594,7 +594,7 @@ build existed, because nothing ever restored this solution outside one developer
 
 | Package | Severity | Advisory | How it arrives |
 |---|---|---|---|
-| `AutoMapper` 12.0.1 | **High** | [GHSA-rvv3-g6hj-g44x](https://github.com/advisories/GHSA-rvv3-g6hj-g44x) | Direct, `MR.Server` |
+| `AutoMapper` 12.0.1 | **High** | [GHSA-rvv3-g6hj-g44x](https://github.com/advisories/GHSA-rvv3-g6hj-g44x) | Direct, `Quorum.Server` |
 | `BouncyCastle` 1.8.9 | Moderate ×3 | [GHSA-8xfc-gm6g-vgpv](https://github.com/advisories/GHSA-8xfc-gm6g-vgpv), [GHSA-m44j-cfrm-g8qc](https://github.com/advisories/GHSA-m44j-cfrm-g8qc), [GHSA-v435-xc8x-wvr9](https://github.com/advisories/GHSA-v435-xc8x-wvr9) | Transitive, via `iTextSharp` |
 | `NuGet.Packaging` / `NuGet.Protocol` 6.12.1 | Low | [GHSA-g4vj-cjjj-v7hg](https://github.com/advisories/GHSA-g4vj-cjjj-v7hg) | Transitive, via `Microsoft.VisualStudio.Web.CodeGeneration.Design` |
 
@@ -648,7 +648,7 @@ Against §3 of the constitution.
 | 6 | Schema applied by `MigrateAsync` from migrations, in a hosted service | ⚠️ migrations ✅ (S4); applied manually, no hosted service |
 | 7 | All config from env; no secret in source; scanner in CI | ❌ F1, F5 |
 | 8 | Exactly one service holds a signing key; others validate via JWKS | ✅ N/A — one service; IdentityServer issues and validates in-process |
-| 9 | Shared kernel holds no entity/DTO/seed/constant | ⚠️ N/A — no kernel. `MR.Shared` is a DTO contract shared with the Blazor client, which P2 permits |
+| 9 | Shared kernel holds no entity/DTO/seed/constant | ⚠️ N/A — no kernel. `Quorum.Shared` is a DTO contract shared with the Blazor client, which P2 permits |
 | 10 | Every optional integration has a working no-op or fallback | ❌ Cloudinary registration is conditional on the config *section* existing, but there is no `NoOp` implementation, so `git clone && dotnet run` with no credentials cannot serve the upload path (P8) |
 | 11 | Multi-stage Dockerfile; runtime major == TFM major; `:8080`; non-root | ❌ F8, F12 |
 | 12 | One `fly.toml`; `min_machines_running = 1` on a synchronous path | ❌ F8 |
@@ -683,7 +683,7 @@ repository, so no commit can close it.
 | P | Action | Finding | Status |
 |---|---|---|---|
 | P1 | **Roll the Stripe live secret key and audit the account's event log back to 2023-06-05** | F0 | **OPEN (owner action)** — the single most urgent row in this document |
-| P1 | Delete `docs/stripe.txt` | F0 | **FIXED** — 2026-08-15, also removed from `MR.sln`'s solution items |
+| P1 | Delete `docs/stripe.txt` | F0 | **FIXED** — 2026-08-15, also removed from `Quorum.sln`'s solution items |
 | P1 | Remove the Cloudinary secret from `appsettings.json`; read it from user-secrets / the environment instead | F1 | **FIXED** — 2026-08-15 |
 | P1 | **Rotate** the Cloudinary key/secret | F1 | **OPEN (owner action)** — the committed value stays valid until rotated in the Cloudinary console, and stays in git history regardless |
 | P1 | Rotate the Azure SQL password and signing certificate in `mreferendaInternal` history | [`00-SECURITY-IMMEDIATE.md`](00-SECURITY-IMMEDIATE.md) | **OPEN (owner action)** |
@@ -710,7 +710,7 @@ repository, so no commit can close it.
 Both findings had the same root cause — authorization declared at the controller and then
 re-derived, inconsistently, per handler — so the fix is a type rather than five predicates.
 
-`IssueOwnerScope` (`MR.Service/Features/Issues/Base/IssueOwnerScope.cs`) has no public
+`IssueOwnerScope` (`Quorum.Service/Features/Issues/Base/IssueOwnerScope.cs`) has no public
 constructor and exactly two factories: `OwnedBy(userId)`, which restricts to one user and
 throws if the id is absent, and `Administrator()`, which does not restrict. Every command
 and query that resolves an issue by id now **requires** one as a constructor argument, so

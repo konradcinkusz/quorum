@@ -1,7 +1,7 @@
-﻿namespace MR.Server.Controllers.Admin;
+﻿namespace Quorum.Server.Controllers.Admin;
 
 [Authorize(Policy = Constants.Policies.RequireAdminRole)]
-public class AdminSignaturePoolController : MRBaseController
+public class AdminSignaturePoolController : QuorumBaseController
 {
     public AdminSignaturePoolController(IMapper mapper) : base(mapper)
     {

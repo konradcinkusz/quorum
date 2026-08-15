@@ -1,4 +1,4 @@
-﻿namespace MR.Service;
+﻿namespace Quorum.Service;
 
 public class ApiResponse<T>
 {

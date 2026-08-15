@@ -1,4 +1,4 @@
-name: build
+﻿name: build
 
 # The cheapest thing this repository was missing. Until this existed, nothing ever
 # compiled MR except an IDE on one machine, so a change that did not build could be
@@ -41,19 +41,19 @@ jobs:
         run: dotnet --info
 
       - name: Restore
-        run: dotnet restore MR.sln
+        run: dotnet restore Quorum.sln
 
       - name: Build
-        run: dotnet build MR.sln --configuration Release --no-restore
+        run: dotnet build Quorum.sln --configuration Release --no-restore
 
-      # Run the test project directly rather than the solution. `dotnet test MR.sln` walks
+      # Run the test project directly rather than the solution. `dotnet test Quorum.sln` walks
       # every project, and the resulting output is dominated by MSBuild noise from the seven
       # non-test ones — the run summary gets buried, and a run that discovered zero tests
       # looks identical to a run that passed.
       - name: Test
         run: |
           set -euo pipefail
-          dotnet test tests/MR.Tests/MR.Tests.csproj \
+          dotnet test tests/Quorum.Tests/Quorum.Tests.csproj \
             --configuration Release --no-build \
             --logger "console;verbosity=normal" | tee test-output.log
 

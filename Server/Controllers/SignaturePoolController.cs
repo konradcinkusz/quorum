@@ -1,7 +1,7 @@
-﻿namespace MR.Server.Controllers;
+﻿namespace Quorum.Server.Controllers;
 
 [Authorize]
-public class SignaturePoolController : MRBaseController
+public class SignaturePoolController : QuorumBaseController
 {
     public SignaturePoolController(IMapper mapper) : base(mapper)
     {

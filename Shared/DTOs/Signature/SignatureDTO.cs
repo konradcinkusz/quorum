@@ -1,4 +1,4 @@
-﻿namespace MR.Shared.DTOs.Signature;
+﻿namespace Quorum.Shared.DTOs.Signature;
 
 public class SignatureDTO : BaseDTO
 {

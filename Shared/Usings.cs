@@ -1,10 +1,10 @@
-﻿global using MR.Shared.DTOs.Signature;
-global using MR.Shared.DTOs.Quarter;
-global using MR.Shared.DTOs.Payment;
-global using MR.Shared.DTOs.Issue;
-global using MR.Shared.DTOs.SignaturePools;
+﻿global using Quorum.Shared.DTOs.Signature;
+global using Quorum.Shared.DTOs.Quarter;
+global using Quorum.Shared.DTOs.Payment;
+global using Quorum.Shared.DTOs.Issue;
+global using Quorum.Shared.DTOs.SignaturePools;
 global using System.Net;
 global using System.ComponentModel.DataAnnotations;
 global using System.Reflection;
-global using MR.Shared.DTOs.Issue.Public;
-global using MR.Shared.DTOs.CloudinaryFile;
+global using Quorum.Shared.DTOs.Issue.Public;
+global using Quorum.Shared.DTOs.CloudinaryFile;

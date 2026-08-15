@@ -1,10 +1,10 @@
 dotnet tool update --global dotnet-ef
 
-dotnet ef migrations add "migrations_name" --startup-project ..\..\MR\Server\
+dotnet ef migrations add "migrations_name" --startup-project ..\..\Quorum\Server\
 
-dotnet ef migrations remove --startup-project ..\..\MR\Server\
+dotnet ef migrations remove --startup-project ..\..\Quorum\Server\
 
-dotnet ef database update --startup-project ..\..\MR\Server\
+dotnet ef database update --startup-project ..\..\Quorum\Server\
 
 dotnet ef database update -- --environment Production
 

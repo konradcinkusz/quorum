@@ -1,4 +1,4 @@
-﻿namespace MR.Shared.DTOs.Issue.Public;
+﻿namespace Quorum.Shared.DTOs.Issue.Public;
 
 public class PublicPublishedIssueRead : BaseDTO
 {
