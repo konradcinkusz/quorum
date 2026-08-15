@@ -1,4 +1,4 @@
-using MR.Domain.Entities;
+﻿using MR.Domain.Entities;
 using MR.Service.Features.Issues.Base;
 using Xunit;
 
@@ -98,11 +98,11 @@ public class IssueOwnerScopeTests
         Assert.DoesNotContain(visible, i => i.CreatedById is null);
     }
 
-    private static List<Issue> Issues() =>
-    [
-        new() { Id = Guid.NewGuid(), CreatedById = Alice, Title = "Alice one" },
-        new() { Id = Guid.NewGuid(), CreatedById = Alice, Title = "Alice two" },
-        new() { Id = Guid.NewGuid(), CreatedById = Bob, Title = "Bob one" },
-        new() { Id = Guid.NewGuid(), CreatedById = null, Title = "Orphan" },
-    ];
+    private static List<Issue> Issues() => new()
+    {
+        new Issue { Id = Guid.NewGuid(), CreatedById = Alice, Title = "Alice one" },
+        new Issue { Id = Guid.NewGuid(), CreatedById = Alice, Title = "Alice two" },
+        new Issue { Id = Guid.NewGuid(), CreatedById = Bob, Title = "Bob one" },
+        new Issue { Id = Guid.NewGuid(), CreatedById = null, Title = "Orphan" },
+    };
 }

@@ -504,6 +504,91 @@ product is, how to run it, and that the three sibling repositories are deprecate
 
 ---
 
+### F13 — The LTS upgrade is blocked by a discontinued authentication package · **High** · P6, F12
+
+```
+Location        Server/MR.Server.csproj, MR.Domain/MR.Domain.csproj
+                PackageReference Microsoft.AspNetCore.ApiAuthorization.IdentityServer 7.0.5
+Evidence        CI run 31870341298, restore against net10.0:
+                error NU1102: Unable to find package
+                Microsoft.AspNetCore.ApiAuthorization.IdentityServer with version (>= 10.0.0)
+                  - Found 154 version(s) in nuget.org
+                    [ Nearest version: 8.0.0-preview.6.23329.11 ]
+```
+
+This finding did not exist when the review was written. It was produced by *attempting* F12
+on 2026-08-15: the TFMs were moved to `net10.0`, restore was allowed to answer, and it did.
+
+**The highest version that package ever reached is `8.0.0-preview.6`.** It was abandoned
+partway through .NET 8's preview cycle and never shipped a stable 8.0.0 — the consequence of
+Duende IdentityServer moving to a commercial licence, which is also why the Blazor WASM
+"Individual Accounts" template that generated this code no longer exists. The last stable
+release is the 7.0.x line this repository is already on.
+
+**Failure scenario.** Not a runtime one — a strategic one. MR's authentication is welded to
+.NET 7, which left support on 2024-05-14. Every other finding in this document that requires
+a framework upgrade to fix properly is downstream of this: F6's authenticated delivery, F12's
+supported runtime, P6's rule that the runtime image major version matches the TFM. The repo
+cannot move forward without first deciding what replaces this package.
+
+**Impact.** No security patches for the runtime, and no upgrade path that is a version bump.
+
+**Recommendation — do not paper over it.** Three options, in rough order of preference:
+
+1. **Replace it with ASP.NET Core Identity's built-in token endpoints** (`MapIdentityApi`,
+   introduced in .NET 8). This is where Microsoft moved everyone, it removes the Duende
+   dependency and its licence entirely, and it suits MR's shape: one server issuing tokens
+   to its own Blazor client. It is a real migration — the client's OIDC wiring, the
+   `ApiAuthorizationDbContext` base class, and the `IdentityServer` configuration section all
+   change — and it needs its own PR and its own testing.
+2. **Adopt Duende IdentityServer directly**, on their licence (free below a revenue
+   threshold). Keeps the OIDC model and the existing client flow; adds a commercial
+   dependency and a licence obligation.
+3. **Stay on .NET 7.** Not viable beyond the short term, and it is the status quo, not a
+   decision.
+
+**What was *not* done, deliberately.** Pinning this one package to `8.0.0-preview.6` while
+everything else moves to 10 would restore successfully and is the wrong answer twice over: it
+ships a preview package in a production auth path, and it mixes a Duende/EF Core generation
+against a runtime three majors newer — the kind of mismatch that builds cleanly and fails at
+first token validation. The TFM change has been reverted to `net7.0` and this finding
+recorded instead, because "the upgrade is blocked on an architectural decision" is a true
+answer and "the build is green" would not have been.
+
+---
+
+### F14 — Known-vulnerable dependencies, including one High · **High** · P6
+
+Surfaced by NuGet audit during the same restore. None of these were visible before the CI
+build existed, because nothing ever restored this solution outside one developer's IDE.
+
+| Package | Severity | Advisory | How it arrives |
+|---|---|---|---|
+| `AutoMapper` 12.0.1 | **High** | [GHSA-rvv3-g6hj-g44x](https://github.com/advisories/GHSA-rvv3-g6hj-g44x) | Direct, `MR.Server` |
+| `BouncyCastle` 1.8.9 | Moderate ×3 | [GHSA-8xfc-gm6g-vgpv](https://github.com/advisories/GHSA-8xfc-gm6g-vgpv), [GHSA-m44j-cfrm-g8qc](https://github.com/advisories/GHSA-m44j-cfrm-g8qc), [GHSA-v435-xc8x-wvr9](https://github.com/advisories/GHSA-v435-xc8x-wvr9) | Transitive, via `iTextSharp` |
+| `NuGet.Packaging` / `NuGet.Protocol` 6.12.1 | Low | [GHSA-g4vj-cjjj-v7hg](https://github.com/advisories/GHSA-g4vj-cjjj-v7hg) | Transitive, via `Microsoft.VisualStudio.Web.CodeGeneration.Design` |
+
+**`iTextSharp` 5.5.13.3 deserves its own line.** It is .NET Framework-only — restore reports
+`NU1701`, meaning it is being consumed through a compatibility shim rather than a supported
+target — and it is the abandoned predecessor of iText 7, still under AGPL. An AGPL PDF
+library in a product that charges subscriptions is a licensing question, not just a
+maintenance one. It generates the signature sheets, so it is on the critical path.
+
+**Recommendation.** Bump AutoMapper first — it is direct, it is High, and 12.0.1 → 13.x is
+the only one of these with a real breaking-change cost (the DI package was folded into the
+main one). Replace `iTextSharp` with QuestPDF or iText 7 under a commercial licence, which
+also clears BouncyCastle. Drop `Microsoft.VisualStudio.Web.CodeGeneration.Design` outright:
+it is scaffolding tooling, unused at runtime, and it is the only reason the NuGet packages
+are in the graph at all.
+
+**Note against my own change.** The OpenTelemetry 1.12.0 packages added for F9 carry two
+moderate advisories of their own ([GHSA-g94r-2vxg-569j](https://github.com/advisories/GHSA-g94r-2vxg-569j),
+[GHSA-4625-4j76-fww9](https://github.com/advisories/GHSA-4625-4j76-fww9)). They are recorded
+here rather than quietly left in the graph; picking a fixed version is a follow-up, and the
+audit now runs on every build so it cannot be forgotten.
+
+---
+
 ### F12 — Target framework out of support · **Low today, blocking for any deployment** · P6
 
 `net7.0` across all seven projects; `global.json` pins SDK `7.0.203`. .NET 7 reached
@@ -582,7 +667,13 @@ repository, so no commit can close it.
 | P2 | Add a secret scanner in CI | F1 | **FIXED** — 2026-08-15, `secret-scan` workflow over tree and full history |
 | P2 | Add a secret scanner as a **pre-commit hook** | F1 | **OPEN** — CI catches it after the commit exists; the hook is what stops it being written |
 | P2 | Add a CI workflow running `dotnet build` | F8 | **FIXED** — 2026-08-15, and it is now the only thing that compiles this repo |
-| P2 | Upgrade `net7.0` → current LTS | F12 | **OPEN** |
+| P2 | Upgrade `net7.0` → current LTS | F12 | **BLOCKED** — attempted 2026-08-15 and reverted; see F13 |
+| P1 | **Decide what replaces `Microsoft.AspNetCore.ApiAuthorization.IdentityServer`** | F13 | **OPEN (needs a decision, not a commit)** — every framework-level fix is downstream of it |
+| P2 | Bump `AutoMapper` 12.0.1 (High severity advisory) | F14 | **OPEN** |
+| P3 | Replace `iTextSharp` 5.x — .NET Framework-only, AGPL, drags in vulnerable BouncyCastle | F14 | **OPEN** |
+| P3 | Wire health checks; split `/health` and `/alive`; add the exception middleware | F7 | **FIXED** — 2026-08-15 |
+| P3 | Add OpenTelemetry per P2's table | F9 | **FIXED** — 2026-08-15 |
+| P3 | Add a test project; characterisation tests over quarter resolution and rating first | F10 | **FIXED** — 2026-08-15, 27 tests, run by CI |
 
 ### How F2 and F3 were fixed
 
@@ -679,9 +770,6 @@ yet. It stays a P2 open row, not a closed one.
 
 | P | Action | Finding |
 |---|---|---|
-| P3 | Wire `AddHealthCheck`/`UseHealthCheck` (fix the `OnionArchConn` key); split `/health` and `/alive`; add the exception middleware | F7 |
-| P3 | Add an xUnit project; characterisation tests over quarter resolution and rating first | F10 |
-| P3 | Add OpenTelemetry per P2's table | F9 |
 | P3 | Multi-stage Dockerfile + one `fly.toml` | F8 |
 | P4 | Move seed data out of `HasData` into a seeding service | F4 |
 | P4 | Provider portability in `AddDbContextService` (InMemory fallback) | F10, P4 |

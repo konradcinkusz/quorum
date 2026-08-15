@@ -25,8 +25,8 @@ public static class HealthCheckExtensions
             // Liveness must not depend on anything external. If it did, a database blip
             // would make the orchestrator kill and restart otherwise-healthy processes,
             // turning a dependency outage into an outage of its own.
-            .AddCheck(LiveTag, () => HealthCheckResult.Healthy(), tags: [LiveTag])
-            .AddDbContextCheck<ApplicationDbContext>("database", tags: [ReadyTag]);
+            .AddCheck(LiveTag, () => HealthCheckResult.Healthy(), tags: new[] { LiveTag })
+            .AddDbContextCheck<ApplicationDbContext>("database", tags: new[] { ReadyTag });
 
         return services;
     }
