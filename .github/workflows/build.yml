@@ -59,9 +59,19 @@ jobs:
 
           # A suite that silently discovers nothing is the failure mode this guard exists
           # for: the job goes green, the badge says tests pass, and nothing has been
-          # verified. Assert a positive pass count rather than trusting the exit code.
-          if ! grep -qE 'Passed!.*Passed:[[:space:]]*[1-9]' test-output.log; then
+          # verified. Assert a positive pass count rather than trusting the exit code,
+          # which a zero-discovery run also returns as success.
+          #
+          # Two output formats have to be handled, which the first version of this guard
+          # got wrong and failed a run of 42 passing tests. The VSTest console logger
+          # prints "Total tests: N" / "Passed: N" on separate lines; newer terse output
+          # prints "Passed!  - Failed: 0, Passed: N". Matching "Passed: <number>" covers
+          # both, and the largest such number is the total.
+          passed=$(grep -oE 'Passed:[[:space:]]*[0-9]+' test-output.log \
+                   | grep -oE '[0-9]+$' | sort -n | tail -1)
+
+          if [ -z "${passed:-}" ] || [ "$passed" -lt 1 ]; then
             echo "::error::No passing tests were reported. A green build that ran zero tests is not a green build."
             exit 1
           fi
-          grep -E 'Passed!|Failed!|Total tests' test-output.log || true
+          echo "$passed tests passed."
