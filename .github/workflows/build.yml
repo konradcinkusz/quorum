@@ -37,3 +37,6 @@ jobs:
 
       - name: Build
         run: dotnet build MR.sln --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test MR.sln --configuration Release --no-build --verbosity normal
