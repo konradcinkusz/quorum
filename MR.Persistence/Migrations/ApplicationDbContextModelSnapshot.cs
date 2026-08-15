@@ -234,44 +234,6 @@ namespace MR.Persistence.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "E97336F4-CF5A-4C72-8C61-997E5C621143",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "B87AD966-7EA1-4696-8107-B190AEAB837D",
-                            Email = "superadmin@gmail.com",
-                            EmailConfirmed = true,
-                            FirstName = "Amit",
-                            LastName = "Naik",
-                            LockoutEnabled = false,
-                            NormalizedEmail = "SUPERADMIN@GMAIL.COM",
-                            NormalizedUserName = "SUPERADMIN@GMAIL.COM",
-                            PasswordHash = "AQAAAAEAACcQAAAAEBLjouNqaeiVWbN0TbXUS3+ChW3d7aQIk/BQEkWBxlrdRRngp14b0BIH0Rp65qD6mA==",
-                            PhoneNumberConfirmed = true,
-                            SecurityStamp = "A94F51C0-E605-43E6-819D-95C43ACE65D3",
-                            TwoFactorEnabled = false,
-                            UserName = "superadmin@gmail.com"
-                        },
-                        new
-                        {
-                            Id = "B2BED4FF-47C0-47A1-9AE0-7AEF44CC14BB",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "A63E25A3-1237-4BD0-A5FC-5C8359885E9E",
-                            Email = "basicuser@gmail.com",
-                            EmailConfirmed = true,
-                            FirstName = "Basic",
-                            LastName = "User",
-                            LockoutEnabled = false,
-                            NormalizedEmail = "BASICUSER@GMAIL.COM",
-                            NormalizedUserName = "BASICUSER@GMAIL.COM",
-                            PasswordHash = "AQAAAAEAACcQAAAAEBLjouNqaeiVWbN0TbXUS3+ChW3d7aQIk/BQEkWBxlrdRRngp14b0BIH0Rp65qD6mA==",
-                            PhoneNumberConfirmed = true,
-                            SecurityStamp = "33135628-31F0-4995-861D-CE867EBA0FBE",
-                            TwoFactorEnabled = false,
-                            UserName = "basicuser@gmail.com"
-                        });
                 });
 
             modelBuilder.Entity("MR.Domain.Auth.RefreshToken", b =>
@@ -412,6 +374,9 @@ namespace MR.Persistence.Migrations
                     b.Property<string>("CreatedById")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("CreatedByEmail")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Icon")
                         .HasColumnType("nvarchar(max)");
 
@@ -545,6 +510,25 @@ namespace MR.Persistence.Migrations
                     b.HasIndex("IssueId");
 
                     b.ToTable("IssueVisibilityHistory", "MRBasics");
+                });
+
+            modelBuilder.Entity("MR.Domain.Entities.MrUser", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("FirstSeenAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("LastSeenAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MrUsers", "MRBasics");
                 });
 
             modelBuilder.Entity("MR.Domain.Entities.Payment", b =>
@@ -963,33 +947,6 @@ namespace MR.Persistence.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            UserId = "B2BED4FF-47C0-47A1-9AE0-7AEF44CC14BB",
-                            RoleId = "D17D4635-9015-422B-AE84-A399601DED81"
-                        },
-                        new
-                        {
-                            UserId = "E97336F4-CF5A-4C72-8C61-997E5C621143",
-                            RoleId = "49FDD1CA-B802-4F9F-AC09-C8619FE90DF5"
-                        },
-                        new
-                        {
-                            UserId = "E97336F4-CF5A-4C72-8C61-997E5C621143",
-                            RoleId = "649B8428-A497-47CA-A5C4-953EE395F16E"
-                        },
-                        new
-                        {
-                            UserId = "E97336F4-CF5A-4C72-8C61-997E5C621143",
-                            RoleId = "91F6299F-59AC-4538-8DFD-4E891200E162"
-                        },
-                        new
-                        {
-                            UserId = "E97336F4-CF5A-4C72-8C61-997E5C621143",
-                            RoleId = "D17D4635-9015-422B-AE84-A399601DED81"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>

@@ -1,0 +1,77 @@
+name: build
+
+# The cheapest thing this repository was missing. Until this existed, nothing ever
+# compiled MR except an IDE on one machine, so a change that did not build could be
+# committed and stay broken indefinitely — and a latent runtime bug like the FindAsync
+# overload in UploadSignedDocumentCommand had nothing to surface it.
+#
+# See docs/architecture/ARCHITECTURE_REVIEW.md F8.
+
+on:
+  # Only the default branch on push. Every other branch is covered by pull_request, and
+  # listening to both fired two identical runs per push to a PR branch — doubling queue
+  # time and Actions minutes for no extra signal.
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# A superseded commit's run tells you nothing. Cancel it and keep the queue for the tip.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          # Read the version from global.json rather than restating it here, so the two
+          # cannot drift.
+          global-json-file: global.json
+
+      - name: Report SDK
+        run: dotnet --info
+
+      - name: Restore
+        run: dotnet restore MR.sln
+
+      - name: Build
+        run: dotnet build MR.sln --configuration Release --no-restore
+
+      # Run the test project directly rather than the solution. `dotnet test MR.sln` walks
+      # every project, and the resulting output is dominated by MSBuild noise from the seven
+      # non-test ones — the run summary gets buried, and a run that discovered zero tests
+      # looks identical to a run that passed.
+      - name: Test
+        run: |
+          set -euo pipefail
+          dotnet test tests/MR.Tests/MR.Tests.csproj \
+            --configuration Release --no-build \
+            --logger "console;verbosity=normal" | tee test-output.log
+
+          # A suite that silently discovers nothing is the failure mode this guard exists
+          # for: the job goes green, the badge says tests pass, and nothing has been
+          # verified. Assert a positive pass count rather than trusting the exit code,
+          # which a zero-discovery run also returns as success.
+          #
+          # Two output formats have to be handled, which the first version of this guard
+          # got wrong and failed a run of 42 passing tests. The VSTest console logger
+          # prints "Total tests: N" / "Passed: N" on separate lines; newer terse output
+          # prints "Passed!  - Failed: 0, Passed: N". Matching "Passed: <number>" covers
+          # both, and the largest such number is the total.
+          passed=$(grep -oE 'Passed:[[:space:]]*[0-9]+' test-output.log \
+                   | grep -oE '[0-9]+$' | sort -n | tail -1)
+
+          if [ -z "${passed:-}" ] || [ "$passed" -lt 1 ]; then
+            echo "::error::No passing tests were reported. A green build that ran zero tests is not a green build."
+            exit 1
+          fi
+          echo "$passed tests passed."

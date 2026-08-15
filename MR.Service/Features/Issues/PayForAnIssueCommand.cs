@@ -19,7 +19,7 @@ public class PayForAnIssueCommand : IRequest<bool>, IIssueCommandData
     public class PayForAnIssueCommandHandler : IssueCommandHandlerBase<PayForAnIssueCommand, bool>
     {
         public PayForAnIssueCommandHandler(
-            MRUserManager MRUserManager, IApplicationDbContext context, ILogger<PayForAnIssueCommand> logger) : base(MRUserManager, context, logger)
+            IMrUserService users, IApplicationDbContext context, ILogger<PayForAnIssueCommand> logger) : base(users, context, logger)
         {
         }
 

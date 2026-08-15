@@ -17,28 +17,4 @@ public static class ConfigureContainer
             setupAction.RoutePrefix = "OpenAPI";
         });
     }
-
-    public static void ConfigureSwagger(this ILoggerFactory loggerFactory)
-    {
-        loggerFactory.AddSerilog();
-    }
-
-    public static void UseHealthCheck(this IApplicationBuilder app)
-    {
-        app.UseHealthChecks("/healthz", new HealthCheckOptions
-        {
-            Predicate = _ => true,
-            ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse,
-            ResultStatusCodes =
-                {
-                    [HealthStatus.Healthy] = StatusCodes.Status200OK,
-                    [HealthStatus.Degraded] = StatusCodes.Status500InternalServerError,
-                    [HealthStatus.Unhealthy] = StatusCodes.Status503ServiceUnavailable,
-                },
-        }).UseHealthChecksUI(setup =>
-        {
-            setup.ApiPath = "/healthcheck";
-            setup.UIPath = "/healthcheck-ui";
-        });
-    }
 }

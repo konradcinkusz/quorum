@@ -14,7 +14,10 @@ public static class ConfigureServiceContainer
 
     public static void AddScopedServices(this IServiceCollection serviceCollection)
     {
-        serviceCollection.AddScoped<IApplicationDbContext>(provider => provider.GetService<ApplicationDbContext>());
+        // IApplicationDbContext is registered by AddDbContextService, next to the
+        // AddDbContext call whose lifetime it has to match. It was registered in both
+        // places, with different lifetimes, and which one won depended on the call order in
+        // Program.cs — so the duplicate is removed rather than kept in sync.
     }
 
     public static void AddTransientServices(this IServiceCollection serviceCollection)
@@ -35,18 +38,5 @@ public static class ConfigureServiceContainer
             config.AssumeDefaultVersionWhenUnspecified = true;
             config.ReportApiVersions = true;
         });
-    }
-
-    public static void AddHealthCheck(this IServiceCollection serviceCollection, AppSettings appSettings, IConfiguration configuration)
-    {
-        serviceCollection.AddHealthChecks()
-            .AddDbContextCheck<ApplicationDbContext>(name: "Application DB Context", failureStatus: HealthStatus.Degraded)
-            .AddUrlGroup(new Uri(appSettings.ApplicationDetail.ContactWebsite), name: "My personal website", failureStatus: HealthStatus.Degraded)
-            .AddSqlServer(configuration.GetConnectionString("OnionArchConn"));
-
-        serviceCollection.AddHealthChecksUI(setupSettings: setup =>
-        {
-            setup.AddHealthCheckEndpoint("Basic Health Check", $"/healthz");
-        }).AddInMemoryStorage();
     }
 }

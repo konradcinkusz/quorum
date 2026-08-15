@@ -13,10 +13,10 @@ public class InitQuarterCommand : IRequest<Guid>
 
     internal class InitQuarterCommandHandler : CommandHandlerBase<InitQuarterCommand, Guid>
     {
-        private readonly MRUserManager _MRUserManager;
-        public InitQuarterCommandHandler(MRUserManager MRUserManager, IApplicationDbContext context, ILogger<InitQuarterCommand> logger) : base(context, logger)
+        private readonly IMrUserService _users;
+        public InitQuarterCommandHandler(IMrUserService users, IApplicationDbContext context, ILogger<InitQuarterCommand> logger) : base(context, logger)
         {
-            _MRUserManager = MRUserManager;
+            _users = users;
         }
 
         public override async Task<Guid> Handle(InitQuarterCommand request, CancellationToken cancellationToken)
@@ -32,7 +32,7 @@ public class InitQuarterCommand : IRequest<Guid>
             if (request.SignaturesCount > 0)
             {
                 //dla wszytkich userów dodaj pule sygnatur na ten kwartał
-                foreach (var applicationUserId in _MRUserManager.Users.Select(x => x.Id))
+                foreach (var applicationUserId in await _users.GetKnownUserIdsAsync(cancellationToken))
                 {
                     var signaturePool = new SignaturePool
                     {

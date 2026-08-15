@@ -6,6 +6,26 @@ public class Issue : BaseEntity<Guid>
     [ForeignKey(nameof(CreatedBy))]
     public string? CreatedById { get; set; }
     public ApplicationUser? CreatedBy { get; set; }
+
+    /// <summary>
+    /// The creator's email address as it stood when the issue was filed, captured from the
+    /// authenticated caller's <c>email</c> claim.
+    /// <para>
+    /// Denormalised deliberately. Once identity moves to <c>authservice</c>
+    /// (<see href="https://github.com/konradcinkusz/MR/blob/master/docs/architecture/0001-identity-via-authservice.md">ADR 0001</see>)
+    /// the <see cref="CreatedBy"/> navigation cannot resolve — P3 forbids reaching into
+    /// another service's database, and IDENTITY-AND-ACCOUNTS §1 is explicit that a service
+    /// holding a token does not call back to ask about the user.
+    /// </para>
+    /// <para>
+    /// For a petition this is the more correct model regardless of where identity lives: a
+    /// signature sheet should record who filed the initiative <i>at the time of filing</i>.
+    /// A later email change does not, and should not, rewrite documents people have already
+    /// signed. The accepted cost is that this value can go stale against the identity
+    /// service; that staleness is the point.
+    /// </para>
+    /// </summary>
+    public string? CreatedByEmail { get; set; }
     public string Title { get; set; }
     public string Question { get; set; }
     public bool IsVerifyByAdmin { get; set; } = false;

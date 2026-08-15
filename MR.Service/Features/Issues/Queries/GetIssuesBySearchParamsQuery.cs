@@ -44,8 +44,12 @@ public class GetIssuesBySearchParamsQuery : QueryBase, IRequest<PagedList<Issue>
 
             if (!string.IsNullOrEmpty(request.CreatedByEmail))
             {
-                query = query.Where(x => x.CreatedBy != null && !string.IsNullOrEmpty(x.CreatedBy.Email) &&
-                            x.CreatedBy.Email.Contains(request.CreatedByEmail));
+                // Matches the denormalised column first, falling back to the navigation for
+                // rows created before it existed. The fallback goes when identity moves out.
+                query = query.Where(x =>
+                    (x.CreatedByEmail != null && x.CreatedByEmail.Contains(request.CreatedByEmail)) ||
+                    (x.CreatedByEmail == null && x.CreatedBy != null && x.CreatedBy.Email != null &&
+                     x.CreatedBy.Email.Contains(request.CreatedByEmail)));
             }
 
             if (!string.IsNullOrEmpty(request.CreatedById))
@@ -110,7 +114,7 @@ public class GetIssuesBySearchParamsQuery : QueryBase, IRequest<PagedList<Issue>
                     case "ApplicationUserEmail":
                         if (sortOrder == SortOrder.Ascending)
                         {
-                            query = query.OrderBy(p => (p as Issue).CreatedBy.Email);
+                            query = query.OrderBy(p => (p as Issue).CreatedByEmail ?? (p as Issue).CreatedBy.Email);
                         }
                         else if (sortOrder == SortOrder.Descending)
                         {

@@ -24,14 +24,31 @@ public class UploadSignedDocumentCommand : IRequest<string>
 
         public override async Task<string> Handle(UploadSignedDocumentCommand request, CancellationToken cancellationToken)
         {
-            var issue = await _context.Issues.FindAsync(request._issueId, cancellationToken);
+            // Cheap checks first: refuse an oversized or non-PDF upload on its declared
+            // metadata before any of it is read into memory.
+            SignedDocumentRules.ValidateOrThrow(request._formFile);
+
+            // Who may attach a signed document is not "who owns the issue" — it is "who
+            // signed it", and only once the issue has ended as a winner in the current
+            // quarter. This is the same predicate GetYourWinnersCommand uses to decide which
+            // issues to offer the user, so the two cannot disagree about eligibility.
+            // Previously there was no check at all: any authenticated caller could attach a
+            // document to any issue by presenting its id.
+            var issue = await _context.Issues
+                .Where(x => x.Id == request._issueId)
+                .Where(x => x.Signatures.Any(signature =>
+                    signature.SignaturePool.ApplicationUserId == request._applicationUserId))
+                .Where(x => x.IssueProcess == IssueProcess.EndedInCurrentQuarter)
+                .Where(x => x.IssueVisibility == IssueVisibility.VisibleForAll)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            // Same result whether the issue does not exist, has not ended, or was not signed
+            // by this user, so the endpoint cannot be used to probe for issue ids.
             if (issue == null)
             {
-                // Issue not found, handle accordingly (e.g., throw an exception, return false, etc.)
-                return string.Empty;
+                throw new NotFoundException(nameof(Issue), request._issueId);
             }
 
-            // Convert the IFormFile to byte[] array
             byte[] pdfBytes;
             using (var stream = new MemoryStream())
             {
@@ -39,10 +56,14 @@ public class UploadSignedDocumentCommand : IRequest<string>
                 pdfBytes = stream.ToArray();
             }
 
-            // Create an UploadedFile object to represent the PDF file
-            UploadedFile uploadedFile = new UploadedFile(request._formFile.FileName, pdfBytes);
+            // The declared content type is chosen by the client; the bytes are the evidence.
+            SignedDocumentRules.ValidateContentOrThrow(pdfBytes);
 
-            // Upload the PDF to Cloudinary using the CloudinaryService
+            // Stored under a name this application generates. The client-supplied file name
+            // used to be passed straight through to the storage provider.
+            var storedFileName = SignedDocumentRules.BuildStoredFileName(request._issueId);
+            var uploadedFile = new UploadedFile(storedFileName, pdfBytes);
+
             var fileData = await _cloudinaryService.UploadPdfAsync(uploadedFile, cancellationToken);
 
             var cloudinaryFile = new CloudinaryFile()
@@ -54,7 +75,7 @@ public class UploadSignedDocumentCommand : IRequest<string>
 
             _ = await _context.CloudinaryFileIssues.AddAsync(new CloudinaryFileIssue() { Issue = issue, CloudinaryFile = cloudinaryFile, CloudinaryFileIssueType = CloudinaryFileIssueType.UserSigned, ApplicationUserId = request._applicationUserId }, cancellationToken);
 
-            var sum = await _context.SaveChangesAsync(cancellationToken);
+            _ = await _context.SaveChangesAsync(cancellationToken);
 
             return fileData.SecureUri.AbsoluteUri;
         }

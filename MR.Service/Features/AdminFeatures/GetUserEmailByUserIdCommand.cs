@@ -12,11 +12,11 @@ public class GetUserEmailByUserIdCommand : IRequest<string>
 
     public class GetUserEmailByUserIdCommandHandler : CommandHandlerBase<GetUserEmailByUserIdCommand, string>
     {
-        private readonly MRUserManager _MRUserManager;
+        private readonly IMrUserService _users;
 
-        public GetUserEmailByUserIdCommandHandler(MRUserManager MRUserManager, IApplicationDbContext context, ILogger<GetUserEmailByUserIdCommand> logger) : base(context, logger)
+        public GetUserEmailByUserIdCommandHandler(IMrUserService users, IApplicationDbContext context, ILogger<GetUserEmailByUserIdCommand> logger) : base(context, logger)
         {
-            _MRUserManager = MRUserManager;
+            _users = users;
         }
 
         public override async Task<string> Handle(GetUserEmailByUserIdCommand request, CancellationToken cancellationToken)
@@ -26,13 +26,17 @@ public class GetUserEmailByUserIdCommand : IRequest<string>
                 throw new ArgumentNullException(nameof(request.UserId));
             }
 
-            var usr = await _MRUserManager.FindByIdAsync(request.UserId);
-            if (usr == null)
+            var email = await _users.GetEmailAsync(request.UserId, cancellationToken);
+            if (email is null)
             {
-                throw new ApplicationException("Cannot find the proper user");
+                // MR has never seen this user. Under the old model this meant "no such user",
+                // because MR owned the user table; it now means "not known to MR", which is a
+                // different and less alarming thing — the account may exist in the identity
+                // service and simply never have signed in here.
+                throw new NotFoundException(nameof(MrUser), request.UserId);
             }
 
-            return string.IsNullOrEmpty(usr.Email) ? "User don't have email" : usr.Email;
+            return string.IsNullOrEmpty(email) ? "User don't have email" : email;
         }
     }
 }
