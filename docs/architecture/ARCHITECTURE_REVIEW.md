@@ -556,7 +556,14 @@ from what still supports .NET 7, that set only shrinks, and what does resolve in
 does so through compatibility paths its authors do not test. F13 is not a tidiness item — it
 gates the repository's ability to take a modern dependency at all.
 
-**Recommendation — do not paper over it.** Three options, in rough order of preference:
+**Decision taken, 2026-08-15:** MR adopts `konradcinkusz/authservice` as its identity
+provider — see [`0001-identity-via-authservice.md`](0001-identity-via-authservice.md). That
+ADR supersedes option 1 below, which was this review's recommendation before `authservice`
+was examined. `authservice` already implements RS256 with a published JWKS (its ADR 0002),
+so adopting it satisfies P5 outright rather than merely removing the Duende dependency, and
+the estate has run this pattern before.
+
+**The options as originally recorded**, in rough order of preference:
 
 1. **Replace it with ASP.NET Core Identity's built-in token endpoints** (`MapIdentityApi`,
    introduced in .NET 8). This is where Microsoft moved everyone, it removes the Duende
@@ -691,7 +698,7 @@ repository, so no commit can close it.
 | P2 | Add a secret scanner as a **pre-commit hook** | F1 | **OPEN** — CI catches it after the commit exists; the hook is what stops it being written |
 | P2 | Add a CI workflow running `dotnet build` | F8 | **FIXED** — 2026-08-15, and it is now the only thing that compiles this repo |
 | P2 | Upgrade `net7.0` → current LTS | F12 | **BLOCKED** — attempted 2026-08-15 and reverted; see F13 |
-| P1 | **Decide what replaces `Microsoft.AspNetCore.ApiAuthorization.IdentityServer`** | F13 | **OPEN (needs a decision, not a commit)** — every framework-level fix is downstream of it |
+| P1 | **Decide what replaces `Microsoft.AspNetCore.ApiAuthorization.IdentityServer`** | F13 | **DECIDED** — 2026-08-15, adopt `authservice`; see [ADR 0001](0001-identity-via-authservice.md). Implementation not started |
 | P2 | Bump `AutoMapper` 12.0.1 (High severity advisory) | F14 | **OPEN** |
 | P3 | Replace `iTextSharp` 5.x — .NET Framework-only, AGPL, drags in vulnerable BouncyCastle | F14 | **OPEN** |
 | P3 | Wire health checks; split `/health` and `/alive`; add the exception middleware | F7 | **FIXED** — 2026-08-15 |
