@@ -203,11 +203,16 @@ internal static class TestAuthentication
                 return Task.FromResult(AuthenticateResult.NoResult());
             }
 
+            // TestAuthentication.Scheme, qualified: inside an AuthenticationHandler, a bare
+            // `Scheme` binds to the inherited AuthenticationScheme property, not to the const
+            // on the enclosing class.
             var identity = new ClaimsIdentity(
-                new[] { new Claim(ClaimTypes.NameIdentifier, userId!) }, Scheme);
+                new[] { new Claim(ClaimTypes.NameIdentifier, userId!) },
+                TestAuthentication.Scheme);
 
             return Task.FromResult(AuthenticateResult.Success(
-                new AuthenticationTicket(new ClaimsPrincipal(identity), Scheme)));
+                new AuthenticationTicket(
+                    new ClaimsPrincipal(identity), TestAuthentication.Scheme)));
         }
     }
 }
