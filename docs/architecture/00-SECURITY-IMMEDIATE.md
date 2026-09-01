@@ -16,7 +16,25 @@ credential can be located and rotated without this document becoming a second co
 
 ## Status
 
-All four repositories are **private** (verified via the GitHub API, 2026-08-14). That bounds
+> **Updated 2026-09-01: Quorum is PUBLIC, and the escalation below was never applied.**
+>
+> `GET /repos/konradcinkusz/quorum` returns `"visibility": "public"`. The 2026-08-14 reading
+> in the paragraph below is therefore out of date for this repository, and the change was
+> made without the precondition in [§ Before this repo could ever be made
+> public](#before-this-repo-could-ever-be-made-public-p3) — history rewritten, **rotation
+> first** — being met. Neither has happened.
+>
+> The practical consequence: the Cloudinary secret in `f0fca15` is no longer exposed to
+> "anyone who has or had read access". It is exposed to anyone at all, and to anyone who
+> clones or scrapes the repository from here on. It is still valid until rotated.
+>
+> This does not change *what* to do — the table below is unchanged — but it removes the
+> remaining reason to treat it as anything other than immediate. See issue #27. The status of
+> the other three repositories was not re-checked on 2026-09-01 and is still as recorded
+> below; re-check them before relying on it.
+
+All four repositories were **private** (verified via the GitHub API, 2026-08-14) — see the
+correction above, which supersedes this for Quorum. Private visibility bounds
 the exposure to anyone who has or had read access — but it does not change the required
 action. A credential that has been committed is a credential that has left your control:
 it is present in every clone, every fork, every IDE workspace backup and every CI cache
@@ -135,3 +153,11 @@ recall the clones that already exist. See
 
 This was a targeted scan of configuration files and seed classes across four repositories,
 not an exhaustive audit. Until a scanner has run over full history, assume there is more.
+
+**Updated 2026-09-01:** a scanner has now run over Quorum's full history — gitleaks 8.28.0,
+74 commits, both working tree and history — and reports no findings beyond the two recorded
+here, which are suppressed by fingerprint in `.gitleaksignore`. That closes this caveat for
+Quorum only. It had been running against a broken config since 2026-08-15 and scanning
+nothing at all (issue #24), so the first trustworthy run is 2026-09-01, not the date the
+workflow was added. The other three repositories are unscanned and the caveat stands for
+them.
