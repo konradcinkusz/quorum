@@ -38,7 +38,7 @@ jobs:
     name: Build and test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: actions/setup-dotnet@v4
         with:
@@ -62,7 +62,7 @@ jobs:
       authservice: ${{ steps.detect.outputs.authservice }}
       postgres: ${{ steps.detect.outputs.postgres }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -131,7 +131,7 @@ jobs:
     if: needs.detect-changes.outputs.server == 'true'
     environment: flyio
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: superfly/flyctl-actions/setup-flyctl@master
 
@@ -155,7 +155,7 @@ jobs:
           && needs.detect-changes.outputs.postgres == 'true' }}
     environment: flyio
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: superfly/flyctl-actions/setup-flyctl@master
 
@@ -210,7 +210,7 @@ jobs:
           && (needs.deploy-postgres.result == 'success' || needs.deploy-postgres.result == 'skipped') }}
     environment: flyio
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: superfly/flyctl-actions/setup-flyctl@master
 
@@ -287,7 +287,7 @@ jobs:
           && (needs.deploy-authservice.result == 'success' || needs.deploy-authservice.result == 'skipped') }}
     environment: flyio
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: superfly/flyctl-actions/setup-flyctl@master
 
