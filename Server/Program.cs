@@ -92,3 +92,11 @@ app.UseSwaggerUI(c =>
      c.SwaggerEndpoint("/swagger/v1/swagger.json", "Quorum v1"));
 
 app.Run();
+
+// Top-level statements compile to an internal Program class, which WebApplicationFactory
+// cannot use as its entry point. Declaring the partial here makes it public without moving
+// any of the wiring above into a class — and this file stays a manifest, which is the shape
+// P14 asks Program.cs to keep.
+//
+// It exists for tests/Quorum.Tests/ApplicationBootTests.cs. Nothing else references it.
+public partial class Program { }

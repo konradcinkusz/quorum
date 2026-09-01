@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="xunit" />
     <PackageReference Include="xunit.runner.visualstudio">
@@ -22,6 +23,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- The Server project is the application under test: ApplicationBootTests boots it. -->
+    <ProjectReference Include="..\..\Server\Quorum.Server.csproj" />
     <ProjectReference Include="..\..\Quorum.Infrastructure\Quorum.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Quorum.Service\Quorum.Service.csproj" />
   </ItemGroup>
