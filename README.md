@@ -210,7 +210,9 @@ roadmap adds a capability.
 
 ## Backlog
 
-`TODO.txt` at the repository root carries the product backlog as it stood in July 2023, in
-Polish. It is kept as a record of intent; it is not a maintained plan — the maintained one is
-[`ROADMAP.md`](ROADMAP.md), and [#10](https://github.com/konradcinkusz/quorum/issues/10)
-folds whatever is still live out of `TODO.txt` into it.
+[`BACKLOG.md`](BACKLOG.md) carries the product intent: seven items still live, each checked
+against the code rather than carried forward on trust, plus what has since been built. It
+replaces the Polish `TODO.txt` of July 2023, whose text it preserves verbatim in an appendix.
+
+Product work is deliberately separate from [`ROADMAP.md`](ROADMAP.md), which covers
+operability and adds no capability.
