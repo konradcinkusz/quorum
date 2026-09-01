@@ -1,0 +1,65 @@
+version: 2
+
+# Dependency currency is enforced by a bot, not by a human reading .csproj files once a year.
+# That is how the two advisories in architecture review F14 were found — AutoMapper 12.0.1
+# and iTextSharp 5.x — and finding them that way means the next one waits for the next review.
+#
+# Limits are deliberately modest below. One maintainer, and every update has to be verified
+# by CI rather than locally; a flood of pull requests nobody can review is how people learn
+# to ignore Dependabot, which is worse than not running it.
+
+updates:
+  # --- NuGet -------------------------------------------------------------------------------
+  # Versions are declared per project across nine projects, so a root directory entry is what
+  # covers them. If #13 lands Central Package Management, this keeps working unchanged —
+  # Dependabot reads Directory.Packages.props from the same root.
+  - package-ecosystem: nuget
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+    groups:
+      # These version in lockstep with the framework. Ten separate pull requests a month for
+      # one coordinated release is the shape that trains people to close them unread.
+      microsoft:
+        patterns:
+          - "Microsoft.*"
+          - "System.*"
+        update-types:
+          - minor
+          - patch
+      opentelemetry:
+        patterns:
+          - "OpenTelemetry.*"
+        update-types:
+          - minor
+          - patch
+      test-tooling:
+        patterns:
+          - "xunit*"
+          - "Microsoft.NET.Test.Sdk"
+
+  # --- GitHub Actions ----------------------------------------------------------------------
+  # Five workflows pinning actions by major tag. build.yml and secret-scan.yml are the only
+  # verification this repository has, so an action going unmaintained matters here.
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+    labels:
+      - dependencies
+      - ci
+
+  # --- Docker ------------------------------------------------------------------------------
+  # The base image the deployed container is built from.
+  - package-ecosystem: docker
+    directory: "/Server"
+    schedule:
+      interval: weekly
+      day: monday
+    labels:
+      - dependencies
