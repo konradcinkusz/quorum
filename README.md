@@ -171,6 +171,16 @@ per-environment configuration and is yours to set.
 Old GitHub URLs redirect, so existing clones and links keep working; update your remote with
 `git remote set-url origin https://github.com/konradcinkusz/quorum`.
 
+## License
+
+MIT — see [`LICENSE`](LICENSE).
+
+One caveat worth stating rather than leaving to be discovered: `Quorum.Service` currently
+depends on **iTextSharp 5.x, which is AGPL**, and an MIT licence on this repository does not
+change the terms that dependency carries into a distributed binary. Choosing a replacement is
+[#15](https://github.com/konradcinkusz/quorum/issues/15) and doing it is
+[#21](https://github.com/konradcinkusz/quorum/issues/21).
+
 ## Roadmap
 
 [`ROADMAP.md`](ROADMAP.md) carries the plan this repository is being taken through: what
