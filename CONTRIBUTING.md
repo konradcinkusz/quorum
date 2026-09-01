@@ -49,6 +49,16 @@ validates the config parses before either scan runs. That guard exists because t
 spent two weeks failing at config load while looking exactly like a normal red X
 ([#24](https://github.com/konradcinkusz/quorum/issues/24)).
 
+**And a pre-commit hook, which runs before either.** `scripts/dev-up.sh` activates it; it
+scans the staged changes against the same `.gitleaks.toml` CI uses, so the two cannot disagree
+about what counts as a secret. Without `gitleaks` installed it warns and lets the commit
+through rather than blocking on a missing tool — a hook that refuses for the wrong reason gets
+disabled and never re-enabled.
+
+`git commit --no-verify` bypasses it. That is stated here rather than left to be discovered,
+because pretending an escape hatch does not exist does not remove it — and CI is not
+bypassable, which is the point.
+
 **What CI does not establish.** The test suite covers pure logic — scopes, rules, quarter
 arithmetic. Nothing exercises the database, the HTTP pipeline, or a real request. A change can
 be green and still not work; the standing example is a `FindAsync` call that compiled cleanly
