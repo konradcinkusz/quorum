@@ -1,5 +1,7 @@
 using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
+using Quorum.Domain.Entities;
+using Quorum.Shared.DTOs.Issue.Admin;
 using Xunit;
 
 namespace Quorum.Tests;
@@ -34,5 +36,32 @@ public sealed class MapperConfigurationTests
         var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
 
         Assert.NotNull(mapper.ConfigurationProvider);
+    }
+
+    [Fact]
+    public async Task An_issue_carries_its_filer_onto_the_admin_dto()
+    {
+        await using var factory = new QuorumApplicationFactory();
+        using var scope = factory.Services.CreateScope();
+        var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
+
+        var issue = new Issue
+        {
+            Title = "Rebuild the bridge",
+            Question = "Should the bridge be rebuilt?",
+            CreatedById = "user-42",
+            CreatedByEmail = "filer@example.test",
+        };
+
+        var dto = mapper.Map<IssueAdminCreateDTO>(issue);
+
+        // Neither destination name matches a source property, so these are populated only
+        // because IssueProfile says so explicitly. They are what the admin console shows as
+        // the person who filed an initiative — and they were the three members at risk from
+        // the duplicate CreateMap this test accompanies the removal of, since the second
+        // declaration mapped one of them and would have been silent about the other two.
+        Assert.Equal("user-42", dto.ApplicationUserId);
+        Assert.Equal("filer@example.test", dto.ApplicationUserEmail);
+        Assert.Equal("Rebuild the bridge", dto.Title);
     }
 }
