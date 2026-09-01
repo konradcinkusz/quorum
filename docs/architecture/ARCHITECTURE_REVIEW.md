@@ -705,7 +705,7 @@ repository, so no commit can close it.
 | P2 | Upgrade `net7.0` → current LTS | F12 | **FIXED** — 2026-08-15, `net10.0` everywhere; unblocked by F13's fix |
 | P1 | **Decide what replaces `Microsoft.AspNetCore.ApiAuthorization.IdentityServer`** | F13 | **FIXED** — 2026-08-15, `authservice` adopted per [ADR 0001](0001-identity-via-authservice.md) and implemented: the package is gone, Quorum validates against the instance's JWKS and holds no key material, the browser holds no token (BFF + HttpOnly cookies), and the estate deploys to Fly.io by tag |
 | P2 | Bump `AutoMapper` 12.0.1 (High severity advisory) | F14 | **OPEN** |
-| P3 | Replace `iTextSharp` 5.x — .NET Framework-only, AGPL, drags in vulnerable BouncyCastle | F14 | **OPEN** |
+| P3 | Replace `iTextSharp` 5.x — .NET Framework-only, AGPL, drags in vulnerable BouncyCastle | F14 | **OPEN** — replacement chosen in [ADR 0002](0002-pdf-generation.md): PDFsharp + MigraDoc, MIT |
 | P3 | Wire health checks; split `/health` and `/alive`; add the exception middleware | F7 | **FIXED** — 2026-08-15 |
 | P3 | Add OpenTelemetry per P2's table | F9 | **FIXED** — 2026-08-15 |
 | P3 | Add a test project; characterisation tests over quarter resolution and rating first | F10 | **FIXED** — 2026-08-15, 27 tests, run by CI |
