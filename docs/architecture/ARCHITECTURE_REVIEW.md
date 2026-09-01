@@ -671,6 +671,11 @@ prototype stage, and it means the modernization path is additive rather than a r
 
 ## 4. Alignment actions
 
+> **The live status of everything still open is now
+> [`DEVIATIONS.md`](DEVIATIONS.md).** This section records the actions as they stood when the
+> review was written and is deliberately not rewritten as they close; the register is the
+> current record. Where the two disagree, the register is right.
+
 Time windows per
 [`SECURITY-REVIEW.md`](https://github.com/konradcinkusz/architecture-standards/blob/main/docs/guides/SECURITY-REVIEW.md)
 §3 — P1 immediately, P2 within a week, P3 within two weeks, P4 long-term.

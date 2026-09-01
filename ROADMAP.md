@@ -35,7 +35,7 @@ roadmap. Complete means:
    review's compliance checklist is either closed or recorded in a dated deviation register
    with a reason and an exit.
 4. **There is evidence it runs, not merely that it compiles.** This is the largest standing
-   risk and the review states it plainly: the 47 tests cover pure logic, and *the application
+   risk and the review states it plainly: the 65 tests cover pure logic, and *the application
    has still never been run*. F6's `FindAsync` bug is the standing proof of what that hides —
    it compiled cleanly for three years and threw on first execution, meaning that endpoint
    could never have worked.
