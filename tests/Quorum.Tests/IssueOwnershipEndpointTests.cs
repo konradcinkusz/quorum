@@ -82,13 +82,7 @@ public sealed class IssueOwnershipEndpointTests
         using var client = factory.CreateClient();
 
         using var edit = await Send(client, HttpMethod.Put, $"{Route}/edit-issue/{issueId}", Stranger,
-            JsonContent.Create(new
-            {
-                Title = "Renamed by a stranger",
-                Question = "Should it be renamed?",
-                Icon = (string?)null,
-                BackgroundColor = (string?)null,
-            }));
+            JsonContent.Create(ValidEdit("Renamed by a stranger")));
         using var archive = await Send(client, HttpMethod.Delete, $"{Route}/archive-issue/{issueId}", Stranger);
 
         // Asserted against the database rather than the response body, deliberately. The two
@@ -168,6 +162,20 @@ public sealed class IssueOwnershipEndpointTests
         return client.SendAsync(request);
     }
 
+    /// <summary>
+    /// A body that passes model binding. Title and Question are [Required] with a 5–50
+    /// length, and Icon and BackgroundColor are [Required] despite being declared nullable —
+    /// omitting them gets the request rejected before it reaches the handler, which would
+    /// make an ownership assertion pass for the wrong reason.
+    /// </summary>
+    private static object ValidEdit(string title) => new
+    {
+        Title = title,
+        Question = "Should the bridge be rebuilt?",
+        Icon = "bridge",
+        BackgroundColor = "#204060",
+    };
+
     private static async Task<ApiResponseEnvelope?> Envelope(HttpResponseMessage response)
         => await response.Content.ReadFromJsonAsync<ApiResponseEnvelope>();
 
@@ -203,6 +211,7 @@ internal static class TestAuthentication
 {
     public const string Scheme = "Test";
     public const string UserIdHeader = "X-Test-User";
+    public const string RoleHeader = "X-Test-Role";
 
     public static void Configure(IServiceCollection services)
         => services
@@ -232,9 +241,16 @@ internal static class TestAuthentication
             // TestAuthentication.Scheme, qualified: inside an AuthenticationHandler, a bare
             // `Scheme` binds to the inherited AuthenticationScheme property, not to the const
             // on the enclosing class.
-            var identity = new ClaimsIdentity(
-                new[] { new Claim(ClaimTypes.NameIdentifier, userId!) },
-                TestAuthentication.Scheme);
+            var claims = new List<Claim> { new(ClaimTypes.NameIdentifier, userId!) };
+
+            // RequireAdminRole reads ClaimTypes.Role, which is what the JWT handler's
+            // inbound mapping produces from the token's `role` claim.
+            if (Request.Headers.TryGetValue(RoleHeader, out var role) && !string.IsNullOrWhiteSpace(role))
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role!));
+            }
+
+            var identity = new ClaimsIdentity(claims, TestAuthentication.Scheme);
 
             return Task.FromResult(AuthenticateResult.Success(
                 new AuthenticationTicket(

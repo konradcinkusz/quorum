@@ -4,7 +4,14 @@ public class EditIssueCommand : IRequest<int>
 {
     public string? Title { get; set; }
     public string? Question { get; set; }
-    public bool? IsVerifyByAdmin { get; set; } = false;
+    /// <summary>
+    /// Null means "leave it as it is", which is what the null-coalescing in the handler
+    /// below is for. It defaulted to <c>false</c>, and the user-facing edit route does not
+    /// set it — so every edit a user made wrote <c>false</c> and silently un-verified their
+    /// own issue, dropping it out of the current quarter's rating and winner selection with
+    /// nothing reported. The admin route always assigns explicitly and is unaffected.
+    /// </summary>
+    public bool? IsVerifyByAdmin { get; set; }
     public IssueVisibility? IssueVisibility { get; set; }
     public IssueProcess? IssueProcess { get; set; }
     public string? Icon { get; set; }
