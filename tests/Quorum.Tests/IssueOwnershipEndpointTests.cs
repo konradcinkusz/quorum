@@ -3,6 +3,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
+using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -63,8 +64,14 @@ public sealed class IssueOwnershipEndpointTests
         // The load-bearing assertion. If these ever diverge, the endpoint has become an
         // oracle for "does this issue id exist", which is what F3 was and what F2's fix
         // deliberately closed.
+        //
+        // Compared with the id masked out: the message is Entity "Issue" (<id>) was not
+        // found, so the two refusals differ by exactly the id the caller themselves supplied.
+        // That echo is not a disclosure — the attacker already knows which id they asked
+        // about — but comparing the raw strings would fail on it and hide the property that
+        // actually matters, which is that everything else is identical.
         Assert.Equal(noSuchIssue.StatusCode, somebodyElsesIssue.StatusCode);
-        Assert.Equal(noSuchIssue.Errors, somebodyElsesIssue.Errors);
+        Assert.Equal(MaskIds(noSuchIssue.Errors), MaskIds(somebodyElsesIssue.Errors));
     }
 
     [Fact]
@@ -75,18 +82,30 @@ public sealed class IssueOwnershipEndpointTests
         using var client = factory.CreateClient();
 
         using var edit = await Send(client, HttpMethod.Put, $"{Route}/edit-issue/{issueId}", Stranger,
-            JsonContent.Create(new { Title = "Renamed by a stranger", Question = "?" }));
+            JsonContent.Create(new
+            {
+                Title = "Renamed by a stranger",
+                Question = "Should it be renamed?",
+                Icon = (string?)null,
+                BackgroundColor = (string?)null,
+            }));
         using var archive = await Send(client, HttpMethod.Delete, $"{Route}/archive-issue/{issueId}", Stranger);
 
-        Assert.False((await Envelope(edit))!.Success);
-        Assert.False((await Envelope(archive))!.Success);
-
-        // And the issue is untouched — a refusal that still wrote would be worse than no
-        // refusal at all, because it would look safe.
+        // Asserted against the database rather than the response body, deliberately. The two
+        // endpoints do not answer in the same shape — a request rejected by model binding
+        // comes back as ValidationProblemDetails, whose `errors` is an object, while a
+        // request that reaches the handler comes back as ApiResponse, whose `errors` is an
+        // array. Binding to either would make this test about serialisation.
+        //
+        // What matters is the same for both: nothing was written. A refusal that still wrote
+        // would be worse than no refusal at all, because it would look safe.
         using var scope = factory.Services.CreateScope();
         var stored = await scope.ServiceProvider.GetRequiredService<ApplicationDbContext>()
             .Issues.FindAsync(issueId);
+
+        Assert.NotNull(stored);
         Assert.Equal("A question for the electorate", stored!.Title);
+        Assert.False(stored.IsDeleted, "archiving somebody else's issue must not mark it deleted");
     }
 
     [Fact]
@@ -151,6 +170,13 @@ public sealed class IssueOwnershipEndpointTests
 
     private static async Task<ApiResponseEnvelope?> Envelope(HttpResponseMessage response)
         => await response.Content.ReadFromJsonAsync<ApiResponseEnvelope>();
+
+    private static List<string>? MaskIds(List<string>? errors)
+        => errors?.Select(e => GuidPattern.Replace(e, "<id>")).ToList();
+
+    private static readonly Regex GuidPattern = new(
+        "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}",
+        RegexOptions.Compiled);
 
     /// <summary>
     /// A local shape for <c>ApiResponse&lt;T&gt;</c>: these tests care about the envelope, not
