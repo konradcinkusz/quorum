@@ -171,6 +171,16 @@ per-environment configuration and is yours to set.
 Old GitHub URLs redirect, so existing clones and links keep working; update your remote with
 `git remote set-url origin https://github.com/konradcinkusz/quorum`.
 
+## Security
+
+Found a vulnerability? Please report it privately — see [`SECURITY.md`](SECURITY.md), which
+also lists what is **already known and open** so you do not spend effort re-reporting it.
+
+The short version of what is known: credentials committed in 2023 remain in this
+repository's history and are not yet rotated, and signed petition documents are delivered
+without authentication. Both are tracked, and both are read before running an environment —
+[`docs/architecture/00-SECURITY-IMMEDIATE.md`](docs/architecture/00-SECURITY-IMMEDIATE.md).
+
 ## License
 
 MIT — see [`LICENSE`](LICENSE).
