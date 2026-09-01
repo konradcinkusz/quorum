@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Quorum.Infrastructure.Persistence;
+using Quorum.Server.Auth;
 using Xunit;
 
 namespace Quorum.Tests;
@@ -88,6 +89,25 @@ public sealed class ApplicationBootTests
 
         Assert.Equal(HttpStatusCode.ServiceUnavailable, health.StatusCode);
         Assert.Equal(HttpStatusCode.OK, alive.StatusCode);
+    }
+
+    [Fact]
+    public async Task The_authservice_client_and_its_resilience_pipeline_are_constructible()
+    {
+        // Resolving the typed client is what builds its handler chain, and the standard
+        // resilience handler validates its options while doing so — the total timeout must
+        // exceed one attempt, and the circuit breaker's sampling window must be at least
+        // twice the attempt timeout. Both are startup-time failures that compile perfectly
+        // and that nothing else in this suite would reach.
+        //
+        // This is the assertion #12 was waiting on. Before the host existed there was no way
+        // to tell a well-configured pipeline from one that would throw on first boot.
+        await using var factory = new QuorumApplicationFactory();
+        using var scope = factory.Services.CreateScope();
+
+        var gateway = scope.ServiceProvider.GetRequiredService<IAuthServiceGateway>();
+
+        Assert.NotNull(gateway);
     }
 
     private static WebApplicationFactoryClientOptions NoRedirects => new() { AllowAutoRedirect = false };
