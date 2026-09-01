@@ -1,4 +1,4 @@
-﻿# gitleaks configuration for MR.
+# gitleaks configuration for Quorum.
 #
 # The point of the allowlist below is that it is SHORT and every entry is dated, explained
 # and tied to a remediation. A scanner that fails permanently on known history gets muted,
@@ -10,7 +10,7 @@
 # it, and if it must stay in history, add it here with the same three things every entry
 # below has: what it is, why it is tolerable now, and what closes it.
 
-title = "MR secret scanning"
+title = "Quorum secret scanning"
 
 [extend]
 useDefault = true
