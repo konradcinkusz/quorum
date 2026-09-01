@@ -171,7 +171,19 @@ per-environment configuration and is yours to set.
 Old GitHub URLs redirect, so existing clones and links keep working; update your remote with
 `git remote set-url origin https://github.com/konradcinkusz/quorum`.
 
+## Roadmap
+
+[`ROADMAP.md`](ROADMAP.md) carries the plan this repository is being taken through: what
+"complete" means for it, four phases with their issues, why they are in that order, which
+paths are protected, and what is deliberately out of scope. Progress is tracked in
+[#22](https://github.com/konradcinkusz/quorum/issues/22).
+
+The short version: the gap here is operability rather than features, so nothing on the
+roadmap adds a capability.
+
 ## Backlog
 
 `TODO.txt` at the repository root carries the product backlog as it stood in July 2023, in
-Polish. It is kept as a record of intent; it is not a maintained plan.
+Polish. It is kept as a record of intent; it is not a maintained plan — the maintained one is
+[`ROADMAP.md`](ROADMAP.md), and [#10](https://github.com/konradcinkusz/quorum/issues/10)
+folds whatever is still live out of `TODO.txt` into it.
