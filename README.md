@@ -135,6 +135,9 @@ The deploy asserts what health checks cannot see: that the identity instance pub
   [`konradcinkusz/architecture-standards`](https://github.com/konradcinkusz/architecture-standards):
   strengths, twelve findings ranked by severity, the compliance checklist, and a
   prioritized alignment-actions table.
+- [`docs/architecture/DEVIATIONS.md`](docs/architecture/DEVIATIONS.md) — what this repository
+  does differently from that reference architecture, dated, each with a reason and an exit,
+  plus the open actions no commit can close.
 - [`docs/architecture/00-SECURITY-IMMEDIATE.md`](docs/architecture/00-SECURITY-IMMEDIATE.md)
   — credentials to rotate, across this repo and its three predecessors.
 
