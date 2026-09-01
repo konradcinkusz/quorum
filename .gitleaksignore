@@ -1,0 +1,27 @@
+# Fingerprints of findings that are KNOWN, RECORDED and already being dealt with.
+#
+# This file exists so that .gitleaks.toml does not have to. A gitleaks allowlist can silence
+# a finding by matching the secret's literal text — and doing that commits the secret again,
+# in the one file a reader trusts to be clean. A fingerprint pins commit + file + rule + line
+# and names no value, which is the same outcome without the disclosure.
+#
+# Every entry below must say what it is, why it is tolerable now, and what closes it. An
+# entry with no exit is an accepted leak wearing a suppression's clothes.
+#
+# See docs/architecture/00-SECURITY-IMMEDIATE.md and issue #27.
+
+# --- Cloudinary API secret (cloud dho08…) -------------------------------------------------
+#
+# Committed to Server/appsettings.json on 2023-07-18 and removed from the working tree on
+# 2026-08-15 (architecture review F1). It remains reachable in history, and this repository
+# is PUBLIC, so the value is world-readable until it is rotated.
+#
+# Tolerable ONLY so the scan fails on the NEXT secret rather than permanently on this one.
+# Nothing here makes the credential safe.
+#
+# Closed by: rotating the key and secret in the Cloudinary console — an owner action that no
+# commit can perform — and then deleting both lines.
+f0fca1528bd1e12502b02cf076560a86a6820b79:Server/appsettings.json:generic-api-key:22
+
+# The same secret, quoted in the architecture review before that document was redacted.
+4b425b71616dda02ef5d4792a562b608db9d7a0f:docs/architecture/ARCHITECTURE_REVIEW.md:generic-api-key:108

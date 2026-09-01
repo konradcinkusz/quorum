@@ -49,14 +49,15 @@ paths = [
 ]
 
 regexes = [
-  # The Cloudinary API secret committed in Server/appsettings.json in f0fca15 (2023-07-18)
-  # and removed from the working tree on 2026-08-15. Still reachable in history.
+  # The Cloudinary API secret is NOT listed here. It used to be, as a literal — which meant
+  # this file, whose whole purpose is to stop credentials being committed, held one in
+  # cleartext in HEAD. On a public repository that is a disclosure in its own right, and it
+  # is the mistake the docs/stripe.txt entry above deliberately avoided: "this entry is a
+  # path, deliberately, so silencing the history finding does not require committing the key
+  # again." The same reasoning applies here and was not applied.
   #
-  # Tolerable ONLY until rotated. This entry exists so the scan fails on a NEW secret rather
-  # than on this one; it is not a statement that this one is safe.
-  #
-  # Closed by: rotating the Cloudinary key/secret in the console, then deleting this line.
-  '''QCth6u4bryHasG8YCohWCHggbzY''',
+  # Its two historical occurrences are silenced by fingerprint in .gitleaksignore instead,
+  # which pins commit + file + rule + line without naming the value. See issue #27.
 
   # The seeded account password hash, as it appears in history outside the migrations path
   # above — Quorum.Persistence/Seeds/DefaultUser.cs (deleted 2026-08-15) and, in commit
