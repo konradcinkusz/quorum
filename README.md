@@ -171,6 +171,13 @@ per-environment configuration and is yours to set.
 Old GitHub URLs redirect, so existing clones and links keep working; update your remote with
 `git remote set-url origin https://github.com/konradcinkusz/quorum`.
 
+## Contributing
+
+[`CONTRIBUTING.md`](CONTRIBUTING.md) covers the local setup, what CI does and does not
+establish, and the conventions that are specific to this codebase — vertical slices,
+`IssueOwnerScope`, ADRs, and why an applied migration is never edited.
+[`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) applies.
+
 ## Security
 
 Found a vulnerability? Please report it privately — see [`SECURITY.md`](SECURITY.md), which
