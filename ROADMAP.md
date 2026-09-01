@@ -148,9 +148,10 @@ never force-merged past a failing check — see [§6](#6-execution-policy).
 
 Named because leaving them unnamed makes them look forgotten.
 
-- **Features.** Nothing in this roadmap adds a capability. The 2023 backlog in `TODO.txt` —
-  variable cycle length, issue editing, document upload flows — is product work, and #10
-  moves it somewhere legible rather than acting on it.
+- **Features.** Nothing in this roadmap adds a capability. The 2023 backlog — variable cycle
+  length, subscription types, document upload flows — is product work. #10 moved it into
+  [`BACKLOG.md`](BACKLOG.md), in English and checked against the code, rather than acting on
+  it.
 - **Rotating the leaked credentials.** The Stripe and Cloudinary keys and the
   `mreferendaInternal` database password are **owner actions**: they live in third-party
   consoles, no commit can close them, and they stay valid until someone rotates them. They
