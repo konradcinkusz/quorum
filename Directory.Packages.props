@@ -34,15 +34,15 @@
     <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions"              Version="10.0.11" />
 
     <!-- Data providers -->
-    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.1" />
+    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
 
     <!-- Telemetry -->
-    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol"      Version="1.12.0" />
-    <PackageVersion Include="OpenTelemetry.Extensions.Hosting"                  Version="1.12.0" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore"          Version="1.12.0" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" Version="1.12.0-beta.1" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.Http"                Version="1.12.0" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime"             Version="1.12.0" />
+    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol"      Version="1.18.0" />
+    <PackageVersion Include="OpenTelemetry.Extensions.Hosting"                  Version="1.18.0" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore"          Version="1.18.0" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" Version="1.12.0-beta.2" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Http"                Version="1.18.0" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime"             Version="1.18.0" />
 
     <!-- Application libraries -->
     <PackageVersion Include="Asp.Versioning.Mvc"                               Version="8.1.0" />
