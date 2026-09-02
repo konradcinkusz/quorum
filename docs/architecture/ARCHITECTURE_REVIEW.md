@@ -699,7 +699,7 @@ repository, so no commit can close it.
 | P1 | Add ownership filters to edit / archive / read-for-edit / publish / pay | F2 | **FIXED** — 2026-08-15 |
 | P1 | Gate or delete `get-issues-by-search-params` | F3 | **FIXED** — 2026-08-15, deleted |
 | P2 | Validate upload type/size; generate the stored name server-side; enforce eligibility | F6 | **FIXED** — 2026-08-15 |
-| P2 | Make signed documents non-public (authenticated delivery) | F6 | **OPEN** — deliberately deferred; see below |
+| P2 | Make signed documents non-public (authenticated delivery) | F6 | **FIXED** — 2026-09-02, stored with Cloudinary's `authenticated` delivery type and reached through an endpoint applying the same eligibility predicate as upload ([#19](https://github.com/konradcinkusz/quorum/issues/19)). Assets uploaded *before* that date are unaffected and remain public — an owner action, see [`DEVIATIONS.md`](DEVIATIONS.md) §4 |
 | P2 | Fix the DEV/PROD connection-string switch; guard `EnableSensitiveDataLogging`; `DbContext` → `Scoped` | F5 | **FIXED** — 2026-08-15 |
 | P2 | Add a secret scanner in CI | F1 | **FIXED** — 2026-08-15, `secret-scan` workflow over tree and full history |
 | P2 | Add a secret scanner as a **pre-commit hook** | F1 | **FIXED** — `.githooks/pre-commit` runs `gitleaks git --staged`, activated idempotently by `scripts/dev-up.sh`. It warns and passes when gitleaks is absent, so a contributor without it is not blocked — CI is still the gate |
@@ -789,6 +789,14 @@ That rewrite also removed the `FindAsync(request._issueId, cancellationToken)` c
 review flagged — it bound to the `params object[] keyValues` overload, so EF saw two key
 values for a single-key entity and threw. **This endpoint could not have worked**, which is
 worth noting as evidence for how much of the app has actually been exercised recently.
+
+> **Closed 2026-09-02 by [#19](https://github.com/konradcinkusz/quorum/issues/19).** The
+> paragraph below describes the code as reviewed and is kept as written. Two things it
+> assumes turned out not to hold: there was no read path to secure at all — signed documents
+> were written and never read, so the leak was the *upload* call returning a public URL — and
+> "every already-stored `SecureUri` would stop resolving" understates it, because changing the
+> delivery type does not reach assets already stored under the old one. Those stay public
+> until somebody clears them in the Cloudinary console.
 
 **What F6 leaves open, on purpose: delivery is still public.** Uploads are validated,
 size-capped, eligibility-checked and stored under a name this application generates whose

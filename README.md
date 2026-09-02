@@ -187,8 +187,10 @@ Found a vulnerability? Please report it privately — see [`SECURITY.md`](SECURI
 also lists what is **already known and open** so you do not spend effort re-reporting it.
 
 The short version of what is known: credentials committed in 2023 remain in this
-repository's history and are not yet rotated, and signed petition documents are delivered
-without authentication. Both are tracked, and both are read before running an environment —
+repository's history and are not yet rotated, and signed petition documents uploaded before
+delivery was locked down are still reachable on the CDN. Both are tracked, both need an
+action in somebody's console rather than a commit, and both are read before running an
+environment —
 [`docs/architecture/00-SECURITY-IMMEDIATE.md`](docs/architecture/00-SECURITY-IMMEDIATE.md).
 
 ## License
