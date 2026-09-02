@@ -1,0 +1,94 @@
+# EditorConfig for Quorum — https://editorconfig.org
+#
+# This file DECLARES a style. It does not enforce one.
+#
+# Every analyzer preference below is `suggestion`, and nothing is `error` or `warning`. That
+# is deliberate and load-bearing: CI builds all nine projects in Release, and raising a
+# severity here would fail that build on three years of existing code. There is no .NET SDK
+# on the machine this was written on, so the size of that blast radius cannot be measured
+# before pushing — and an .editorconfig that turns CI red on unrelated code is worse than no
+# .editorconfig at all.
+#
+# Raising enforcement is a later, per-rule job, each step proven clean by a build first.
+#
+# Note also what this file does NOT do: it does not reformat anything. 398 tracked files
+# carry a UTF-8 BOM (a Visual Studio artifact). They are harmless in C# sources — the one
+# place a BOM was fatal was .gitleaks.toml, fixed in #24 — and a 398-file whitespace commit
+# would bury `git blame` across the repository for no benefit. `charset` below applies to
+# files as they are next edited.
+
+root = true
+
+[*]
+indent_style = space
+indent_size = 4
+# LF, because that is what is actually stored: .gitattributes sets `* text=auto`, so the
+# repository normalises to LF and every tracked file checked here is LF. A Visual Studio
+# template would say crlf here, editors would write crlf, and git would normalise it back
+# on every commit — churn that looks like a change and is not.
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+[*.{yml,yaml}]
+indent_size = 2
+
+[*.{json,jsonc}]
+indent_size = 2
+
+[*.{csproj,props,targets,config,xml}]
+indent_size = 2
+
+[*.md]
+# Two trailing spaces are a hard line break in Markdown.
+trim_trailing_whitespace = false
+
+[*.{razor,cshtml}]
+indent_size = 4
+
+[*.cs]
+indent_size = 4
+
+# --- using directives --------------------------------------------------------------------
+dotnet_sort_system_directives_first = true
+dotnet_separate_import_directive_groups = false
+csharp_using_directive_placement = outside_namespace:suggestion
+
+# --- language preferences ----------------------------------------------------------------
+csharp_style_namespace_declarations = file_scoped:suggestion
+csharp_prefer_braces = true:suggestion
+csharp_style_var_for_built_in_types = false:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_style_expression_bodied_methods = false:suggestion
+csharp_style_expression_bodied_properties = true:suggestion
+
+dotnet_style_qualification_for_field = false:suggestion
+dotnet_style_qualification_for_property = false:suggestion
+dotnet_style_qualification_for_method = false:suggestion
+dotnet_style_predefined_type_for_locals_parameters_members = true:suggestion
+dotnet_style_object_initializer = true:suggestion
+dotnet_style_collection_initializer = true:suggestion
+dotnet_style_null_propagation = true:suggestion
+dotnet_style_coalesce_expression = true:suggestion
+dotnet_style_readonly_field = true:suggestion
+
+# --- naming ------------------------------------------------------------------------------
+dotnet_naming_rule.interfaces_start_with_i.severity = suggestion
+dotnet_naming_rule.interfaces_start_with_i.symbols = interfaces
+dotnet_naming_rule.interfaces_start_with_i.style = prefix_with_i
+
+dotnet_naming_symbols.interfaces.applicable_kinds = interface
+dotnet_naming_symbols.interfaces.applicable_accessibilities = *
+
+dotnet_naming_style.prefix_with_i.required_prefix = I
+dotnet_naming_style.prefix_with_i.capitalization = pascal_case
+
+dotnet_naming_rule.types_are_pascal_case.severity = suggestion
+dotnet_naming_rule.types_are_pascal_case.symbols = types_and_members
+dotnet_naming_rule.types_are_pascal_case.style = pascal_case
+
+dotnet_naming_symbols.types_and_members.applicable_kinds = class, struct, enum, property, method, event
+dotnet_naming_symbols.types_and_members.applicable_accessibilities = *
+
+dotnet_naming_style.pascal_case.capitalization = pascal_case

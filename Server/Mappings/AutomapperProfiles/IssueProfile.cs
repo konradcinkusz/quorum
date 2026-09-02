@@ -13,8 +13,6 @@ public class IssueProfile : Profile
             .ForMember(dest => dest.ApplicationUserEmail, opt => opt.MapFrom(src => src.CreatedByEmail ?? string.Empty));
 
         CreateMap<Issue, IssueCreateDTO>();
-        CreateMap<Issue, IssueAdminCreateDTO>()
-            .ForMember(dest => dest.InitialPayment, opt => opt.MapFrom(src => src.InitialPayment));
 
         CreateMap<CloudinaryFile, FileReadDTO>();
 

@@ -30,16 +30,13 @@ public class UploadSignedDocumentCommand : IRequest<string>
 
             // Who may attach a signed document is not "who owns the issue" — it is "who
             // signed it", and only once the issue has ended as a winner in the current
-            // quarter. This is the same predicate GetYourWinnersCommand uses to decide which
-            // issues to offer the user, so the two cannot disagree about eligibility.
-            // Previously there was no check at all: any authenticated caller could attach a
-            // document to any issue by presenting its id.
+            // quarter. RestrictToSignatory is that rule, and the winners list and the
+            // download endpoint call the same one, so no two of the three can disagree about
+            // eligibility. Previously there was no check at all: any authenticated caller
+            // could attach a document to any issue by presenting its id.
             var issue = await _context.Issues
                 .Where(x => x.Id == request._issueId)
-                .Where(x => x.Signatures.Any(signature =>
-                    signature.SignaturePool.ApplicationUserId == request._applicationUserId))
-                .Where(x => x.IssueProcess == IssueProcess.EndedInCurrentQuarter)
-                .Where(x => x.IssueVisibility == IssueVisibility.VisibleForAll)
+                .RestrictToSignatory(request._applicationUserId)
                 .FirstOrDefaultAsync(cancellationToken);
 
             // Same result whether the issue does not exist, has not ended, or was not signed
@@ -64,7 +61,11 @@ public class UploadSignedDocumentCommand : IRequest<string>
             var storedFileName = SignedDocumentRules.BuildStoredFileName(request._issueId);
             var uploadedFile = new UploadedFile(storedFileName, pdfBytes);
 
-            var fileData = await _cloudinaryService.UploadPdfAsync(uploadedFile, cancellationToken);
+            // Not UploadPdfAsync. That one stores the blank sheet an administrator generates
+            // for people to print, which is public by design; this document comes back with
+            // real names and signatures on it and is stored so that its URL is worthless
+            // without a signature.
+            var fileData = await _cloudinaryService.UploadSignedPdfAsync(uploadedFile, cancellationToken);
 
             var cloudinaryFile = new CloudinaryFile()
             {
@@ -77,7 +78,15 @@ public class UploadSignedDocumentCommand : IRequest<string>
 
             _ = await _context.SaveChangesAsync(cancellationToken);
 
-            return fileData.SecureUri.AbsoluteUri;
+            // The stored name, not the URL. This method used to return
+            // fileData.SecureUri.AbsoluteUri, which wrote a permanent, unauthenticated link
+            // to a page of real signatures into an HTTP response body — and from there into
+            // whatever history, proxy log and referrer header saw it. A caller that wants the
+            // document asks GetSignedDocumentDownloadUrlQuery for a short-lived one.
+            //
+            // Nothing consumed the old value: the client declares this call as
+            // ApiResponse<bool> and discards the payload.
+            return storedFileName;
         }
     }
 }
