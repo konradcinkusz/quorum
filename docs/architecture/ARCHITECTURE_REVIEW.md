@@ -683,6 +683,8 @@ Time windows per
 Legend: **FIXED** · **OPEN** · **OPEN (owner action)** — needs something outside the
 repository, so no commit can close it.
 
+> **This table is a ledger, not a record of the review.** The narrative findings above describe the code as it was reviewed on 2026-08-14 and are deliberately not rewritten; the rows below are current and must be updated by the change that closes them. Three of them had drifted — `AutoMapper`, the pre-commit hook and `iTextSharp` were all done and all still read **OPEN** — because the pull requests that did the work updated [`DEVIATIONS.md`](DEVIATIONS.md) and forgot this file. A row here that is stale is worse than one that is missing: it reads as a live finding and invites the work to be done twice.
+
 ### Blocks any deployment
 
 | P | Action | Finding | Status |
@@ -700,12 +702,12 @@ repository, so no commit can close it.
 | P2 | Make signed documents non-public (authenticated delivery) | F6 | **OPEN** — deliberately deferred; see below |
 | P2 | Fix the DEV/PROD connection-string switch; guard `EnableSensitiveDataLogging`; `DbContext` → `Scoped` | F5 | **FIXED** — 2026-08-15 |
 | P2 | Add a secret scanner in CI | F1 | **FIXED** — 2026-08-15, `secret-scan` workflow over tree and full history |
-| P2 | Add a secret scanner as a **pre-commit hook** | F1 | **OPEN** — CI catches it after the commit exists; the hook is what stops it being written |
+| P2 | Add a secret scanner as a **pre-commit hook** | F1 | **FIXED** — `.githooks/pre-commit` runs `gitleaks git --staged`, activated idempotently by `scripts/dev-up.sh`. It warns and passes when gitleaks is absent, so a contributor without it is not blocked — CI is still the gate |
 | P2 | Add a CI workflow running `dotnet build` | F8 | **FIXED** — 2026-08-15, and it is now the only thing that compiles this repo |
 | P2 | Upgrade `net7.0` → current LTS | F12 | **FIXED** — 2026-08-15, `net10.0` everywhere; unblocked by F13's fix |
 | P1 | **Decide what replaces `Microsoft.AspNetCore.ApiAuthorization.IdentityServer`** | F13 | **FIXED** — 2026-08-15, `authservice` adopted per [ADR 0001](0001-identity-via-authservice.md) and implemented: the package is gone, Quorum validates against the instance's JWKS and holds no key material, the browser holds no token (BFF + HttpOnly cookies), and the estate deploys to Fly.io by tag |
-| P2 | Bump `AutoMapper` 12.0.1 (High severity advisory) | F14 | **OPEN** |
-| P3 | Replace `iTextSharp` 5.x — .NET Framework-only, AGPL, drags in vulnerable BouncyCastle | F14 | **OPEN** — replacement chosen in [ADR 0002](0002-pdf-generation.md): PDFsharp + MigraDoc, MIT |
+| P2 | Bump `AutoMapper` 12.0.1 (High severity advisory) | F14 | **FIXED** — 14.0.0, and pinned once in `Directory.Packages.props` rather than in two project files, which is what made the bump a two-place edit in the first place |
+| P3 | Replace `iTextSharp` 5.x — .NET Framework-only, AGPL, drags in vulnerable BouncyCastle | F14 | **FIXED** — 2026-09-02, PDFsharp + MigraDoc 6.2.4 per [ADR 0002](0002-pdf-generation.md), both MIT. BouncyCastle confirmed gone by walking the 541-package transitive closure, not inferred from a build log |
 | P3 | Wire health checks; split `/health` and `/alive`; add the exception middleware | F7 | **FIXED** — 2026-08-15 |
 | P3 | Add OpenTelemetry per P2's table | F9 | **FIXED** — 2026-08-15 |
 | P3 | Add a test project; characterisation tests over quarter resolution and rating first | F10 | **FIXED** — 2026-08-15, 27 tests, run by CI |
