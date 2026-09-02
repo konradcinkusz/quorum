@@ -31,7 +31,7 @@ jobs:
       - uses: actions/checkout@v7
 
       - name: Set up .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v6
         with:
           # Read the version from global.json rather than restating it here, so the two
           # cannot drift.
