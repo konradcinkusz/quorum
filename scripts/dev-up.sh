@@ -9,6 +9,14 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
+# The secret-scanning pre-commit hook, activated here because this is the script every
+# contributor already runs first. CI catches a committed credential after the commit exists;
+# the hook is what stops it being written. See .githooks/pre-commit and issue #20.
+if [ "$(git config --get core.hooksPath || true)" != ".githooks" ]; then
+  git config core.hooksPath .githooks
+  echo "Enabled the pre-commit secret scan (git config core.hooksPath .githooks)."
+fi
+
 KEY=".dev/keys/authservice-dev.pem"
 if [ ! -f "$KEY" ]; then
   mkdir -p .dev/keys

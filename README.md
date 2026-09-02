@@ -135,6 +135,9 @@ The deploy asserts what health checks cannot see: that the identity instance pub
   [`konradcinkusz/architecture-standards`](https://github.com/konradcinkusz/architecture-standards):
   strengths, twelve findings ranked by severity, the compliance checklist, and a
   prioritized alignment-actions table.
+- [`docs/architecture/DEVIATIONS.md`](docs/architecture/DEVIATIONS.md) — what this repository
+  does differently from that reference architecture, dated, each with a reason and an exit,
+  plus the open actions no commit can close.
 - [`docs/architecture/00-SECURITY-IMMEDIATE.md`](docs/architecture/00-SECURITY-IMMEDIATE.md)
   — credentials to rotate, across this repo and its three predecessors.
 
@@ -184,19 +187,22 @@ Found a vulnerability? Please report it privately — see [`SECURITY.md`](SECURI
 also lists what is **already known and open** so you do not spend effort re-reporting it.
 
 The short version of what is known: credentials committed in 2023 remain in this
-repository's history and are not yet rotated, and signed petition documents are delivered
-without authentication. Both are tracked, and both are read before running an environment —
+repository's history and are not yet rotated, and signed petition documents uploaded before
+delivery was locked down are still reachable on the CDN. Both are tracked, both need an
+action in somebody's console rather than a commit, and both are read before running an
+environment —
 [`docs/architecture/00-SECURITY-IMMEDIATE.md`](docs/architecture/00-SECURITY-IMMEDIATE.md).
 
 ## License
 
 MIT — see [`LICENSE`](LICENSE).
 
-One caveat worth stating rather than leaving to be discovered: `Quorum.Service` currently
-depends on **iTextSharp 5.x, which is AGPL**, and an MIT licence on this repository does not
-change the terms that dependency carries into a distributed binary. Choosing a replacement is
-[#15](https://github.com/konradcinkusz/quorum/issues/15) and doing it is
-[#21](https://github.com/konradcinkusz/quorum/issues/21).
+Every runtime dependency is MIT or similarly permissive. The one that was not — **iTextSharp
+5.x, which is AGPL** — generated the signature sheet, and an MIT licence on this repository
+does not change the terms such a dependency carries into a distributed binary. It was replaced
+with PDFsharp + MigraDoc under [ADR 0002](docs/architecture/0002-pdf-generation.md)
+([#15](https://github.com/konradcinkusz/quorum/issues/15) chose,
+[#21](https://github.com/konradcinkusz/quorum/issues/21) did it).
 
 ## Roadmap
 

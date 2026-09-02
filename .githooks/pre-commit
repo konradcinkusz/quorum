@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+#
+# Stop a credential before the commit exists.
+#
+# secret-scan.yml already scans the tree and the full history on every push and pull request,
+# and that is the hard gate. But by the time it fires, the secret is in a branch's history on
+# GitHub, and remediation is rotation plus a history rewrite rather than `git commit --amend`.
+# docs/architecture/00-SECURITY-IMMEDIATE.md exists because that has happened three times
+# across four repositories.
+#
+# Install: scripts/dev-up.sh does it, or run
+#   git config core.hooksPath .githooks
+#
+# See issue #20.
+
+set -uo pipefail
+
+CONFIG="$(git rev-parse --show-toplevel)/.gitleaks.toml"
+
+if ! command -v gitleaks >/dev/null 2>&1; then
+  # Deliberately a warning, not a refusal.
+  #
+  # A hook that blocks the commit because a tool is missing gets disabled with --no-verify and
+  # never re-enabled, which costs the scanning that would otherwise have happened for the rest
+  # of the repository's life. CI remains the hard gate either way.
+  echo "pre-commit: gitleaks is not installed, so staged changes were NOT scanned." >&2
+  echo "            Install it from https://github.com/gitleaks/gitleaks/releases —" >&2
+  echo "            CI will still scan, but only after the commit exists." >&2
+  exit 0
+fi
+
+# `git --staged` scans what is about to be committed, not the working tree and not the full
+# history — gitleaks' own help calls it "good for pre-commit". A hook that takes several
+# seconds on every commit is a hook people bypass.
+#
+# Note for anyone updating this: the `protect` subcommand this would once have used no longer
+# exists in gitleaks 8.x, and because the check below treats any non-zero exit as a finding,
+# an unknown subcommand would refuse every commit in the repository.
+if ! gitleaks git --staged --config "$CONFIG" --redact --no-banner "$(git rev-parse --show-toplevel)"; then
+  cat >&2 <<'MESSAGE'
+
+pre-commit: gitleaks found a secret in the staged changes, so the commit was refused.
+
+  - If it is a real credential: remove it, and rotate it. A credential that has been
+    committed has left your control even if the commit never leaves your machine.
+  - If it is a false positive: add it to .gitleaks.toml with what it is, why it is
+    tolerable, and what closes it — the three things every entry there already has.
+    Never silence a finding with a broad path or pattern.
+  - `git commit --no-verify` bypasses this. CI will not be bypassed.
+
+MESSAGE
+  exit 1
+fi

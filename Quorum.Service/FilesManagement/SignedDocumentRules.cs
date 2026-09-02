@@ -19,6 +19,18 @@ public static class SignedDocumentRules
 
     public const string RequiredContentType = "application/pdf";
 
+    /// <summary>
+    /// How long a signed download URL stays valid.
+    /// <para>
+    /// Once handed out, the URL <i>is</i> the credential — anyone holding it can fetch the
+    /// document — so the useful question is not "is it secret" but "for how long is a copy of
+    /// it worth anything". Five minutes is long enough for a browser to follow a link the
+    /// user just clicked and short enough that the same string in a proxy log tomorrow is
+    /// inert. It is not long enough to email to somebody, which is the point.
+    /// </para>
+    /// </summary>
+    public static readonly TimeSpan DownloadUrlLifetime = TimeSpan.FromMinutes(5);
+
     /// <summary>`%PDF-` — the header every PDF starts with.</summary>
     private static readonly byte[] PdfMagicBytes = { 0x25, 0x50, 0x44, 0x46, 0x2D };
 
@@ -75,13 +87,13 @@ public static class SignedDocumentRules
     /// document is identified by its issue and uploader, both of which are recorded in the
     /// database row.
     /// <para>
-    /// The suffix is 256 bits from a CSPRNG rather than a <c>Guid</c>, because while
-    /// delivery remains public (see ARCHITECTURE_REVIEW.md F6) this name is the only thing
-    /// standing between a stranger and a document full of real signatures — which makes it
-    /// a share token, and a GUID is not a secret. This is mitigation, not a fix: an
-    /// unguessable URL is still an unauthenticated one, and it leaks the moment it is
-    /// pasted into a browser's history, a proxy log or a referrer header. Authenticated
-    /// delivery is the actual answer.
+    /// The suffix is 256 bits from a CSPRNG rather than a <c>Guid</c>. That was originally
+    /// mitigation for public delivery — the name was the only thing standing between a
+    /// stranger and a page of real signatures, which made it a share token, and a GUID is
+    /// not a secret. Delivery is authenticated now (F6 closed by #19), so the name is no
+    /// longer load-bearing and it stays unpredictable anyway: defence in depth costs nothing
+    /// here, and a predictable name would become load-bearing again the moment somebody
+    /// added a second storage path.
     /// </para>
     /// </summary>
     public static string BuildStoredFileName(Guid issueId)

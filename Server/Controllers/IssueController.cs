@@ -146,4 +146,12 @@ public sealed class IssueController : QuorumBaseController
     [HttpPut("upload-signed-document/{id}")]
     public async Task<ActionResult<ApiResponse<string>>> UploadSignedDocument([FromRoute] Guid id, [FromForm] IFormFile file)
         => await HandleErrors(async () => await Mediator.Send(new UploadSignedDocumentCommand(id, file, GetUserId())));
+
+    // The only way to reach a signed petition sheet. The document itself is stored with
+    // Cloudinary's "authenticated" delivery type, so its bare URL is not fetchable; this
+    // returns a URL that is, for five minutes, to a caller the same predicate says was
+    // entitled to attach it. Upload used to return a permanent public link instead.
+    [HttpGet("signed-document-url/{id}")]
+    public async Task<ActionResult<ApiResponse<string>>> GetSignedDocumentUrl([FromRoute] Guid id)
+        => await HandleErrors(async () => await Mediator.Send(new GetSignedDocumentDownloadUrlQuery(id, GetUserId())));
 }
