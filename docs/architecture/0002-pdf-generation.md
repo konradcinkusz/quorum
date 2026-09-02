@@ -98,8 +98,15 @@ recurring question rather than a decision.
 - `IIssuePDFService` **does not change**. The rewrite is confined to `FilesManagement`, which
   is one of the two places the review credits this codebase with getting extension points
   right.
-- `iTextSharp` leaves the dependency graph, and BouncyCastle should leave with it — to be
-  confirmed rather than assumed, since another package could pull it in.
+- `iTextSharp` leaves the dependency graph, and BouncyCastle leaves with it. **Confirmed
+  rather than assumed**, since another package could have pulled it in: the transitive
+  closure of all 37 direct `PackageReference`s was walked against the NuGet flat-container
+  API and comes to **541 package/version pairs with no BouncyCastle and no iText edge
+  anywhere in it**. The walk resolves each version range to its lower bound, which is what
+  a restore picks unless another edge asks for more; that can understate a *version* but
+  cannot add or remove a *package*, which is the only question here. Note that CI is no
+  help with this one — `dotnet restore` at default verbosity names no packages, so a clean
+  build log is silence rather than evidence.
 - `WrtiePDFDocumentToFile` is deleted from the interface and the implementation.
 - **Existing generated documents are not regenerated.** They live on Cloudinary and are
   historical artefacts; nothing reads them back through this service.
