@@ -45,7 +45,7 @@
     <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime"             Version="1.18.0" />
 
     <!-- Application libraries -->
-    <PackageVersion Include="Asp.Versioning.Mvc"                               Version="8.1.0" />
+    <PackageVersion Include="Asp.Versioning.Mvc"                               Version="10.2.1" />
     <PackageVersion Include="AutoMapper"                                       Version="14.0.0" />
     <PackageVersion Include="CloudinaryDotNet"                                 Version="1.21.0" />
     <PackageVersion Include="FluentValidation"                                 Version="11.5.2" />
