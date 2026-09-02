@@ -26,4 +26,15 @@ internal sealed class CloudinaryNotConfiguredService : ICloudinaryService
 
     public Task<FileData> UploadPdfAsync(UploadedFile uploadedFile, CancellationToken cancellationToken)
         => throw new InvalidOperationException(Explanation);
+
+    public Task<FileData> UploadSignedPdfAsync(UploadedFile uploadedFile, CancellationToken cancellationToken)
+        => throw new InvalidOperationException(Explanation);
+
+    /// <summary>
+    /// Throws, like the rest of this class, rather than returning an empty or fabricated URL.
+    /// A caller that got a string back would hand it to a citizen as a link to their own
+    /// signature sheet, and it would go nowhere.
+    /// </summary>
+    public string BuildSignedDownloadUrl(string publicId, TimeSpan lifetime)
+        => throw new InvalidOperationException(Explanation);
 }

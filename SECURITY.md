@@ -53,11 +53,13 @@ us nothing new. A report that one of them is *worse than documented* is very wel
   third-party console and has not happened. See
   [`docs/architecture/00-SECURITY-IMMEDIATE.md`](docs/architecture/00-SECURITY-IMMEDIATE.md)
   and [#27](https://github.com/konradcinkusz/quorum/issues/27).
-- **Signed petition documents are delivered publicly.** Upload is validated, size-capped and
-  eligibility-checked, and the stored name carries 256 bits from a CSPRNG — but delivery is
-  unauthenticated, so that name is a share token rather than an access control. This is
-  documented as mitigation, not a fix, in the architecture review (F6), and
-  [#19](https://github.com/konradcinkusz/quorum/issues/19) closes it.
+- **Signed petition documents uploaded before 2026-09-02 are still public.** Delivery is
+  authenticated now — new uploads are stored so their bare URL is not fetchable, and reaching
+  one goes through an endpoint that checks eligibility ([#19](https://github.com/konradcinkusz/quorum/issues/19),
+  review finding F6). That change does **not** reach assets already uploaded under the old
+  public delivery type: those URLs stay live until someone re-uploads or deletes them in the
+  Cloudinary console. It is an owner action, like the credential rotations above, and it is
+  recorded in [`docs/architecture/DEVIATIONS.md`](docs/architecture/DEVIATIONS.md) §4.
 - **The application has never been run against a real database.** The test suite covers pure
   logic; no endpoint has been exercised end to end. Behavioural claims about paths those
   tests do not reach are read from source rather than observed —

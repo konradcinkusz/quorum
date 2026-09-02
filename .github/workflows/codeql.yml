@@ -1,0 +1,57 @@
+name: codeql
+
+# The repository's other two workflows check that the code compiles, that the tests pass and
+# that no credential is committed. None of them looks for the class of defect this repository
+# has actually shipped: an IDOR on every issue mutation (architecture review F2) and an
+# endpoint returning every user's private drafts (F3), both found by a human reading the code
+# once. CodeQL is the standing version of that read.
+#
+# See docs/architecture/ARCHITECTURE_REVIEW.md.
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  # Findings depend on the query pack as much as on the code, and the pack is updated
+  # independently of this repository. A weekly run is what surfaces a new query against
+  # unchanged code.
+  schedule:
+    - cron: "17 3 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  analyze:
+    name: analyze (csharp)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    permissions:
+      # Required to upload the results to the Security tab.
+      security-events: write
+      contents: read
+      actions: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Initialise CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: csharp
+          # `none` analyses the source directly instead of restoring and compiling all nine
+          # projects. autobuild would roughly double this workflow's cost to re-prove
+          # something build.yml already proves on every push, and would give this job a
+          # second way to fail that has nothing to do with security findings.
+          build-mode: none
+
+      - name: Analyse
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:csharp"
