@@ -1,4 +1,4 @@
-﻿name: build
+name: build
 
 # The cheapest thing this repository was missing. Until this existed, nothing ever
 # compiled MR except an IDE on one machine, so a change that did not build could be
@@ -28,7 +28,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Set up .NET
         uses: actions/setup-dotnet@v4
