@@ -97,9 +97,10 @@ public class SignedDocumentRulesTests
     [Fact]
     public void The_stored_name_is_unpredictable()
     {
-        // While delivery stays public this suffix is effectively a share token, so it comes
-        // from a CSPRNG. Uniqueness across many draws is a weak proxy for that, but it does
-        // catch the regression that matters: someone swapping it back for a counter, a
+        // The suffix comes from a CSPRNG. It was a share token while delivery was public;
+        // now that delivery is authenticated it is defence in depth, and still worth
+        // pinning. Uniqueness across many draws is a weak proxy for unpredictability, but it
+        // does catch the regression that matters: someone swapping it back for a counter, a
         // timestamp, or the client's own file name.
         var issueId = Guid.NewGuid();
 

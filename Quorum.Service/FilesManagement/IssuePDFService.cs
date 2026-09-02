@@ -1,17 +1,66 @@
-﻿namespace Quorum.Service.FilesManagement
+namespace Quorum.Service.FilesManagement
 {
-    using iTextSharp.text.pdf;
-    using iTextSharp.text;
+    using MigraDoc.DocumentObjectModel;
+    using MigraDoc.DocumentObjectModel.Tables;
+    using MigraDoc.Rendering;
+    using PdfSharp.Fonts;
+    using PdfSharp.WPFonts;
 
     internal interface IIssuePDFService
     {
         byte[] GeneratePdfBytes(Issue issue);
         string GetIssuePDFFileName(Issue issue);
-        string WrtiePDFDocumentToFile(Issue issue);
+    }
+
+    /// <summary>
+    /// Resolves every requested typeface to a Segoe WP face embedded in the PDFsharp package.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// PDFsharp 6's cross-platform build has no font of its own and does not read the host's
+    /// font directory. Without a resolver it throws at render time, so the container would
+    /// fail to produce a sheet while every unit test that never rendered one passed. Binding
+    /// to <c>PdfSharp.WPFonts</c> — which ships the font bytes as embedded resources inside
+    /// the package — removes the host from the question entirely: the output is identical on
+    /// a developer's machine, in CI, and in the deployed image, and installing or removing a
+    /// system font cannot change it.
+    /// </para>
+    /// <para>
+    /// The resolver is deliberately <i>total</i>. It never returns <c>null</c>, so an
+    /// unexpected family name yields a readable document rather than an exception on a code
+    /// path nothing exercises. There is exactly one font family here and no italic face, so
+    /// italics are simulated by PDFsharp; that is a cosmetic compromise on a document that
+    /// currently uses neither.
+    /// </para>
+    /// </remarks>
+    internal sealed class EmbeddedSegoeFontResolver : IFontResolver
+    {
+        internal const string FamilyName = "Segoe WP";
+
+        const string Regular = "SegoeWP";
+        const string Bold = "SegoeWPBold";
+
+        public FontResolverInfo ResolveTypeface(string familyName, bool isBold, bool isItalic)
+            => new FontResolverInfo(isBold ? Bold : Regular, false, isItalic);
+
+        public byte[] GetFont(string faceName)
+            => faceName == Bold ? FontDataHelper.SegoeWPBold : FontDataHelper.SegoeWP;
     }
 
     internal class IssuePDFService : IIssuePDFService
     {
+        /// <summary>
+        /// PDFsharp requires the font resolver to be installed once, before any font operation.
+        /// A <see cref="Lazy{T}"/> gives that guarantee under the concurrent requests a web
+        /// application serves; assigning the property directly from the constructor would race,
+        /// and this service is registered per scope.
+        /// </summary>
+        static readonly Lazy<bool> FontResolverInstalled = new(() =>
+        {
+            GlobalFontSettings.FontResolver = new EmbeddedSegoeFontResolver();
+            return true;
+        });
+
         public string GetIssuePDFFileName(Issue issue)
         {
             // Generate the timestamp and format it as a string
@@ -20,39 +69,68 @@
             // Remove invalid characters from the issue title and replace spaces with underscores
             string issueTitle = string.Join("_", issue.Title.Split(Path.GetInvalidFileNameChars()));
 
-            // Create a PDF writer to write the document to a file in the current execution path
             return $"{timestamp}_{issueTitle}.pdf";
         }
 
-        PdfPTable GeneratePdfPTable(Issue issue)
+        public byte[] GeneratePdfBytes(Issue issue)
         {
-            // Create a table to hold the information
-            PdfPTable table = new PdfPTable(2);
-            table.WidthPercentage = 100;
+            _ = FontResolverInstalled.Value;
+
+            var document = new Document();
+            document.Info.Title = issue?.Title ?? string.Empty;
+            document.Styles.Normal.Font.Name = EmbeddedSegoeFontResolver.FamilyName;
+            document.Styles.Normal.Font.Size = Unit.FromPoint(11);
+
+            var section = document.AddSection();
+            section.PageSetup.PageFormat = PageFormat.A4;
+
+            section.Add(BuildTable(issue));
+
+            var renderer = new PdfDocumentRenderer();
+            renderer.Document = document;
+            renderer.RenderDocument();
+
+            // Restate the title on the rendered document rather than relying on MigraDoc to
+            // carry Document.Info across. It is the one field a reader of the finished file can
+            // check without decoding an embedded font's encoding out of a compressed content
+            // stream, so the tests assert on it and it should be true by construction.
+            renderer.PdfDocument.Info.Title = document.Info.Title;
+
+            using var pdfStream = new MemoryStream();
+
+            // false: leave the stream open so the bytes can be read back out of it. The
+            // MemoryStream is disposed by the using above, after ToArray has copied them.
+            renderer.Save(pdfStream, false);
+
+            return pdfStream.ToArray();
+        }
+
+        static Table BuildTable(Issue issue)
+        {
+            var table = new Table();
+            table.Borders.Width = Unit.FromPoint(0.75);
+
+            // A4 is 21 cm and MigraDoc's default side margins are 2.5 cm each, so 16 cm is the
+            // full measure. Splitting it 6/10 keeps the label column narrow enough that the
+            // history dates below it do not wrap.
+            table.AddColumn(Unit.FromCentimeter(6));
+            table.AddColumn(Unit.FromCentimeter(10));
 
             if (issue == null)
             {
-                PdfPCell errorCell = new PdfPCell(new Phrase("Issue data is missing."));
-                errorCell.Colspan = 2;
-                table.AddCell(errorCell);
+                AddFullWidthRow(table, "Issue data is missing.");
                 return table;
             }
 
-            // Add the title to the table
-            PdfPCell titleCell = new PdfPCell(new Phrase(issue.Title));
-            titleCell.Colspan = 2;
-            titleCell.HorizontalAlignment = Element.ALIGN_CENTER;
-            titleCell.PaddingBottom = 10;
-            table.AddCell(titleCell);
+            var titleCell = table.AddRow()[0];
+            titleCell.MergeRight = 1;
+            titleCell.Format.Alignment = ParagraphAlignment.Center;
+            titleCell.Format.Font.Bold = true;
+            titleCell.Format.Font.Size = Unit.FromPoint(16);
+            titleCell.AddParagraph(issue.Title ?? string.Empty);
 
-            // Add the question to the table
-            PdfPCell questionCell = new PdfPCell(new Phrase(issue.Question));
-            questionCell.Colspan = 2;
-            questionCell.PaddingBottom = 10;
-            table.AddCell(questionCell);
+            AddFullWidthRow(table, issue.Question ?? string.Empty);
 
-            // Add the email and verification status to the table.
-            //
             // The denormalised column is preferred over the navigation on purpose, and this
             // is the site where the difference matters most: this document is printed, signed
             // by hand, and submitted. It must show the address of whoever filed the initiative
@@ -61,95 +139,36 @@
             //
             // Previously this dereferenced a CreatedBy navigation with no null check, so any
             // issue whose creator had been removed threw here rather than producing a sheet.
-            var createdByEmail = issue.CreatedByEmail ?? string.Empty;
-            PdfPCell emailCell = new PdfPCell(new Phrase(createdByEmail));
-            PdfPCell verificationCell = new PdfPCell(new Phrase(issue.IsVerifyByAdmin ? "Verified" : "Not Verified"));
-            table.AddCell(emailCell);
-            table.AddCell(verificationCell);
+            AddLabelledRow(table, "Filed by", issue.CreatedByEmail ?? string.Empty);
+            AddLabelledRow(table, "Verification", issue.IsVerifyByAdmin ? "Verified" : "Not Verified");
+            AddLabelledRow(table, "Rating", issue.RatingValue.ToString(CultureInfo.InvariantCulture));
 
-            // Add the rating value to the table
-            PdfPCell ratingCell = new PdfPCell(new Phrase(issue.RatingValue.ToString()));
-            table.AddCell(ratingCell);
-
-            // Add the processing histories to the table
-            if (issue.IssueProcessingHistories != null && issue.IssueProcessingHistories.Count > 0)
+            if (issue.IssueProcessingHistories != null)
             {
                 foreach (var history in issue.IssueProcessingHistories)
                 {
-                    PdfPCell processCell = new PdfPCell(new Phrase(history.IssueProcess.ToString()));
-                    PdfPCell dateCell = new PdfPCell(new Phrase(history.CreatedAt.ToString("g", CultureInfo.InvariantCulture)));
-                    table.AddCell(processCell);
-                    table.AddCell(dateCell);
+                    AddLabelledRow(
+                        table,
+                        history.IssueProcess.ToString(),
+                        history.CreatedAt.ToString("g", CultureInfo.InvariantCulture));
                 }
             }
 
             return table;
         }
 
-        public byte[] GeneratePdfBytes(Issue issue)
+        static void AddFullWidthRow(Table table, string text)
         {
-            using (MemoryStream pdfStream = new MemoryStream())
-            {
-                using (Document document = new Document())
-                {
-                    // Create a PDF writer to write the document to the memory stream
-                    PdfWriter writer = PdfWriter.GetInstance(document, pdfStream);
-
-                    document.SetPageSize(PageSize.A4);
-
-                    // Open the document
-                    document.Open();
-
-                    // Generate the PDF table using the IssuePDFService
-                    var table = GeneratePdfPTable(issue);
-
-                    // Check if the table is empty
-                    if (table.Rows.Count == 0)
-                    {
-                        // Return an empty byte array or an error message, depending on your requirement
-                        // For example, you can throw an exception or return a specific error message.
-                        // Here, we'll return an empty byte array.
-                        return new byte[0];
-                    }
-
-                    // Add the table to the document
-                    document.Add(table);
-                    document.Close();
-                }
-                // Rest of your PDF generation code goes here...
-
-                // Convert the PDF memory stream to a byte array
-                byte[] pdfBytes = pdfStream.ToArray();
-
-                return pdfBytes;
-            }
+            var cell = table.AddRow()[0];
+            cell.MergeRight = 1;
+            cell.AddParagraph(text);
         }
 
-        public string WrtiePDFDocumentToFile(Issue issue)
+        static void AddLabelledRow(Table table, string label, string value)
         {
-            // Create the document and set the page size
-            Document document = new Document();
-            document.SetPageSize(PageSize.A4);
-
-            // Open the document
-            document.Open();
-
-            // Generate the PDF table using the IssuePDFService
-            var table = GeneratePdfPTable(issue);
-
-            // Add the table to the document
-            document.Add(table);
-            // Get the current execution path where the project files are located
-            string currentExecutionPath = AppDomain.CurrentDomain.BaseDirectory;
-
-            // Create a PDF writer to write the document to a file in the current execution path
-            string outputFilePath = Path.Combine(currentExecutionPath, GetIssuePDFFileName(issue));
-            PdfWriter writer = PdfWriter.GetInstance(document, new FileStream(outputFilePath, FileMode.Create));
-
-            writer.Close();
-            document.Close();
-
-            return outputFilePath;
+            var row = table.AddRow();
+            row[0].AddParagraph(label);
+            row[1].AddParagraph(value);
         }
     }
 }
