@@ -195,11 +195,12 @@ without authentication. Both are tracked, and both are read before running an en
 
 MIT — see [`LICENSE`](LICENSE).
 
-One caveat worth stating rather than leaving to be discovered: `Quorum.Service` currently
-depends on **iTextSharp 5.x, which is AGPL**, and an MIT licence on this repository does not
-change the terms that dependency carries into a distributed binary. Choosing a replacement is
-[#15](https://github.com/konradcinkusz/quorum/issues/15) and doing it is
-[#21](https://github.com/konradcinkusz/quorum/issues/21).
+Every runtime dependency is MIT or similarly permissive. The one that was not — **iTextSharp
+5.x, which is AGPL** — generated the signature sheet, and an MIT licence on this repository
+does not change the terms such a dependency carries into a distributed binary. It was replaced
+with PDFsharp + MigraDoc under [ADR 0002](docs/architecture/0002-pdf-generation.md)
+([#15](https://github.com/konradcinkusz/quorum/issues/15) chose,
+[#21](https://github.com/konradcinkusz/quorum/issues/21) did it).
 
 ## Roadmap
 
